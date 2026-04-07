@@ -1,0 +1,312 @@
+        body {
+            margin: 0;  /* spacing outside from top,right,bottom,left */
+            padding: 0;  /* spacing inside */ 
+            background: rgb(255, 255, 255);
+            font-family: Helvetica, sans-serif;
+        }
+        #menu-toggle {
+            display: none;
+        }
+        header {
+            background: url("../assets/img_bg/books_bg.jpg") no-repeat center center;
+            color: white;
+            padding: 1em;
+            height: 200px;
+            text-align: center;
+
+        }
+        .space a {
+            color: white;
+            background: transparent;
+            display: inline-block;
+            text-decoration: none;
+            width: 200px;
+            height: 60px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 60px; /* Centers text vertically */
+            border-radius: 8px; /* Optional: rounded corners */
+        }
+        
+        section {
+            padding: 1em;
+
+            background: rgb(143, 208, 255);
+
+            height: 330px;
+
+        }
+        footer {
+            background: rgb(226, 151, 151);
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+        div {
+            background: rgb(218, 218, 218);
+            display: inline-block;
+            width: 100px;
+            height: 50;
+            margin: 10px;
+            text-align: center;
+        }
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+        li {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .menu-icon {
+            position: absolute;
+            top: 20px;  /* Adjust as needed */
+            left: 10px; /* Adjust as needed */
+            cursor: pointer;
+            z-index: 1000; /* Ensure it stays above other elements */
+        }
+
+
+        .menu-icon img {
+            width: 50px; /* Adjust size as needed */
+            height: auto;
+        }
+        
+        
+        /* Show menu when checkbox is checked */
+        #menu-toggle:checked + .menu-icon + nav {
+            display: block;
+        }
+
+/* Sidebar menu (hidden by default) */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -350px; /* Hide off-screen */
+    width: 250px;
+    height: 50%;
+    background: rgba(0, 0, 0, 0.8);
+    padding-top: 80px;
+    transition: 0.3s;
+    z-index: 1000;
+    
+}
+
+
+/* Show sidebar when checkbox is checked */
+#menu-toggle:checked + .menu-icon + .side-menu {
+    left: 0;
+}
+
+/* Sidebar links */
+.side-menu ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+
+.side-menu ul li {
+    padding: 10px 0; /* Spacing between Login & About Us */
+    width: 50%;
+}
+
+.side-menu ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+    display: block;
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+}
+
+
+/* Show sidebar when checkbox is checked */
+#menu-toggle:checked + .menu-icon + .side-menu {
+    left: 0;
+}
+
+/* Sidebar links */
+.side-menu ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+.side-menu ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    display: block;
+}
+
+.side-menu ul li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Modal (Login & About Us) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1100;
+}
+
+/* Modal content */
+.modal-content input {
+    width: 90%;
+    padding: 8px;
+    margin: 5px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Close button for modal */
+.modal .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Search */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 20px / 20px; /* Oval shape */
+    padding: 5px 10px;
+    width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+
+.search-input {
+    border: none;
+    padding: 8px;
+    font-size: 16px;
+    outline: none;
+    flex: 1; /* Takes remaining space */
+}
+
+.search-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button img {
+    width: 24px;
+    height: 24px;
+}
+
+
+.book-shelf {
+    background-color: rgb(143, 208, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 1em;
+    flex-wrap: nowrap;
+    width: 80%;
+    height: 200px;
+    margin: 0 auto;
+    padding: 1em;   
+}
+
+.book-category {
+    background: rgb(143, 208, 255);
+    color: white;
+    width: 200px;
+    text-align: center;
+}
+
+.book-page {
+    background-color: #757de7;
+    color: white;
+    width: 100px;
+    height: 140px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    margin: 30px;
+}
+
+.scroll-left {
+    position: relative;
+    width: 90%;
+    height: 70%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color:#8d8fa3;
+    
+}
+.scroll-left:hover .arrow-left {
+    opacity: 1;
+}
+.arrow {
+    width: 30px; /* Adjust width */
+    height: 30px; /* Adjust height */
+    cursor: pointer; /* Ensure the cursor is a pointer */
+    opacity: 0.6; /* Optional: adjust opacity for visual effect */
+}
+
+.arrow img {
+    max-width: 30px;  /* Prevent the right arrow from being larger than this size */
+    max-height: 30px;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+
+
+
+
+
+        

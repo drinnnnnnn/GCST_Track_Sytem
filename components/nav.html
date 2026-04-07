@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GCST Admin - Neumorphic Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --neu-bg: #e0e5ec;
+      --neu-light: #ffffff;
+      --neu-shadow: #a3b1c6;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--neu-bg);
+    }
+
+    /* Neumorphic Sidebar Container */
+    .neu-sidebar {
+      background: var(--neu-bg);
+      box-shadow: 9px 9px 16px var(--neu-shadow), 
+                  -9px -9px 16px var(--neu-light);
+    }
+
+    /* Neumorphic Button - Default State */
+    .nav-item {
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: var(--neu-bg);
+      border: 1px solid transparent;
+    }
+
+    /* Neumorphic Button - Hover/Active "Pressed" Effect */
+    .nav-item:hover, .nav-item.active {
+      box-shadow: inset 6px 6px 12px var(--neu-shadow), 
+                  inset -6px -6px 12px var(--neu-light);
+      color: #3b82f6; /* Blue-500 */
+      transform: scale(0.98);
+    }
+
+    /* Logo Section Neumorphism */
+    .logo-container {
+      box-shadow: 4px 4px 8px var(--neu-shadow), 
+                 -4px -4px 8px var(--neu-light);
+      border-radius: 20px;
+    }
+
+    /* Custom Scrollbar for Minimalist look */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--neu-bg); }
+    ::-webkit-scrollbar-thumb { 
+      background: var(--neu-shadow); 
+      border-radius: 10px; 
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden text-gray-600">
+
+  <aside class="w-72 h-full neu-sidebar z-10 p-6 flex flex-col">
+    
+    <div class="logo-container flex flex-col items-center py-6 mb-8">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granby_logo.png" alt="Logo" class="w-14 h-14 object-contain mb-3 filter drop-shadow-md">
+      <span class="text-xs uppercase tracking-widest font-semibold text-gray-400">Admin Portal</span>
+      <h3 class="text-lg font-bold text-gray-700 font-poppins">GCST System</h3>
+    </div>
+    
+    <nav class="flex-1 space-y-4 overflow-y-auto px-2">
+      <a href="#" class="nav-item active flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="home" class="w-5 h-5"></i> Home
+      </a>
+      
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="users" class="w-5 h-5"></i> Queueing System
+      </a>
+
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="wallet" class="w-5 h-5"></i> Cashier
+      </a>
+
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="trending-up" class="w-5 h-5"></i> Sales
+      </a>
+
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="package" class="w-5 h-5"></i> Inventory
+      </a>
+
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i> Products
+      </a>
+
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Reports
+      </a>
+
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-medium">
+        <i data-lucide="mail" class="w-5 h-5"></i> Gmail Notifications
+      </a>
+    </nav>
+
+    <div class="mt-auto pt-6">
+      <a href="#" class="nav-item flex items-center gap-4 px-5 py-3 rounded-xl font-semibold text-red-400 hover:text-red-500">
+        <i data-lucide="log-out" class="w-5 h-5"></i> Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-10 bg-[#e0e5ec]">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-700">Dashboard Overview</h1>
+      <p class="text-gray-400">Welcome back, Administrator</p>
+    </header>
+    
+    <div class="w-full h-64 rounded-3xl neu-sidebar p-8">
+      <p class="text-gray-500 italic">Select a menu item to view reports and data analytics.</p>
+    </div>
+  </main>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Smooth Navigation Logic
+    const navItems = document.querySelectorAll('.nav-item');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        // Only prevent default if it's a dummy link (#)
+        if(this.getAttribute('href') === '#') e.preventDefault();
+        
+        // Remove active class from all items
+        navItems.forEach(nav => nav.classList.remove('active'));
+        
+        // Add active class to clicked item
+        this.classList.add('active');
+
+        // Optional: Smooth scroll to content top if needed
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

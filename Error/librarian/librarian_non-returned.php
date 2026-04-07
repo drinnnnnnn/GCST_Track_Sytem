@@ -1,0 +1,288 @@
+<?php
+session_start();
+
+// If not logged in OR not librarian, redirect
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'librarian') {
+    header("Location: http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Non-Returned Books - Librarian</title>
+  <title>Reports - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/admin_css/librarian_navbar.css" />
+  <style>
+        html{
+        height: 100%;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: #f0f2f5;
+        overflow: auto; 
+        }
+
+    body {
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    background: linear-gradient(to bottom, #334155, #0f172a);
+    color: #000000;
+    font-family: 'Poppins', sans-serif;
+    }
+
+.main-content {
+  margin-left: 200px;
+  height: 100vh;
+    display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 7px;
+  padding-right: 65px;
+  box-sizing: border-box;
+  width: 1222px;
+  max-width: calc(100% - 200px); /* prevents overflow beyond sidebar */
+
+}
+
+    
+    .content-box {
+      margin: 30px;
+      padding: 30px;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      min-height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: calc(100% - 60px); /* prevents overflow on the right */
+      box-sizing: border-box;
+      margin-left: 100px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    button {
+      padding: 6px 12px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b02a37;
+    }
+    .top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-form {
+  flex: 1;
+  display: flex;
+  justify-content: left;
+}
+
+.search-form input {
+  margin-top: 20px;
+  padding: 8px 12px;
+  width: 70%;
+  max-width: 900px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+}
+
+.shortcut-link {
+  text-decoration: none;
+  color: #348dec;
+  font-weight: bold;
+  padding: 6px 12px;
+  margin-top: 20px;
+}
+.shortcut-link:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+<!-- Sidebar-->
+<aside class="sidebar">
+  <div>
+    <div class="logo-container">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granby_logo.png" class="logo-img">
+      <h3 class="logo-title">GCST Library</h3>
+    </div>
+
+    <nav class="nav-menu">
+      <a href="librarian_dashb.html" class="nav-link {{dashboard}}">
+        <img src="http://localhost/GCST_Track_System/assets/sidebar_img/dashbc.png" class="icon">
+        Dashboard
+      </a>
+
+      <a href="librarian_issued_books.html" class="nav-link {{issued}}">
+        <img src="http://localhost/GCST_Track_System/assets/adb_icon/nonheart.png" class="icon">
+        Issued Books
+      </a>
+
+      <a href="librarian_non-returned.html" class="nav-link active">
+        <img src="http://localhost/GCST_Track_System/assets/adb_icon/nonret.png" class="icon">
+        Non-Returned
+      </a>
+
+      <a href="librarian_request.html" class="nav-link {{requests}}">
+        <img src="http://localhost/GCST_Track_System/assets/adb_icon/pointbk.png" class="icon">
+        Requests
+      </a>
+
+      <a href="#" class="nav-link logout" onclick="confirmLogout(event)">
+        <img src="http://localhost/GCST_Track_System/assets/sidebar_img/outv.png" class="icon">
+        Logout
+      </a>
+    </nav>
+  </div>
+</aside>
+
+
+  <div class="main-content">
+    <div class="content-box">
+      <h2>Non-Returned Books</h2>
+      <div class="top-bar">
+  <form class="search-form">
+    <input type="text" placeholder="Search..." />
+  </form>
+ 
+</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Book Name</th>
+            <th>Student Name</th>
+            <th>Student ID</th>
+            <th>Date Received</th>
+            <th>Return Date</th>
+            <th>Days Left</th>
+            <th>Return Book</th>
+          </tr>
+        </thead>
+        <tbody id="non-returned-tbody">
+
+          
+          <!-- Add more rows as needed -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Calculates "days left" for each row
+    document.querySelectorAll("tr").forEach(row => {
+      const returnDateCell = row.cells[4];
+      const daysLeftCell = row.querySelector(".days-left");
+
+      if (returnDateCell && daysLeftCell) {
+        const returnDate = new Date(returnDateCell.textContent.trim());
+        const today = new Date();
+        const diffTime = returnDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        daysLeftCell.textContent = diffDays >= 0 ? `${diffDays} day(s)` : `Overdue by ${Math.abs(diffDays)} day(s)`;
+        daysLeftCell.style.color = diffDays < 0 ? 'red' : 'black';
+      }
+    });
+  </script>
+
+<script>
+function daysLeft(returnDate) {
+  const today = new Date();
+  const ret = new Date(returnDate);
+  const diffTime = ret - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
+function reloadNonReturnedBooks() {
+    fetch('/GCST_Track_System/utils/get_non_returned_books.php', {
+    credentials: 'same-origin'
+    })
+
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById('non-returned-tbody');
+      tbody.innerHTML = '';
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(row => {
+          const diffDays = daysLeft(row.return_date);
+          tbody.innerHTML += `
+            <tr>
+              <td>${row.book_name}</td>
+              <td>${row.student_name}</td>
+              <td>${row.student_id}</td>
+              <td>${row.date_student_received_book}</td>
+              <td>${row.return_date}</td>
+               <td class="days-left" style="color:${diffDays <= 0 ? 'red' : 'black'};">
+                ${diffDays > 0 ? `${diffDays} day(s)` : `Overdue by ${Math.abs(diffDays)} day(s)`}
+              </td>
+              <td><button class="mark-returned-btn" data-nrbid="${row.nrb_id}">Mark as Returned</button></td>
+            </tr>
+          `;
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="7">No non-returned books found.</td></tr>`;
+      }
+    })
+    .then(() => {
+      // Attach event listeners to the new buttons
+      document.querySelectorAll('.mark-returned-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const nrb_id = this.getAttribute('data-nrbid');
+          if (confirm('Mark this book as returned?')) {
+            fetch('http://localhost/GCST_Track_System/utils/mark_as_returned.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: 'nrb_id=' + encodeURIComponent(nrb_id)
+            })
+            .then(res => res.json())
+            .then(resp => {
+              if (resp.success) {
+                reloadNonReturnedBooks();
+              } else {
+                alert('Error: ' + (resp.error || 'Failed to mark as returned.'));
+              }
+            });
+          }
+        });
+      });
+    });
+}
+
+window.addEventListener('DOMContentLoaded', reloadNonReturnedBooks);
+</script>
+
+<!--Logout Confirmation-->
+<a href="/GCST_Track_System/logout.php"
+   class="nav-link logout"
+   onclick="return confirm('Are you sure you want to logout?')">
+
+</body>
+</html>

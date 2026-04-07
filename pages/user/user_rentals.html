@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Rentals - GCST Library</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_rentals.css" />
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.student_id) {
+            window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+          }
+        })
+        .catch(() => {
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        });
+    });
+  </script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <strong>Granby Colleges of Science & Technology</strong>
+    </div>
+    
+    <nav class="nav-links">
+      <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
+      <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
+      <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+    </nav>
+  </header>
+
+  <div class="dropdown-menu" id="dropdown-menu">
+    <a class="menu-item" href="user_browse_products.html">
+      <i class="fas fa-shopping-bag"></i> Browse Products
+    </a>
+    <a class="menu-item" href="user_rentals.html">
+      <i class="fas fa-box"></i> My Rentals
+    </a>
+    <a class="menu-item" href="user_queue_tickets.html">
+      <i class="fas fa-ticket-alt"></i> Queue Tickets
+    </a>
+    <a class="menu-item" href="user_tuition_fees.html">
+      <i class="fas fa-receipt"></i> Tuition Fees
+    </a>
+    <a class="menu-item" href="user_profile.html">
+      <i class="fas fa-user-circle"></i> Profile
+    </a>
+    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+      <i class="fas fa-sign-out-alt"></i> Log Out
+    </a>
+  </div>
+
+  <section class="hero">
+    <h1>My Rentals</h1>
+  </section>
+
+  <!-- Dashboard Cards -->
+  <div class="dashboard-cards">
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-hourglass-half"></i></div>
+      <div class="card-content">
+        <h3>Active Rentals</h3>
+        <p class="card-number" id="active-count">0</p>
+      </div>
+    </div>
+
+    <div class="card overdue">
+      <div class="card-icon"><i class="fas fa-exclamation-circle"></i></div>
+      <div class="card-content">
+        <h3>Overdue Rentals</h3>
+        <p class="card-number" id="overdue-count">0</p>
+      </div>
+    </div>
+
+    <div class="card returned">
+      <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+      <div class="card-content">
+        <h3>Returned Items</h3>
+        <p class="card-number" id="returned-count">0</p>
+      </div>
+    </div>
+
+    <div class="card fees">
+      <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div class="card-content">
+        <h3>Total Rental Fees</h3>
+        <p class="card-number" id="total-fees">$0.00</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Rentals Section -->
+  <section class="rentals-section">
+    <h2>Active Rentals</h2>
+    <div class="rentals-table-container">
+      <table class="rentals-table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Date Borrowed</th>
+            <th>Due Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="active-rentals">
+          <tr><td colspan="4">No active rentals.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Overdue Rentals Section -->
+  <section class="rentals-section">
+    <h2>Overdue Rentals</h2>
+    <div class="rentals-table-container">
+      <table class="rentals-table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Date Borrowed</th>
+            <th>Due Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="overdue-rentals">
+          <tr><td colspan="4">No overdue rentals.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Returned Items Section -->
+  <section class="rentals-section">
+    <h2>Returned Items</h2>
+    <div class="rentals-table-container">
+      <table class="rentals-table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Date Borrowed</th>
+            <th>Date Returned</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="returned-items">
+          <tr><td colspan="4">No returned items.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+        .then(res => res.json())
+        .then(user => {
+          if (!user.student_id) {
+            window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+            return;
+          }
+          
+          fetch('http://localhost/GCST_Track_System/utils/get_user_rentals.php')
+            .then(res => res.json())
+            .then(data => populateRentals(data))
+            .catch(err => console.error('Error fetching rentals:', err));
+        })
+        .catch(() => {
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        });
+    });
+
+    function populateRentals(data) {
+      const active = data.filter(r => r.status === 'active');
+      const overdue = data.filter(r => r.status === 'overdue');
+      const returned = data.filter(r => r.status === 'returned');
+
+      document.getElementById('active-count').textContent = active.length;
+      document.getElementById('overdue-count').textContent = overdue.length;
+      document.getElementById('returned-count').textContent = returned.length;
+      document.getElementById('total-fees').textContent = `$${(data.reduce((sum, r) => sum + (parseFloat(r.rental_fee) || 0), 0)).toFixed(2)}`;
+
+      populateTable('active-rentals', active);
+      populateTable('overdue-rentals', overdue);
+      populateTable('returned-items', returned, true);
+    }
+
+    function populateTable(tableId, items, isReturned = false) {
+      const tbody = document.getElementById(tableId);
+      tbody.innerHTML = '';
+      
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4">No items to display.</td></tr>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const returnedDate = isReturned ? item.date_returned : item.due_date;
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.item_name}</td>
+            <td>${item.date_borrowed}</td>
+            <td>${returnedDate}</td>
+            <td><span class="status-badge status-${item.status}">${item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span></td>
+          </tr>
+        `;
+      });
+    }
+  </script>
+
+  <script>
+    const menuIcon = document.getElementById('menu-icon');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    menuIcon.addEventListener('click', () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
+        dropdownMenu.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+</html>

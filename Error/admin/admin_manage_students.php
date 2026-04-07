@@ -1,0 +1,382 @@
+<?php
+session_start();
+
+// If not logged in OR not admin, redirect
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Students - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="http://localhost/GCST_Track_Systemtory/styles/admin_css/admin_navbar.css" />
+
+<style>
+    html, body {
+    height: auto; /* allow content height to grow */
+    overflow-x: hidden; /* optional */
+    background: linear-gradient(to bottom, #334155, #0f172a);
+
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: block; /* remove flex */
+    }
+  
+    .main-content {
+    margin-left: 290px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    
+    }
+
+    button.suspend-btn {
+      padding: 6px 12px;
+      background-color: #f36466;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button.suspend-btn:hover {
+      background-color: #e24048;
+    }
+
+    .main-content {
+      margin-left: 293px;
+      height: 100vh;
+      overflow-y: auto; 
+      padding: 10px;
+      box-sizing: border-box;
+      
+    }
+.content-box {
+      margin-top: 20px;
+      padding: 30px;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      min-height: calc(100vh - 40px);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 93%;
+      height: fit-content;
+
+}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+    th {
+      font-size: 14px;
+      background-color: #e1e8eb;
+    }
+    td {
+      background-color: #ffffff;
+      font-size: 14px;
+    }
+    button {
+      padding: 6px 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e7e34;
+    }
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.header-row h2 {
+  margin: 0;
+}
+
+.search-radio-container input[type="text"] {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 350px;
+  
+}
+
+
+th:nth-child(1) { width: 60px; }      /* ID */
+th:nth-child(2) { width: 220px; }     /* Student Name */
+th:nth-child(3) { width: 220px; }     /* Email */
+th:nth-child(4) { width: 130px; }     /* Phone Number */
+th:nth-child(5) { width: 90px; }     /* Course */
+th:nth-child(6) { width: 90px; }     /* Year&Section */
+th:nth-child(7) { width: 90px; }  
+
+.search-radio-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+  padding: 10px;
+}
+
+.left-title {
+  flex: 1;
+}
+
+.center-controls {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+
+  .radio-inputs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px; /* Adjust spacing between radio buttons */
+    border-radius: 0.5rem;
+    background-color: #c1d8e6;
+    box-sizing: border-box;
+    box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
+    padding: 0.25rem;
+    width: auto; /* Adjust width to fit content */
+    font-size: 14px;
+  }
+
+  .radio-inputs .radio {
+    flex: 1;
+    text-align: center;
+  }
+
+  .radio-inputs .radio input {
+    display: none;
+  }
+
+  .radio-inputs .radio .name {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: none;
+    padding: .5rem 1rem; /* Adjust padding for better alignment */
+    color: #555;
+    transition: all .15s ease-in-out;
+  }
+
+  .radio-inputs .radio input:checked + .name {
+    background-color: #f4f4f4;
+    font-weight: 600;
+  }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div>
+      <div class="logo-container">
+        <img src="http://localhost/GCST_Track_Systemtory/assets/img_icon/granby_logo.png" alt="Logo" class="logo-img">
+        <h3 class="logo-title">GCST Library</h3>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="admin_dashb.php" class="nav-link active">
+          <img src="http://localhost/GCST_Track_Systemtory/assets/sidebar_img/dashbc.png" alt="Dashboard Icon" class="icon">
+          Dashboard
+        </a>
+        <a href="admin_create.php" class="nav-link">
+          <img src="http://localhost/GCST_Track_Systemtory/assets/sidebar_img/addgrey.png" alt="Dashboard Icon" class="icon">
+          Create
+        </a>
+        <a href="admin_books.php" class="nav-link">
+          <img src="http://localhost/GCST_Track_Systemtory/assets/sidebar_img/bookpen.png" alt="Dashboard Icon" class="icon">
+          Books
+        </a>
+        <a href="/GCST_Track_System/pages/admin/logout.php" class="nav-link logout" onclick="return confirm('Are you sure you want to logout?')">
+          <img src="http://localhost/GCST_Track_Systemtory/assets/sidebar_img/outv.png" alt="Dashboard Icon" class="icon">
+          Logout
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+<div class="main-content">
+  <div class="content-box">
+<div class="search-radio-container">
+  <div class="left-title">
+    <h2>Manage Students</h2>
+  </div>
+
+  <div class="center-controls">
+    <input type="text" id="studentSearch" placeholder="Search students..." />
+    <div class="radio-inputs">
+      <label class="radio">
+        <input type="radio" name="status-filter" value="active" checked>
+        <span class="name">Active</span>
+      </label>
+      <label class="radio">
+        <input type="radio" name="status-filter" value="suspended">
+        <span class="name">Suspended</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+    <!-- Datalist -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Student Name</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Course</th>
+          <th>Year&Section</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentTableBody">
+        <!-- Populated via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const tbody = document.getElementById("studentTableBody");
+    const search = document.getElementById("studentSearch");
+    const radios = document.querySelectorAll("input[name='status-filter']");
+
+    let users = [];
+    let filter = "Active";
+
+        // use absolute URLs to avoid incorrect relative path resolution
+        function getURL() {
+          const base = "http://localhost/GCST_Track_System/utils/";
+          return base + (filter === "Active"
+            ? "get_active_users.php"
+            : "get_suspended_users.php");
+        }
+
+        async function load() {
+        const endpoint = getURL();
+        console.log("Fetching:", endpoint);
+
+        try {
+            const response = await fetch(endpoint);
+
+            if (!response.ok) {
+                throw new Error("Server error: " + response.status);
+            }
+
+            const data = await response.json();
+
+            users = data;
+            render(data);
+
+        } catch (err) {
+            console.error("LOAD ERROR:", err);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="color:red;">
+                        Failed to load student records
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function render(data) {
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">No student records found</td>
+                </tr>`;
+            return;
+        }
+
+        data.forEach(u => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${u.student_id}</td>
+                <td>${u.last_name}, ${u.first_name} ${u.middle_name ?? ""}</td>
+                <td>${u.email}</td>
+                <td>${u.contact_number ?? ""}</td>
+                <td>${u.course ?? ""}</td>
+                <td>${u.year_section ?? ""}</td>
+                <td>
+                    <button class="suspend-btn">
+                        ${filter === "Active" ? "Suspend" : "Activate"}
+                    </button>
+                </td>
+            `;
+
+            tr.querySelector("button").onclick = () => update(u.student_id);
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function update(id) {
+        const base = "http://localhost/GCST_Track_System/utils/";
+        const endpoint = filter === "Active"
+            ? "suspend_user.php"
+            : "activate_user.php";
+
+        if (!confirm("Are you sure?")) return;
+
+        await fetch(base + endpoint, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: "student_id=" + encodeURIComponent(id)
+        });
+
+        load();
+    }
+
+    radios.forEach(r => {
+        r.addEventListener("change", () => {
+            filter = r.value;
+            load();
+        });
+    });
+
+    search.addEventListener("input", () => {
+        const v = search.value.toLowerCase();
+        render(users.filter(u =>
+            Object.values(u).some(val =>
+                val && val.toString().toLowerCase().includes(v)
+            )
+        ));
+    });
+
+    load();
+});
+</script>
+
+</body>
+</html>

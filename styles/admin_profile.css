@@ -1,0 +1,63 @@
+.main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      margin-left: 110px;
+    }
+
+    .card-container {
+      background-color: #e1e8eb;
+      margin-left: 100px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: center;
+      width: 800px;
+      height: 500px;
+    }
+
+    .card {
+      width: 250px;
+      height: 250px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: 0.3s;
+      text-align: center;
+    }
+
+    .card img {
+      width: 100px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      color: black;
+    }
+
+    .card.non-returned {
+      background-color: #ffffff;
+    }
+
+    .card.issued {
+      background-color: #ffffff;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      
+    }
+
+    .form-container button:hover {
+      background-color: #2896d6;
+    }

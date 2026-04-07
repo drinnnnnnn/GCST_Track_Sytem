@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GCST Library - Browse Products</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_browse_products.css" />
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.student_id) {
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        }
+      })
+      .catch(() => {
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+      });
+  });
+</script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <strong>Granby Colleges of Science & Technology</strong>
+    </div>
+    
+    <nav class="nav-links">
+      <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
+      <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
+      <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+    </nav>
+  </header>
+
+  <div class="dropdown-menu" id="dropdown-menu">
+    <a class="menu-item" href="user_browse_products.html">
+      <i class="fas fa-shopping-bag"></i> Browse Products
+    </a>
+    <a class="menu-item" href="user_rentals.html">
+      <i class="fas fa-box"></i> My Rentals
+    </a>
+    <a class="menu-item" href="user_queue_tickets.html">
+      <i class="fas fa-ticket-alt"></i> Queue Tickets
+    </a>
+    <a class="menu-item" href="user_tuition_fees.html">
+      <i class="fas fa-receipt"></i> Tuition Fees
+    </a>
+    <a class="menu-item" href="user_profile.html">
+      <i class="fas fa-user-circle"></i> Profile
+    </a>
+    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+      <i class="fas fa-sign-out-alt"></i> Log Out
+    </a>
+  </div>
+
+  <section class="hero">
+    <h1>Browse Products</h1>
+  </section>
+
+  <div class="category-tabs">
+    <button class="category-tab active" data-category="all">All Products</button>
+    <button class="category-tab" data-category="books">📚 Books</button>
+    <button class="category-tab" data-category="uniforms">👕 Uniforms</button>
+    <button class="category-tab" data-category="accessories">🎒 Accessories</button>
+  </div>
+
+  <div class="products-container">
+    <div class="products-grid" id="products-grid">
+      <!-- Products will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    const menuIcon = document.getElementById('menu-icon');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    menuIcon.addEventListener('click', () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
+        dropdownMenu.style.display = 'none';
+      }
+    });
+
+    // Sample products data
+    const products = [
+      { id: 1, name: 'Advanced Physics', price: '$45.99', category: 'books', image: '📕' },
+      { id: 2, name: 'Chemistry Essentials', price: '$38.50', category: 'books', image: '📗' },
+      { id: 3, name: 'Biology Textbook', price: '$52.00', category: 'books', image: '📘' },
+      { id: 4, name: 'GCST Polo Shirt', price: '$24.99', category: 'uniforms', image: '👕' },
+      { id: 5, name: 'GCST Blazer', price: '$89.99', category: 'uniforms', image: '🧥' },
+      { id: 6, name: 'School Backpack', price: '$35.99', category: 'accessories', image: '🎒' },
+      { id: 7, name: 'Notebook Set', price: '$12.50', category: 'accessories', image: '📓' },
+    ];
+
+    const productsGrid = document.getElementById('products-grid');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+
+    function renderProducts(category) {
+      productsGrid.innerHTML = '';
+      const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+
+      if (filtered.length === 0) {
+        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products found.</p></div>';
+        return;
+      }
+
+      filtered.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <div class="product-image">${product.image}</div>
+          <div class="product-info">
+            <div class="product-name">${product.name}</div>
+            <div class="product-price">${product.price}</div>
+            <div class="product-actions">
+              <button class="btn-rent" onclick="alert('Rent: ${product.name}')">Rent</button>
+              <button class="btn-buy" onclick="alert('Buy: ${product.name}')">Buy</button>
+            </div>
+          </div>
+        `;
+        productsGrid.appendChild(card);
+      });
+    }
+
+    categoryTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        categoryTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        renderProducts(tab.getAttribute('data-category'));
+      });
+    });
+
+    renderProducts('all');
+  </script>
+</body>
+</html>

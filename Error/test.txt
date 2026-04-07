@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Request Books</title>
+  <style>
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #8AD9F7, #04BCF2, #0189DD);
+      overflow: hidden;
+    }
+    .library-container {
+      background: #fff;
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
+    }
+    
+    header {
+      background: linear-gradient(90deg, #0189DD, #04BCF2, #8AD9F7);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    header .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .logo {
+      height: 5rem;
+      width: auto;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      text-transform: uppercase;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    
+    .search-bar {
+      background-color: #f2f2f2;
+      padding: 20px;
+      text-align: center;
+      border-top: 3px solid #0189DD;  
+      border-bottom: 3px solid #8AD9F7; 
+    }
+    .search-bar input[type='text'] {
+      width: 70%;
+      padding: 10px;
+      border: 2px solid #04BCF2;
+      border-radius: 5px;
+      font-size: 1rem;
+      margin-right: 10px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    .search-bar input[type='text']:focus {
+      border: 2px solid #0189DD;
+    }
+    .search-bar button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: #0189DD;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .search-bar button:hover {
+      background: #04BCF2;
+      transform: scale(1.05);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+    table th, table td {
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    table th {
+      background: linear-gradient(90deg, #0189DD, #04BCF2, #8AD9F7);
+      color: #fff;
+      font-weight: 600;
+    }
+    table tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    table tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="library-container">
+    <header>
+      <div class="header">
+        <img src="/assets/img_icon/granby_logo.png" alt="Logo" class="logo">
+        <h1>GCST Library</h1>
+      </div>
+      <p>Request Books</p>
+    </header>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search for books by name, category or status..." />
+      <button onclick="searchBooks()">Search</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Book Name</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Request (Time)</th>
+          <th>Request (Date)</th>
+        </tr>
+      </thead>
+      <tbody id="bookTable">
+        <tr>
+          <td>Introduction to Psychology</td>
+          <td>Action</td>
+          <td>Pending</td>
+          <td>2:00</td>
+          <td>05/21/2025</td>
+        </tr>
+        <tr>
+          <td>World Literature</td>
+          <td>Drama</td>
+          <td>Approved</td>
+          <td>3:15</td>
+          <td>05/22/2025</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    
+    function searchBooks() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toUpperCase();
+      const table = document.getElementById('bookTable');
+      const tr = table.getElementsByTagName('tr');
+
+      for (let i = 0; i < tr.length; i++) {
+        const td = tr[i].getElementsByTagName('td')[0];
+        if (td) {
+          const txtValue = td.textContent || td.innerText;
+          tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+

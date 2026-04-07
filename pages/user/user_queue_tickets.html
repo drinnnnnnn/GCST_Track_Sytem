@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Queue Tickets - GCST Library</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_queue_tickets.css" />
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+    .then(res => res.json())
+    .then(data => {
+      if (!data.student_id) {
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+      }
+    })
+    .catch(() => {
+      window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+    });
+});
+</script>
+</head>
+
+<body>
+<header>
+  <div class="logo">
+    <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+    <strong>Granby Colloges of Science & Technology</strong>
+  </div>
+  
+  <nav class="nav-links">
+    <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
+    <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
+    <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+  </nav>
+</header>
+
+  <div class="dropdown-menu" id="dropdown-menu">
+    <a class="menu-item" href="user_browse_products.html">
+      <i class="fas fa-shopping-bag"></i> Browse Products
+    </a>
+    <a class="menu-item" href="user_rentals.html">
+      <i class="fas fa-box"></i> My Rentals
+    </a>
+    <a class="menu-item" href="user_queue_tickets.html">
+      <i class="fas fa-ticket-alt"></i> Queue Tickets
+    </a>
+    <a class="menu-item" href="user_tuition_fees.html">
+      <i class="fas fa-receipt"></i> Tuition Fees
+    </a>
+    <a class="menu-item" href="user_profile.html">
+      <i class="fas fa-user-circle"></i> Profile
+    </a>
+    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+      <i class="fas fa-sign-out-alt"></i> Log Out
+    </a>
+  </div>
+
+<section class="hero">
+  <h1>My Queue Tickets</h1>
+</section>
+
+<div class="stats-container">
+  <div class="stat-card">
+    <i class="fas fa-clock"></i>
+    <div>
+      <h3 id="active-count">0</h3>
+      <p>Active Tickets</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <i class="fas fa-check-circle"></i>
+    <div>
+      <h3 id="completed-count">0</h3>
+      <p>Completed</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <i class="fas fa-ticket-alt"></i>
+    <div>
+      <h3 id="total-count">0</h3>
+      <p>Total Generated</p>
+    </div>
+  </div>
+</div>
+
+<div class="tickets-table-container">
+  <table class="tickets-table">
+    <thead>
+      <tr>
+        <th>Ticket Number</th>
+        <th>Status</th>
+        <th>Date Created</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const menuIcon = document.getElementById('menu-icon');
+  const dropdownMenu = document.getElementById('dropdown-menu');
+
+  menuIcon.addEventListener('click', () => {
+    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
+      dropdownMenu.style.display = 'none';
+    }
+  });
+</script>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('http://localhost/GCST_Track_System/utils/get_user_queue_tickets.php')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector('.tickets-table tbody');
+      tbody.innerHTML = '';
+      
+      if (Array.isArray(data) && data.length > 0) {
+        let activeCount = 0, completedCount = 0;
+        
+        data.forEach(ticket => {
+          if (ticket.status === 'Active') activeCount++;
+          if (ticket.status === 'Completed') completedCount++;
+          
+          tbody.innerHTML += `
+            <tr>
+              <td>${ticket.ticket_number}</td>
+              <td><span class="status-badge status-${ticket.status.toLowerCase()}">${ticket.status}</span></td>
+              <td>${ticket.date_created}</td>
+            </tr>
+          `;
+        });
+        
+        document.getElementById('active-count').textContent = activeCount;
+        document.getElementById('completed-count').textContent = completedCount;
+        document.getElementById('total-count').textContent = data.length;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3">No queue tickets found.</td></tr>`;
+        document.getElementById('active-count').textContent = '0';
+        document.getElementById('completed-count').textContent = '0';
+        document.getElementById('total-count').textContent = '0';
+      }
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<?php
+session_start();
+
+// If not logged in OR not admin, redirect
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/admin_css/admin_navbar.css" />
+    <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/admin_dashboard.css">
+</head>
+
+<style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #334155, #0f172a);
+      background-attachment: fixed;
+      font-family: 'Poppins', sans-serif;
+    }
+  
+  .main-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: hidden;
+      color: #000000;
+      font-family: 'Poppins', sans-serif;
+  }
+
+    .dashboard-box {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      margin-left: 40px;
+      width: 1100px;  
+      
+    }
+
+    .dashboard-box, h1 {
+      
+      margin-bottom: 65px;
+      margin-top: 0px;
+
+    }
+    
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;   
+      background-color: #e1e8eb;
+      border-radius: 10px;
+      padding: 20px;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+      height: 58px;
+
+    }
+
+    .card-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+  .card .icon {
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+    .card .text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .card p {
+      font-size: 22px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    /* Card Colors */
+    .blue { color: #000000; }
+    .orange { color: #000000; }
+    .green { color: #000000; }
+    .red { color: #000000; }
+    .cyan { color: #000000; }
+    .yellow { color: #000000; }
+    .purple { color: #000000; }
+    .pink { color: #000000; }
+    .lime { color: #000000; }
+
+    /* Quick Actions */
+    .quick-actions {
+      margin-top: 10px;
+    }
+
+    .quick-actions h3 {
+      margin-bottom: 10px;
+      color: #000000;
+    }
+
+    .quick-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .quick-actions .add {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+
+    .quick-actions .send {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+
+    .quick-actions .suspend {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+    .quick-actions .non-returned {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+    .quick-actions .issued {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+    .quick-actions .account {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+    .quick-actions .maintenance {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+    .quick-actions .others {
+      background-color: #e1e8eb;
+      color: #040505;
+    }
+    .icon img {
+      width: 30px;
+      height: 30px;
+    }
+    button img {
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+</style>
+<body>
+
+<aside class="sidebar">
+    <div>
+      <div class="logo-container">
+        <img src="http://localhost/GCST_Track_System/assets/img_icon/granby_logo.png" alt="Logo" class="logo-img">
+        <h3 class="logo-title">GCST Library</h3>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="admin_dashb.php" class="nav-link active">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/dashbc.png" alt="Dashboard Icon" class="icon">
+          Dashboard
+        </a>
+        <a href="admin_create.php" class="nav-link">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/addgrey.png" alt="Dashboard Icon" class="icon">
+          Create
+        </a>
+        <a href="admin_books.php" class="nav-link">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/bookpen.png" alt="Dashboard Icon" class="icon">
+          Books
+        </a>
+        <a href="/GCST_Track_System/pages/admin/logout.php" class="nav-link logout" onclick="return confirm('Are you sure you want to logout?')">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/outv.png" alt="Dashboard Icon" class="icon">
+          Logout
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+
+  <div class="main-content">
+    <div class="dashboard-box">
+      <h1>Dashboard Overview</h1>
+
+<div class="cards">
+<div class="card blue">
+  <div class="card-content">
+    <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/bookshelf.png" alt="Members" /></div>
+    <div class="text"><h2>Available Books</h2></div>
+  </div>
+  <p id="totalBooks">0</p>
+</div>
+
+  <div class="card orange">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/genreb.png" alt="Members" /></div>
+      <div class="text"><h2>Categories</h2></div>
+    </div>
+    <p id="totalCategories">0</p>
+  </div>
+
+  <div class="card green">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/sixm.png" alt="Members" /></div>
+      <div class="text"><h2>Members</h2></div>
+    </div>
+    <p id="totalMembers">0</p>
+  </div>
+
+  <div class="card red">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/susp.png" alt="Members" /></div>
+      <div class="text"><h2>Suspended Accounts</h2></div>
+    </div>
+    <p id="totalSuspended">0</p>
+  </div>
+
+<div class="card cyan">
+  <div class="card-content">
+    <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/pointbk.png" alt="Members" /></div>
+    <div class="text"><h2>Pending Requests</h2></div>
+  </div>
+  <p id="pendingRequests">0</p>
+</div>
+
+  <div class="card yellow">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/calenx.png" alt="Members" /></div>
+      <div class="text"><h2>Overdue book</h2></div>
+    </div>
+    <p id="totalOverdueBooks">0</p>
+  </div>
+
+  <div class="card purple">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/nonun.png" alt="Members" /></div>
+      <div class="text"><h2>Unavailable Books</h2></div>
+    </div>
+    <p id="totalUnavailableBooks">0</p>
+  </div>
+
+  <div class="card pink">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/nonret.png" alt="Members" /></div>
+      <div class="text"><h2>Non-return Books</h2></div>
+    </div>
+    <p id="totalNonReturnedBooks">0</p>
+  </div>
+
+  <div class="card lime">
+    <div class="card-content">
+      <div class="icon"><img src="http://localhost/GCST_Track_System/assets/adb_icon/nonheart.png" alt="Members" /></div>
+      <div class="text"><h2>Issued Books</h2></div>
+    </div>
+    <p id="totalIssuedBooks">0</p>
+  </div>
+</div>
+
+      <div class="quick-actions">
+        <h3>More Actions:</h3>
+          <a href="admin_category.php" class="add" 
+            style="display: inline-block; padding: 6px 6px; background-color: #ffffff; color: white; border-radius: 4px; text-decoration: none; font-family: sans-serif;">
+            <button class="add"><img src="http://localhost/GCST_Track_System/assets/adb_icon/mcateg.png" alt="Manage Account" /> Manage Categories</button>
+          </a>  
+          <a href="admin_manage_students.php" class="add" 
+            style="display: inline-block; padding: 6px 6px; background-color: #ffffff; color: white; border-radius: 4px; text-decoration: none; font-family: sans-serif;">
+            <button class="suspend"><img src="http://localhost/GCST_Track_System/assets/adb_icon/pfp.png" alt="Manage Account" /> Manage Account</button>
+        </a>
+        <a href="admin_lost_books.php" class="add" 
+            style="display: inline-block; padding: 6px 6px; background-color: #ffffff; color: white; border-radius: 4px; text-decoration: none; font-family: sans-serif;">
+            <button class="suspend"><img src="http://localhost/GCST_Track_System/assets/adb_icon/finder.png" alt="Manage Account" /> Lost Books</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+<script>
+fetch('/GCST_Track_System/utils/get_counts.php', {
+  credentials: 'same-origin'
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('totalCategories').textContent = data.total_categories ?? 0;
+  });
+</script>
+
+<!-- count -->
+<script>
+  fetch('/GCST_Track_System/utils/get_counts.php', {
+  credentials: 'same-origin'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Unauthorized");
+    return res.json();
+  })
+  .then(data => {
+    document.getElementById('totalBooks').textContent = data.total_books ?? 0;
+    document.getElementById('totalCategories').textContent = data.total_categories ?? 0;
+    document.getElementById('totalMembers').textContent = data.total_members ?? 0;
+    document.getElementById('pendingRequests').textContent = data.pending_requests ?? 0;
+    document.getElementById('totalNonReturnedBooks').textContent = data.total_non_returned_books ?? 0;
+    document.getElementById('totalIssuedBooks').textContent = data.total_issued_books ?? 0;
+    document.getElementById('totalSuspended').textContent = data.total_suspended ?? 0;
+    document.getElementById('totalOverdueBooks').textContent = data.overdue_books ?? 0;
+    document.getElementById('totalUnavailableBooks').textContent = data.total_unavailable_books ?? 0;
+  })
+  .catch(err => {
+    console.error("Access denied or session expired");
+  });
+</script>
+
+</body>
+</html>

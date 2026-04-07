@@ -1,0 +1,50 @@
+<aside class="sidebar">
+    <div>
+      <div class="logo-container">
+        <img src="http://localhost/GCST_Track_System/assets/img_icon/granby_logo.png" alt="Logo" class="logo-img">
+        <h3 class="logo-title">GCST Library</h3>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-link active">
+          <span class="icon">📄</span>
+          Requests
+        </a>
+        <a href="#" class="nav-link">
+          <span class="icon">⏰</span>
+          Non-Returned
+        </a>
+        <a href="#" class="nav-link">
+          <span class="icon">📚</span>
+          Issued Books
+        </a>
+        <a href="#" class="nav-link logout">
+          <span class="icon">🚪</span>
+          Logout
+        </a>
+      </nav>
+    </div>
+
+    <div class="role-switch-container">
+      <h2 class="role-label">Role:</h2>
+      <label class="switch-label" id="switchLabel">
+        <input type="checkbox" id="roleSwitch" class="hidden" />
+        <span class="switch-bg"></span>
+        <span id="sliderIcon" class="slider-icon">😺</span>
+        <span id="roleText" class="role-text">Librarian</span>
+
+        <div class="pin-container hidden left" id="pinContainerLeft">
+          <input type="text" maxlength="1" class="pin-input" />
+          <input type="text" maxlength="1" class="pin-input" />
+          <input type="text" maxlength="1" class="pin-input" />
+          <input type="text" maxlength="1" class="pin-input" />
+        </div>
+        <div class="pin-container hidden right" id="pinContainerRight">
+          <input type="text" maxlength="1" class="pin-input" />
+          <input type="text" maxlength="1" class="pin-input" />
+          <input type="text" maxlength="1" class="pin-input" />
+          <input type="text" maxlength="1" class="pin-input" />
+        </div>
+      </label>
+    </div>
+  </aside>

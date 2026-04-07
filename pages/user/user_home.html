@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GCST Track</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_home.css" />
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <strong>Granby Colloges of Science & Technology - Tracking System</strong>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div class="auth-links">
+        <a href="http://localhost/GCST_Track_System/pages/sign_up.html" class="signin">Sign in</a>
+        <a href="http://localhost/GCST_Track_System/pages/sign_up.html?show=register" class="signup">Sign up</a>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+      </nav>
+    </div>
+</header>
+
+  <div class="floating-box" id="floating-box">
+    <a href="http://localhost/GCST_Track_System/index1.html"><i class="fas fa-info-circle"></i> About Us</a>
+  </div>
+
+
+  <section class="hero">
+    <h1>Discover Your Next Products</h1>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products, uniforms, etc...">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+  </section>
+
+<main>
+  <div class="section">
+    <h3 id="products-title">All Products</h3>
+    <div class="products-grid">
+      <!-- products will be injected here -->
+    </div>
+  </div>
+  <aside class="sidebar">
+    <h3>Categories</h3>
+      <div class="categories" id="categories-list">
+        <!-- Categories will be injected here by JS -->
+      </div>
+    </aside>
+  </main>
+
+<script>
+  const floatingBox = document.getElementById('floating-box');
+  const trigger = document.getElementById('menu-icon'); // or your custom trigger element
+
+  trigger.addEventListener('click', () => {
+    floatingBox.style.display = floatingBox.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!floatingBox.contains(e.target) && !trigger.contains(e.target)) {
+      floatingBox.style.display = 'none';
+    }
+  });
+</script>
+
+  <script>
+  window.addEventListener('DOMContentLoaded', () => {
+  fetch('http://localhost/GCST_Track_System/utils/fetch.php')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.querySelector('.products-grid');
+      container.innerHTML = ''; // Clear existing content
+
+      if (Array.isArray(data)) {
+        data.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+
+          // Use product_image if exists, else fallback image
+          const imgSrc = product.product_image ? product.product_image : '/assets/img_bg/product_details.png';
+
+          card.innerHTML = `
+            <div class="product-cover">
+              <img src="${imgSrc}" alt="Cover of ${product.product_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
+            </div>
+            <div class="product-title">${product.product_name}</div>
+            <div class="product-author">${product.product_author}</div>
+          `;
+          container.appendChild(card);
+        });
+      } else {
+        container.innerHTML = '<p>Failed to load products.</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading products:', error);
+      document.querySelector('.products-grid').innerHTML = '<p>Error loading products.</p>';
+    });
+});
+
+</script>
+
+<script>
+  let allproducts = [];
+  let selectedCategory = null;
+  let searchTerm = "";
+  let lastSearchText = "";
+
+// Fetch all products and render categories/products
+  window.addEventListener('DOMContentLoaded', () => {
+    fetch('http://localhost/GCST_Track_System/utils/fetch.php')
+      .then(response => response.json())
+      .then(data => {
+        if (!Array.isArray(data)) {
+          document.querySelector('.products-grid').innerHTML = '<p>Failed to load products.</p>';
+          return;
+        }
+        allproducts = data;
+        renderCategories();
+        renderproducts();
+      })
+      .catch(error => {
+        console.error('Error loading products:', error);
+        document.querySelector('.products-grid').innerHTML = '<p>Error loading products.</p>';
+      });
+
+  // Search logic
+  const searchInput = document.getElementById('search-input');
+  const searchIcon = document.querySelector('.search-icon');
+
+  function doSearch() {
+    searchTerm = searchInput.value.trim();
+    lastSearchText = searchTerm;
+    renderproducts();
+    updateproductsTitle();
+    searchInput.value = "";
+  }
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      doSearch();
+    }
+  });
+
+  searchIcon.addEventListener('click', () => {
+    doSearch();
+    searchInput.focus();
+  });
+});
+
+// Render categories dynamically
+function renderCategories() {
+  const categoriesDiv = document.getElementById('categories-list');
+  categoriesDiv.innerHTML = '';
+  const categories = Array.from(new Set(allproducts.map(product => product.product_category).filter(Boolean)));
+  // Add "All" option
+  categoriesDiv.innerHTML += `<div class="category${selectedCategory ? '' : ' active'}" data-category="">All</div>`;
+  categories.forEach(cat => {
+    categoriesDiv.innerHTML += `<div class="category${selectedCategory === cat ? ' active' : ''}" data-category="${cat}">${cat}</div>`;
+  });
+
+  // Add click listeners
+  categoriesDiv.querySelectorAll('.category').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedCategory = el.dataset.category || null;
+      renderCategories();
+      renderproducts();
+    });
+  });
+}
+
+// Update the products title based on search
+function updateproductsTitle() {
+  const title = document.getElementById('products-title');
+  if (lastSearchText.length > 0) {
+    title.textContent = 'Search Results: ' + lastSearchText;
+  } else {
+    title.textContent = 'All Products';
+  }
+}
+
+// Render products based on selected category and search term
+function renderproducts() {
+  const container = document.querySelector('.products-grid');
+  container.innerHTML = '';
+  let filtered = allproducts;
+
+  // Filter by category if selected
+  if (selectedCategory) {
+    filtered = filtered.filter(product => product.product_category === selectedCategory);
+  }
+
+  // Filter by search term
+  if (searchTerm && searchTerm.length > 0) {
+    const term = searchTerm.toLowerCase();
+    filtered = filtered.filter(product =>
+      (product.product_name && product.product_name.toLowerCase().includes(term)) ||
+      (product.product_author && product.product_author.toLowerCase().includes(term)) ||
+      (product.product_category && product.product_category.toLowerCase().includes(term))
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p>No products found.</p>';
+    return;
+  }
+  filtered.forEach(product => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    const imgSrc = product.product_image ? product.product_image : '/assets/img_bg/product_details.png';
+    card.innerHTML = `
+      <div class="product-cover">
+        <img src="${imgSrc}" alt="Cover of ${product.product_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
+      </div>
+      <div class="product-title">${product.product_name}</div>
+      <div class="product-author">${product.product_author}</div>
+    `;
+    container.appendChild(card);
+  });
+  updateproductsTitle();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin / Librarian Registration</title>
+
+    <!-- Boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Styles -->
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea, #7494ec);
+        }
+
+        /* Container */
+        .container {
+            width: 450px;
+            max-width: 95%;
+            padding: 40px;
+            background: #fff;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* Form Fields */
+        .form-fields {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .form-fields::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .form-fields::-webkit-scrollbar-thumb {
+            background: #bbb;
+            border-radius: 10px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 14px 40px 14px 15px;
+            border: 2px solid #e2e2e2;
+            border-radius: 12px;
+            outline: none;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px #7494ec;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 14px 0;
+            background: linear-gradient(90deg, #667eea, #7494ec);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Show Password Icon */
+        .show-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Admin / Librarian Registration</h1>
+        <form action="http://localhost/GCST_Track_System/utils/process_admin_librarian.php" method="POST" onsubmit="return validateForm(this)">
+            <div class="form-fields">
+                <div class="input-group">
+                    <input type="text" name="last_name" placeholder="Last Name" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="first_name" placeholder="First Name" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="middle_name" placeholder="Middle Name">
+                </div>
+                <div class="input-group">
+                    <select name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="librarian">Librarian</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                    <i class='bx bx-show show-password' id="togglePassword"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required>
+                    <i class='bx bx-show show-password' id="toggleConfirm"></i>
+                </div>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        togglePassword.addEventListener('click', () => {
+            password.type = password.type === 'password' ? 'text' : 'password';
+            togglePassword.classList.toggle('bx-show');
+            togglePassword.classList.toggle('bx-hide');
+        });
+
+        const toggleConfirm = document.getElementById('toggleConfirm');
+        const confirmPassword = document.getElementById('confirm_password');
+        toggleConfirm.addEventListener('click', () => {
+            confirmPassword.type = confirmPassword.type === 'password' ? 'text' : 'password';
+            toggleConfirm.classList.toggle('bx-show');
+            toggleConfirm.classList.toggle('bx-hide');
+        });
+
+        // Form validation
+        function validateForm(form) {
+            if (form.password.value !== form.confirm_password.value) {
+                alert("Passwords do not match!");
+                form.password.focus();
+                return false;
+            }
+            return true;
+        }
+
+        // Show success popup and refresh page
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === '1') {
+                alert("Account successfully created!");
+                // Remove the query string and refresh page without re-submitting the form
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
+
+</body>
+</html>

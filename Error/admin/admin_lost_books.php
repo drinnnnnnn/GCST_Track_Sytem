@@ -1,0 +1,506 @@
+<?php
+session_start();
+
+// If not logged in OR not admin, redirect
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lost Books - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="http://localhost/GCST_Track_SystemRepository/styles/admin_css/admin_navbar.css" />
+  <style>
+    html, body {
+    height: auto; /* allow content height to grow */
+    overflow-x: hidden; /* optional */
+    background: linear-gradient(to bottom, #334155, #0f172a);
+
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: block; /* remove flex */
+    }
+  
+    .main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box; 
+    }
+
+    button.suspend-btn {
+      padding: 6px 12px;
+      background-color: #f36466;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button.suspend-btn:hover {
+      background-color: #e24048;
+    }
+
+    .content-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 993px;
+  padding: 17px;
+  margin: 0 auto; 
+  margin-left: 34px;
+  border-radius: 16px;
+  background-attachment: fixed;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td ,tr{
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+      font-size: 11px;
+      
+    }
+    th {
+      font-size: 12px;
+      background-color: #e1e8eb;
+      width: 59px;
+
+    }
+    button {
+      padding: 6px 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e7e34;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .header-row h2 {
+      margin: 0;
+    }
+
+    .header-row input[type="text"] {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 450px;
+      margin-left: 20px;
+    }
+
+    .mark-paid-btn {
+      padding: 6px 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .mark-paid-btn:hover {
+      background-color: #0056b3;
+    }
+
+    th:nth-child(1) { width: 100px; }      
+    th:nth-child(2) { width: 70px; }     
+    th:nth-child(3) { width: 120px; }     
+    th:nth-child(7) { width: 90px; }  
+  
+    .radio-toggle-group {
+  display: flex;
+  background-color: #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 40px;
+  padding: 4px;
+}
+
+.radio-toggle-group input[type="radio"] {
+  display: none;
+}
+
+.radio-toggle-group label {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: background 0.3s, color 0.3s;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radio-toggle-group input[type="radio"]:checked + label {
+  background-color: #f1f5f9;
+  border-radius: 6px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-search-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.search-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-wrapper input[type="text"] {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 450px;
+}
+
+  </style>
+
+  <style>
+    /* modal Styles */
+.modal {
+  display: flex;  /* visible by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* to be on top */
+}
+
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+  }
+
+  .modal-buttons button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .modal-buttons button:hover {
+    opacity: 0.9;
+  }
+
+.hidden {
+  display: none !important; /* hide when hidden */
+}
+
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    unicode-bidi: isolate;
+    font-size: 10px;
+}
+
+#sendEmailBtn {
+  background-color: #0ea5e9; /* blue */
+  color: white;
+}
+
+#printReceiptBtn {
+  background-color: #22c55e; /* green */
+  color: white;
+}
+
+#markFinedBtn {
+  background-color: #ef4444; /* red */
+  color: white;
+}
+
+.modal-buttons button:hover {
+  opacity: 0.9;
+}
+
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div>
+      <div class="logo-container">
+        <img src="http://localhost/GCST_Track_SystemRepository/assets/img_icon/granby_logo.png" alt="Logo" class="logo-img">
+        <h3 class="logo-title">GCST Library</h3>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="admin_dashb.php" class="nav-link active">
+          <img src="http://localhost/GCST_Track_SystemRepository/assets/sidebar_img/dashbc.png" alt="Dashboard Icon" class="icon">
+          Dashboard
+        </a>
+        <a href="admin_create.php" class="nav-link">
+          <img src="http://localhost/GCST_Track_SystemRepository/assets/sidebar_img/addgrey.png" alt="Dashboard Icon" class="icon">
+          Create
+        </a>
+        <a href="admin_books.php" class="nav-link">
+          <img src="http://localhost/GCST_Track_SystemRepository/assets/sidebar_img/bookpen.png" alt="Dashboard Icon" class="icon">
+          Books
+        </a>
+        <a href="/GCST_Track_System/pages/admin/logout.php" class="nav-link logout" onclick="return confirm('Are you sure you want to logout?')">
+          <img src="http://localhost/GCST_Track_SystemRepository/assets/sidebar_img/outv.png" alt="Dashboard Icon" class="icon">
+          Logout
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+<div class="main-content">
+    <div class="content-box">
+<div class="header-row">
+    <h2>Lost Books</h2>
+  <div class="filter-search-wrapper">
+        <!-- Search Bar Centered -->
+    <div class="search-wrapper">
+      <input type="text" id="studentSearch" placeholder="Search students..."/>
+    </div>
+    <!-- Radio Toggle Group -->
+    <div class="filter-controls">
+      <div class="radio-toggle-group">
+        <input type="radio" id="pending fine" name="status" checked>
+        <label for="pending fine">Pending</label>
+
+        <input type="radio" id="fined" name="status">
+        <label for="fined">Fined</label>
+
+        <input type="radio" id="paid" name="status">
+        <label for="paid">Paid</label>
+      </div>
+    </div>
+  </div>
+
+</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Book Name</th>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Days Overdue</th>
+                    <th>Fine Value</th>
+                    <th>Fine Status</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <!-- Data will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="fineNoticeModal" class="modal hidden">
+  <div class="modal-content">
+    <h3>Library Fine Notice</h3>
+
+    <p>Dear <span id="modalStudentName"></span>,</p>
+    <p>This is a friendly reminder that the book "<span id="modalBookTitle"></span>" borrowed under your name is overdue by <span id="modalDaysOverdue"></span> day(s). The fine is ₱20.00 per day, so your current total fine is ₱<span id="modalTotalFine"></span>.</p>
+    <p><strong>IMPORTANT NOTICE:</strong></p>
+    <p>If the book has been lost, please be advised that you will need to pay the full replacement cost of ₱<span id="modalFineValue"></span>.</p>
+    <p>Kindly return the book as soon as possible or contact the library if the book is lost.</p>
+    <div class="modal-buttons">
+      <button id="sendEmailBtn">Send to Email</button>
+      <button id="printReceiptBtn">Print Receipt</button>
+      <button id="markFinedBtn">Mark as Fined</button>
+      <button id="markPaidBtn">Mark as Paid</button> <!-- New button -->
+    </div>
+  </div>
+</div>
+
+<script>
+function loadLostBooks(status = 'pending fine') {
+  fetch(`http://localhost/GCST_Track_SystemRepository/utils/admin_queries/get_lost_books.php?status=${status}`, {
+    credentials: 'same-origin'
+  })
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("studentTableBody");
+      tbody.innerHTML = "";
+
+      if (data.error) {
+        console.error("Error:", data.error);
+        tbody.innerHTML = `<tr><td colspan="6">Failed to load data: ${data.error}</td></tr>`;
+        return;
+      }
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6">No lost books found.</td></tr>`;
+        return;
+      }
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.book_name}</td>
+          <td>${row.student_id}</td>
+          <td>${row.student_name}</td>
+          <td>${row.days_overdue}</td>
+          <td>₱${parseFloat(row.fine_amount).toFixed(2)}</td>
+          <td>${row.status}</td>
+        `;
+        tr.addEventListener("click", () => showFineNoticeModal(row));
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      console.error("Failed to load data:", err);
+      const tbody = document.getElementById("studentTableBody");
+      tbody.innerHTML = `<tr><td colspan="6">Failed to load data.</td></tr>`;
+    });
+}
+
+//exit modal when clicking outside the modal content
+document.getElementById("fineNoticeModal").addEventListener("click", function (e) {
+  if (e.target === this) {
+    this.classList.add("hidden");
+  }
+});
+
+document.getElementById("sendEmailBtn").addEventListener("click", () => {
+  alert("Email sent");
+});
+
+document.getElementById("printReceiptBtn").addEventListener("click", () => {
+  window.print();
+});
+
+document.getElementById("markFinedBtn").addEventListener("click", () => {
+  const studentId = document.getElementById("modalStudentName").dataset.studentId;
+  const bookId = document.getElementById("modalBookTitle").dataset.bookId;
+
+  fetch("http://localhost/GCST_Track_SystemRepository/utils/admin_queries/mark_as_fined.php", {
+    method: "POST",
+    credentials: 'same-origin',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ student_id: studentId, book_id: bookId })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Marked as fined successfully");
+        document.getElementById("fineNoticeModal").classList.add("hidden");
+        loadLostBooks(); // Reload table
+      } else {
+        alert("Failed to mark as fined");
+      }
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("An error occurred");
+    });
+});
+
+document.getElementById("markPaidBtn").addEventListener("click", () => {
+  const studentId = document.getElementById("modalStudentName").dataset.studentId;
+  const bookId = document.getElementById("modalBookTitle").dataset.bookId;
+
+  fetch("http://localhost/GCST_Track_SystemRepository/utils/admin_queries/mark_as_paid.php", {
+    method: "POST",
+    credentials: 'same-origin',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ student_id: studentId, book_id: bookId })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Marked as paid successfully");
+        document.getElementById("fineNoticeModal").classList.add("hidden");
+        loadLostBooks(); // Reload table
+      } else {
+        alert("Failed to mark as paid");
+      }
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("An error occurred");
+    });
+});
+
+
+document.querySelectorAll(".radio-toggle-group input[type='radio']").forEach(radio => {
+  radio.addEventListener("change", () => {
+    loadLostBooks(radio.id); // Maglo-load ng data base sa `id` ng napiling radio button
+  });
+});
+
+function showFineNoticeModal(row) {
+  // Reset modal content to avoid retaining old data
+  document.getElementById("modalBookTitle").textContent = "";
+  document.getElementById("modalDaysOverdue").textContent = "";
+  document.getElementById("modalTotalFine").textContent = "";
+  document.getElementById("modalFineValue").textContent = "";
+  document.getElementById("modalStudentName").textContent = "";
+
+  // Update modal content with new data
+  document.getElementById("modalBookTitle").textContent = row.book_name;
+  document.getElementById("modalDaysOverdue").textContent = row.days_overdue;
+  document.getElementById("modalTotalFine").textContent = (row.days_overdue * 20).toFixed(2);
+  document.getElementById("modalFineValue").textContent = parseFloat(row.fine_amount).toFixed(2);
+  document.getElementById("modalStudentName").textContent = row.student_name;
+  document.getElementById("modalStudentName").dataset.studentId = row.student_id;
+  document.getElementById("modalBookTitle").dataset.bookId = row.book_id;
+
+  document.getElementById("fineNoticeModal").classList.remove("hidden");
+}
+
+// Load lost books on page load
+document.addEventListener("DOMContentLoaded", () => {
+  loadLostBooks(); // Load lost books initially
+  document.getElementById("pending fine").dispatchEvent(new Event("change")); // Trigger change event for pending fine
+});
+</script>
+
+</body>
+</html>

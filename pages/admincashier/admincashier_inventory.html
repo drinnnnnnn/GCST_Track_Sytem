@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book List</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/admin_css/admin_navbar.css" />
+
+ <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #334155, #0f172a);
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      box-sizing: border-box; 
+    }
+
+    .book-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 993px;
+      padding: 17px;
+      margin: 0 auto; 
+      margin-left: 34px;
+      border-radius: 16px;
+      background-attachment: fixed;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-bar-container {
+      display: flex;
+      justify-content: center;
+      border-radius: 20px;
+    }
+
+    .search-input {
+      flex: 1;
+      max-width: 500px;
+      padding: 10px 16px;
+      border: 1px solid #e1e8eb;
+      border-radius: 30px 0 0 30px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .search-button {
+      padding: 10px 24px;
+      background-color: #0077cc;
+      color: #e1e8eb;
+      border: none;
+      border-radius: 0 30px 30px 0;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .search-button:hover {
+      background-color: #005fa3;
+    }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 17px;
+    }
+
+    .book-card {
+      background-color: #e1e8eb;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+      overflow: hidden;
+      transition: transform 0.18s, box-shadow 0.18s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      margin-right: 10px;
+      padding: 1px;
+      position: relative;
+    }
+
+    .book-card:hover {
+      transform: translateY(-7px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    }
+
+    .book-card .book-cover {
+      width: 186px;
+      height: 280px;
+      margin-top: 0px;
+      margin-bottom: 6px;
+      border-radius: 7px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      background: #e1e8eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book-card .book-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .book-title {
+      font-weight: bold;
+      font-size: 1.08rem;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      padding: 0 10px;
+      color: #222;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book-author {
+      font-size: 0.97rem;
+      color: #4a6fa1;
+      margin-bottom: 8px;
+      text-align: center;
+      padding: 0 16px;
+    }
+
+   .search-radio-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px; /* Adjust spacing between elements */
+    margin-bottom: 25px;
+    padding: 10px; /* Add padding for better alignment */
+  }
+
+  .radio-inputs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px; /* Adjust spacing between radio buttons */
+    border-radius: 0.5rem;
+    background-color: #c1d8e6;
+    box-sizing: border-box;
+    box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
+    padding: 0.25rem;
+    width: auto; /* Adjust width to fit content */
+    font-size: 14px;
+  }
+
+  .radio-inputs .radio {
+    flex: 1;
+    text-align: center;
+  }
+
+  .radio-inputs .radio input {
+    display: none;
+  }
+
+  .radio-inputs .radio .name {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: none;
+    padding: .5rem 1rem; /* Adjust padding for better alignment */
+    color: #555;
+    transition: all .15s ease-in-out;
+  }
+
+  .radio-inputs .radio input:checked + .name {
+    background-color: #f4f4f4;
+    font-weight: 600;
+  }
+
+.search-bar-container {
+  display: flex;
+  flex: 1;
+  max-width: 500px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 16px; /* may space sa kanan para sa icon */
+  border: 1px solid #e1e8eb;
+  border-radius: 8px; /* same sa .radio-inputs */
+  outline: none;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 16px;
+  pointer-events: none; /* para hindi clickable */
+}
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+        padding: 17px;
+      }
+
+      .book-container {
+        padding: 10px;
+      }
+
+      .search-bar-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .search-input {
+        width: 100%;
+        border-radius: 30px;
+        margin-bottom: 10px;
+      }
+
+      .search-button {
+        border-radius: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+<aside class="sidebar">
+    <div>
+      <div class="logo-container">
+        <img src="http://localhost/GCST_Track_System/assets/img_icon/granby_logo.png" alt="Logo" class="logo-img">
+        <h3 class="logo-title">GCST Library</h3>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="admin_dashb.html" class="nav-link">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/dashbc.png" alt="Dashboard Icon" class="icon">
+          Dashboard
+        </a>
+        <a href="admin_create.html" class="nav-link">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/addgrey.png" alt="Dashboard Icon" class="icon">
+          Create
+        </a>
+        <a href="admin_books.html" class="nav-link active">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/bookpen.png" alt="Dashboard Icon" class="icon">
+          Books
+        </a>
+        <a href="#" class="nav-link logout" onclick="confirmLogout(event)">
+          <img src="http://localhost/GCST_Track_System/assets/sidebar_img/outv.png" alt="Dashboard Icon" class="icon">
+          Logout
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="book-container">
+    <div class="search-radio-container">
+      <div class="radio-inputs"> <!-- Left: Radio Inputs -->
+        <label class="radio">
+          <input type="radio" name="status-filter" value="available" checked>
+          <span class="name">Available</span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="status-filter" value="unavailable">
+          <span class="name">Unavailable</span>
+        </label>
+  </div>
+
+  <!-- Right: Search Bar -->
+  <div class="search-bar-container">
+    <div class="search-input-wrapper">
+      <input type="text" class="search-input" placeholder="Search for books, authors, or genres...">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+  </div>
+</div>
+
+  <div class="book-grid">
+  <!-- Book cards will be injected here by JavaScript -->
+</div>
+
+<div id="adminBookModal" class="modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.4);justify-content:center;align-items:center;">
+  <div class="modal-content" style="background:#fff;padding:20px;border-radius:12px;width:400px;max-width:90%;position:relative;box-shadow:0 8px 16px rgba(0,0,0,0.2);">
+    <span class="close-button" style="position:absolute;top:10px;right:15px;margin-left: 30px;font-size:24px;font-weight:bold;cursor:pointer;">&times;</span>
+    <div id="admin-modal-body" class="modal-body" style="display:flex;gap:20px;align-items:flex-start;">
+      <!-- Modal content will be injected by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+  let booksData = [];
+
+// Add modal logic for admin
+// Add modal logic for admin
+function showAdminBookModal(book, imgSrc) {
+  const modal = document.getElementById("adminBookModal");
+  const modalBody = document.getElementById("admin-modal-body");
+  modalBody.innerHTML = `
+    <img src="${imgSrc}" alt="Cover of ${book.book_name}" style="width:120px;height:190px;object-fit:cover;border-radius:8px;">
+    <div class="book-info" style="flex:1;">
+      <h3 style="margin:0 0 10px;font-size:1.2rem;">${book.book_name}</h3>
+      <div class="book-author"><strong>Author:</strong> ${book.book_author}</div>
+      
+      <!-- CATEGORY + QUANTITY GROUP -->
+      <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px; margin-bottom: 10px;">
+        <div class="category" style="background:#e0e7ff;padding:6px 12px;border-radius:6px;font-size:0.9rem;font-weight:500;">
+          ${book.book_category || 'Unknown Category'}
+        </div>
+        <div class="quantity" style="background:#fef3c7;padding:6px 12px;border-radius:6px;font-size:0.9rem;font-weight:500;color:#92400e;">
+          Qty: ${book.quantity ?? 'N/A'}
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <p class="description" style="margin:15px 0;font-size:0.95rem;color:#444;line-height:1.5;">
+        ${book.book_description || 'No description available.'}
+      </p>
+
+      <!-- BUTTONS -->
+      <div class="modal-buttons" style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn-edit" style="padding:8px 14px;border:none;border-radius:6px;font-weight:600;cursor:pointer;background:#60a5fa;color:#fff;">Edit Book</button>
+        <button class="btn-status-toggle" style="padding:8px 14px;border:none;border-radius:6px;font-weight:600;cursor:pointer;background:${book.book_status === 'unavailable' ? '#10b981' : '#ef4444'};color:#fff;">
+          ${book.book_status === 'unavailable' ? 'Set Available' : 'Set Unavailable'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Edit button logic
+  modalBody.querySelector('.btn-edit').addEventListener('click', () => {
+    if (book.quantity && book.fine_value) {
+      window.location.href = `edit_book.html?book_id=${encodeURIComponent(book.book_id)}&quantity=${encodeURIComponent(book.quantity)}&fine_value=${encodeURIComponent(book.fine_value)}`;
+    } else {
+      alert('Missing quantity or fine value for this book.');
+    }
+  });
+
+  // Status toggle button logic
+  modalBody.querySelector('.btn-status-toggle').addEventListener('click', () => {
+    const newStatus = book.book_status === 'unavailable' ? 'available' : 'unavailable';
+    const confirmationMessage = `Are you sure you want to set this book as ${newStatus}?`;
+
+    if (confirm(confirmationMessage)) {
+      fetch('http://localhost/GCST_Track_System/utils/set_book_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ book_id: book.book_id, new_status: newStatus })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert(`Book set to ${newStatus}!`);
+          modal.style.display = "none";
+          // Re-render books with updated status
+          renderBooks(booksData, newStatus === 'available' ? 'unavailable' : 'available');
+        } else {
+          alert('Failed to update book: ' + (res.message || 'Unknown error.'));
+        }
+      })
+      .catch(() => {
+        alert('Failed to update book: Network error.');
+      });
+    }
+  });
+
+  modal.style.display = "flex";
+}
+
+// Modal close logic
+window.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById("adminBookModal");
+  const closeBtn = modal.querySelector(".close-button");
+  closeBtn.onclick = () => modal.style.display = "none";
+  window.onclick = (event) => {
+    if (event.target == modal) modal.style.display = "none";
+  };
+});
+
+// Update renderBooks to handle both available and unavailable books
+function renderBooks(books, filterStatus = 'available') {
+  const container = document.querySelector('.book-grid');
+  container.innerHTML = '';
+  
+  // Filter books based on the status
+  const filteredBooks = books.filter(book => book.book_status === filterStatus);
+
+  if (filteredBooks.length === 0) {
+    container.innerHTML = `<p>No ${filterStatus} books found.</p>`;
+    return;
+  }
+
+  filteredBooks.forEach(book => {
+    const card = document.createElement('div');
+    card.className = 'book-card';
+    const imgSrc = book.book_image && book.book_image !== "" 
+      ? book.book_image 
+      : 'http://localhost/GCST_Track_System/assets/img_bg/book_details.png';
+    card.innerHTML = `
+      <div class="book-cover">
+        <img src="${imgSrc}" alt="Cover of ${book.book_name}" />
+      </div>
+      <div class="book-title">${book.book_name}</div>
+      <div class="book-author">${book.book_author}</div>
+    `;
+    // Open modal on click
+    card.addEventListener('click', () => showAdminBookModal(book, imgSrc));
+    container.appendChild(card);
+  });
+}
+</script>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('http://localhost/GCST_Track_System/utils/fetch.php')
+    .then(response => response.json())
+    .then(data => {
+      booksData = Array.isArray(data) ? data : [];
+      renderBooks(booksData); // Default to available books
+    })
+    .catch(error => {
+      console.error('Error loading books:', error);
+      document.querySelector('.book-grid').innerHTML = '<p>Error loading books.</p>';
+    });
+
+
+// Search functionality
+const searchInput = document.querySelector('.search-input');
+function handleSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+  const filterStatus = document.querySelector('input[name="status-filter"]:checked').value;
+
+  if (!query) {
+    renderBooks(booksData, filterStatus);
+    return;
+  }
+
+  const filtered = booksData.filter(book => {
+    return (
+      (book.book_status === filterStatus) &&
+      (
+        (book.book_name && book.book_name.toLowerCase().includes(query)) ||
+        (book.book_author && book.book_author.toLowerCase().includes(query)) ||
+        (book.book_category && book.book_category.toLowerCase().includes(query))
+      )
+    );
+  });
+  renderBooks(filtered, filterStatus);
+}
+
+// Real-time search habang nagta-type
+searchInput.addEventListener('input', handleSearch);
+
+// Filter books by status when radio buttons change
+document.querySelectorAll('input[name="status-filter"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    handleSearch(); // Para updated agad kahit may filter
+  });
+});
+});
+</script>
+      </div>
+    </div>
+  </div>
+
+</script>
+<!--Logout Confirmation-->
+<script>
+function confirmLogout(event) {
+    event.preventDefault();
+
+    const confirmAction = confirm("Are you sure you want to logout?");
+
+    if (confirmAction) {
+        // Clear session storage if used
+        localStorage.clear();
+
+        // Redirect to logout handler or login page
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+    }
+}
+</script>
+
+</body>
+</html>
