@@ -6,7 +6,7 @@ $password = "";
 $dbname = "gcst_tracking_system";
 $conn = new mysqli($host, $username, $password, $dbname);
 
-$sql = "SELECT product_id, product_name, product_author, product_category, product_image FROM products";
+$sql = "SELECT product_id, product_name, product_author, product_category, product_image, product_price FROM products";
 $result = $conn->query($sql);
 
 $products = [];
