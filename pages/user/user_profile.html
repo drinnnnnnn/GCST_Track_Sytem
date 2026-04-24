@@ -3,406 +3,365 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GCST Library</title>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
+  
+  <title>GCST User Profile</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
 
 <script>
-window.addEventListener('DOMContentLoaded', function() {
-  fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-    .then(res => res.json())
-    .then(data => {
-      if (!data.student_id) {
-        // Not logged in, redirect to sign up/login page
+  window.addEventListener('DOMContentLoaded', function() {
+    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.student_id) {
+          // Not logged in, redirect to sign up/login page
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        }
+      })
+      .catch(() => {
+        // In case of error, also redirect
         window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
-      }
-    })
-    .catch(() => {
-      // In case of error, also redirect
-      window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
-    });
-});
+      });
+  });
 </script>
 
-  <style>
-    .menu-item i {
-  margin-right: 10px; /* space between icon and text */
-  width: 20px;         /* optional: aligns icons neatly */
-  text-align: center;  /* optional: centers icon in space */
-}
+<style>
+  .profile-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #dbeafe;
+  }
 
-h3 {
-    display: block;
-    font-size: 1.17em;
-    margin-block-start: 10px;
-    margin-block-end: 10px;
-    margin-inline-start: 10px;
-    margin-inline-end: 10px;
-    margin-top: 20px;
-    margin-bottom: 0px;
-    font-weight: bold;
-    unicode-bidi: isolate;
-}
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: #fff;
-      color: #333;
-    }
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .logo img {
-      width: 30px;
-      height: 30px;
-    }
-
-    nav a {
-      margin-left: 1.5rem;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-    }
-
-    .hero {
-      background: linear-gradient(to right, #e0e7ff, #dde0eb);
-      padding: 17px;
-      text-align: center;
-      border-radius: 10px;
-      margin: 50px;
-      height: 90px;
-      margin-bottom: 0px;
-      margin-top: 30px;
-      box-shadow: 0 8px 10px rgba(0,0,0,0.1);
-    }
-
-    
-    .hero h1 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .search-box {
-      margin-inline: auto;
-      max-width: 600px;
-      background: #fff;
-      padding: 0.75rem 1rem;
-      border-radius: 18px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-    }
-
-    .search-box input {
-      flex: 1;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border: none;
-      outline: none;
-    }
-
-    main {
-      display: flex;
-      justify-content: space-between;
-      gap: 2rem;
-      padding: 1px 2rem;
-      margin: 1px;
-      flex-wrap: wrap;
-    }
-
-    .section {
-      flex: 1;
-      min-width: 600px;
-      padding-top: 0px;
-    }
-
-    .sidebar {
-      width: 200px;
-    }
-
-    .section h2,
-    .sidebar h2 {
-      font-size: 1.5rem;
-      margin-bottom: 0px;
-    }
-
-    .books-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 1rem;
-    }
-
-    .book-card {
-      background: #f4f4f4;
-      border-radius: 10px;
-      padding: 1rem;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    }
-
-  .book-cover {
-    background: #ccc;
-    width: 120px;
-    height: 160px;
-    border-radius: 6px;
-    margin: 0 auto 0.75rem auto;
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    background: #e0e7ff;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    font-size: 3rem;
+    color: #4f46e5;
   }
 
-
-    .book-title {
-      font-weight: bold;
-      font-size: 0.95rem;
-    }
-
-    .book-author {
-      font-size: 0.85rem;
-      color: #666;
-    }
-
-    .categories {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 14px;
-    }
-
-    .category {
-      padding: 0.5rem 1rem;
-      background: #f8f8f8;
-      border-radius: 8px;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-/* Dropdown Menu (Modern) */
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 65px;
-  right: 20px;
-  background-color: #f0f4ff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-  width: 220px;
-  z-index: 999;
-  overflow: hidden;
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-.menu-item {
-  all: unset;
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  width: 100%;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.menu-item:hover {
-  background-color: #dbeafe;
-}
-
-    /* --- Profile --- */
-
-.profile-card {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  max-width: 1200px;
-  height: 290px;
-  margin: 30px auto;
-  background: #f9fafb;
-  border: 1px solid #dbeafe;
-  border-radius: 16px;
-  padding: 0.8rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-}
-
-.avatar-section {
-  flex-shrink: 30;
-}
-
-.avatar-section img {
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #cbd5e1;
-  margin-left: 10px;
-}
-
-.info-section {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.info-left,
-.info-right {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.info-left p,
-.info-right p {
-  font-size: 1rem;
-  margin: 0;
-  color: #374151;
-  background: linear-gradient(to right, #e0e7ff, #dde0eb);
-  padding: 15px;
-  border-radius: 10px;
-  width: 390px;
-}
-
-@media (max-width: 700px) {
-  .profile-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+  .profile-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
-  .info-section {
-    align-items: center;
+  .info-item {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #4f46e5;
   }
-}
 
+  .info-item label {
+    font-weight: 600;
+    color: #333;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
 
-    
-  </style>
+  .info-item span {
+    color: #666;
+  }
+
+  .edit-btn {
+    display: block;
+    margin: 2rem auto 0;
+    padding: 0.75rem 2rem;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .edit-btn:hover {
+    background: #3730a3;
+  }
+
+  @media (max-width: 600px) {
+    .profile-info {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
 </head>
 <body>
-  <!-- Inside the <header> -->
-<header>
-  <div class="logo">
-    <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
-    <strong>Library of Granby Colloges of Science & Technology</strong>
-  </div>
-  
-  <nav class="nav-links">
-    <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
-    <a href="http://localhost/GCST_Track_System/pages/user/InUser_books.html">Books</a>
-    <a href="http://localhost/GCST_Track_System/index1.html">About</a>
-    <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
-    <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
-  </nav>
-</header>
 
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <strong>GCST Tracking System</strong>
+    </div>
+    
+    <nav class="nav-links">
+      <a href="#" class="notification-icon" id="notification-bell" title="Notifications">
+        🔔
+        <span id="notif-badge"></span>
+      </a>
 
-<div class="dropdown-menu" id="dropdown-menu">
-  <a class="menu-item" href="http://localhost/GCST_Track_System/pages/user/user_profile.html">
-    <i class="fas fa-user"></i> Profile
-  </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/pages/user/user_request.html">
-    <i class="fas fa-paper-plane"></i> Request
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="dropdown-header">Notifications</div>
+        <div class="notifications-list" id="notifications-list"></div>
+        <div class="dropdown-footer" id="clear-notifications">Clear All</div>
+      </div>
+
+      <a href="#" class="menu-icon" id="menu-icon">☰</a>
+    </nav>
+  </header>
+
+  <div class="dropdown-menu" id="dropdown-menu">
+    <a class="menu-item" href="user_browse_products.html">
+      <i class="fas fa-shopping-bag"></i> Browse Products
     </a>
-  <a class="menu-item" href="http://localhost/GCST_Track_System/pages/user/user_favorites.html">
-    <i class="fas fa-star"></i> Favorites
-  </a>
-  <a class="menu-item" href="http://localhost/GCST_Track_System/pages/user/user_nrbooks.html">
-    <i class="fas fa-book-dead"></i> Non-Returned Books
-  </a>
-  <a class="menu-item" href="http://localhost/GCST_Track_System/pages/user/user_issued_books.html">
-    <i class="fas fa-book"></i> Issued Books
-  </a>
-<a class="menu-item" href="http://localhost/GCST_Track_System/pages/user/user_home.html">
-  <i class="fas fa-sign-out-alt"></i> Log Out
-</a>
-</div>
-
-
-
-  <section class="hero">
-    <h1>My Profile Information</h1>
-  </section>
-
-<div class="profile-card">
-  <div class="avatar-section">
-    <img src="http://localhost/GCST_Track_System/assets/img_icon/student_male.jpg" alt="Student Avatar" />
+    <a class="menu-item" href="user_rentals.html">
+      <i class="fas fa-box"></i> My Rentals
+    </a>
+    <a class="menu-item" href="user_queue_tickets.html">
+      <i class="fas fa-ticket-alt"></i> Queue Tickets
+    </a>
+    <a class="menu-item" href="user_tuition_fees.html">
+      <i class="fas fa-receipt"></i> Tuition Fees
+    </a>
+    <a class="menu-item" href="user_profile.html">
+      <i class="fas fa-user-circle"></i> Profile
+    </a>
+    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+      <i class="fas fa-sign-out-alt"></i> Log Out
+    </a>
   </div>
-<div class="info-section">
-  <div class="info-left">
-    <p><strong>Student ID:</strong> <span id="student-id"></span></p>
-    <p><strong>Student Name:</strong> <span id="student-name"></span></p>
-    <p><strong>Email:</strong> <span id="student-email"></span></p>
-    <p><strong>Sex:</strong></p>
 
-  </div>
-  <div class="info-right">
-    <p><strong>Course:</strong> </p>
-    <p><strong>Year & Section:</strong> </p>
-    <p><strong>Phone Number:</strong> </p>
-    <p><strong>Address:</strong></p>
-  </div>
-</div>
-</div>
+  <!-- Main Content -->
+  <main style="max-width: 1400px; margin: 0 auto;">
 
-<script>
-  const menuIcon = document.getElementById('menu-icon');
-  const dropdownMenu = document.getElementById('dropdown-menu');
+    <!-- Greeting Section -->
+    <section class="greeting-section">
+      <div class="greeting-content">
+        <h1 id="greeting-message">My Profile</h1>
+        <p id="current-date-time"></p>
+      </div>
+      <div class="greeting-icon">👤</div>
+    </section>
 
-  menuIcon.addEventListener('click', () => {
-    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-  });
+    <!-- Profile Card -->
+    <section class="profile-section">
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <h2 id="student-name">Student Name</h2>
+        </div>
+        <div class="profile-info">
+          <div class="info-item">
+            <label>Student ID</label>
+            <span id="student-id">Loading...</span>
+          </div>
+          <div class="info-item">
+            <label>Course</label>
+            <span id="course">Loading...</span>
+          </div>
+          <div class="info-item">
+            <label>Year Level</label>
+            <span id="year-level">Loading...</span>
+          </div>
+          <div class="info-item">
+            <label>Phone Number</label>
+            <span id="phone-number">Loading...</span>
+          </div>
+        </div>
+        <button class="edit-btn" onclick="alert('Edit functionality not implemented yet.')">Edit Profile</button>
+      </div>
+    </section>
 
-  // Optional: Hide dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
-      dropdownMenu.style.display = 'none';
-    }
-  });
-</script>
+  </main>
 
-<script>
-  document.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      alert("Your request has been cancelled.");
-    });
-  });
-</script>
+  <!-- Scripts -->
+  <script>
+    let currentStudentId = null;
 
-<script>
-// Fetch and display user info in profile
-window.addEventListener('DOMContentLoaded', function() {
-  fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-    .then(res => res.json())
-    .then(user => {
-      if (!user.student_id) return;
-      // Fetch full user info from database
-      fetch('http://localhost/GCST_Track_System/utils/get_user_full.php')
+    // Initialize greeting and current date/time
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
         .then(res => res.json())
         .then(data => {
-          document.getElementById('student-id').textContent = data.student_id || '';
-          document.getElementById('student-name').textContent = data.name || '';
-          document.getElementById('student-email').textContent = data.email || '';
+          if (data.student_id) {
+            currentStudentId = data.student_id;
+            updateGreeting(data.name);
+            loadProfile(data);
+            loadNotifications();
+            startNotifPolling();
+          }
         });
+
+      updateDateTime();
+      setInterval(updateDateTime, 60000); // Update time every minute
     });
-});
-</script>
 
+    function updateGreeting(studentName) {
+      const hour = new Date().getHours();
+      let greet = "Hello";
+      if (hour < 12) greet = "Good Morning";
+      else if (hour < 18) greet = "Good Afternoon";
+      else greet = "Good Evening";
 
+      document.getElementById('greeting-message').textContent = `${greet}, ${studentName}!`;
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('en-US', options);
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('current-date-time').textContent = `${dateStr} • ${timeStr}`;
+    }
+
+    function loadProfile(data) {
+      document.getElementById('student-name').textContent = data.name || 'N/A';
+      document.getElementById('student-id').textContent = data.student_id || 'N/A';
+      document.getElementById('course').textContent = data.course || 'N/A';
+      document.getElementById('year-level').textContent = data.year_level || 'N/A';
+      document.getElementById('phone-number').textContent = data.phone_number || 'N/A';
+    }
+
+    // Menu toggle
+    document.getElementById('menu-icon').addEventListener('click', (e) => {
+      e.preventDefault();
+      const menu = document.getElementById('dropdown-menu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('dropdown-menu');
+      if (!menu.contains(e.target) && !document.getElementById('menu-icon').contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
+
+    // Notification functions (similar to InUser_home.html)
+    const bell = document.getElementById('notification-bell');
+    const dropdown = document.getElementById('notification-dropdown');
+    const notificationsList = document.getElementById('notifications-list');
+    const clearBtn = document.getElementById('clear-notifications');
+    const notifBadge = document.getElementById('notif-badge');
+
+    let notifInterval = null;
+
+    bell.addEventListener('click', (e) => {
+      e.preventDefault();
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      if (dropdown.style.display === 'block') {
+        markAllNotificationsRead(() => {
+          loadNotifications();
+          startNotifPolling();
+        });
+      } else {
+        stopNotifPolling();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+        dropdown.style.display = 'none';
+        stopNotifPolling();
+      }
+    });
+
+    function startNotifPolling() {
+      if (notifInterval) clearInterval(notifInterval);
+      notifInterval = setInterval(loadNotifications, 5000);
+    }
+
+    function stopNotifPolling() {
+      if (notifInterval) clearInterval(notifInterval);
+      notifInterval = null;
+    }
+
+    function loadNotifications() {
+      if (!currentStudentId) return;
+      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?student_id=' + encodeURIComponent(currentStudentId))
+        .then(res => res.json())
+        .then(notifs => {
+          notificationsList.innerHTML = '';
+          if (notifs.length === 0) {
+            notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
+            notifBadge.style.display = 'none';
+            return;
+          }
+
+          const unreadCount = notifs.filter(n => n.is_read == 0).length;
+          if (unreadCount > 0) {
+            notifBadge.textContent = unreadCount;
+            notifBadge.style.display = 'inline-block';
+          } else {
+            notifBadge.style.display = 'none';
+          }
+
+          notifs.forEach(n => {
+            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
+            item.innerHTML = `
+              <img src="${imgSrc}" alt="Product">
+              <div>
+                <div class="notification-message">${n.product_name} - ${n.status}</div>
+                <div class="notification-time">${new Date(n.notified_at).toLocaleString()}</div>
+              </div>
+            `;
+            notificationsList.appendChild(item);
+          });
+        });
+    }
+
+    function markAllNotificationsRead(callback) {
+      if (!currentStudentId) {
+        if (typeof callback === 'function') callback();
+        return;
+      }
+      fetch('http://localhost/GCST_Track_System/utils/mark_notifications_read.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: currentStudentId })
+      }).then(() => {
+        if (typeof callback === 'function') callback();
+      });
+    }
+
+    clearBtn.addEventListener('click', () => {
+      if (!currentStudentId) return;
+      fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: currentStudentId })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
+          notifBadge.style.display = 'none';
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
