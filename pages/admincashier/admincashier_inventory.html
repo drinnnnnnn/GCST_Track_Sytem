@@ -91,11 +91,11 @@
 
     #notif-badge {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 4px;
+      right: 4px;
       min-width: 18px;
       height: 18px;
-      padding: 0 6px;
+      padding: 0 4px;
       border-radius: 999px;
       background: var(--danger);
       color: white;
@@ -516,17 +516,26 @@
   </header>
 
   <div class="dropdown-menu" id="dropdown-menu">
+    <a class="menu-item" href="admincashier_dashb.html">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
     <a class="menu-item" href="admincashier_sales.html">
       <i class="fas fa-cash-register"></i> Sales
     </a>
     <a class="menu-item" href="admincashier_inventory.html">
       <i class="fas fa-boxes"></i> Inventory
     </a>
+    <a class="menu-item" href="admincashier_products.html">
+      <i class="fas fa-boxes"></i> Products
+    </a>
     <a class="menu-item" href="admincashier_reports.html">
       <i class="fas fa-chart-line"></i> Reports
     </a>
     <a class="menu-item" href="admincashier_queuing_system.html">
       <i class="fas fa-users"></i> Queue System
+    </a>
+    <a class="menu-item" href="admincashier_gmail_notifications.html">
+      <i class="fas fa-envelope"></i> Gmail Notifications
     </a>
     <a class="menu-item" href="admincashier_profile.html">
       <i class="fas fa-user-circle"></i> Profile
@@ -676,17 +685,19 @@
     </section>
   </main>
 
-  <div class="dropdown-menu" id="notification-dropdown" style="display:none; right: 24px; top: 74px;">
-    <div class="menu-item" style="cursor:default; font-weight:700;">Notifications</div>
-    <div id="notifications-list" style="display:flex; flex-direction:column; gap:10px; padding:12px 18px; color:var(--muted);">
+  <div class="notification-dropdown" id="notification-dropdown" style="display:none; position:absolute; right:24px; top:74px; width:320px; background:var(--surface); border-radius:24px; box-shadow:0 18px 40px rgba(15,23,42,.15); z-index:70; padding:18px 20px;">
+    <div style="font-weight:700; margin-bottom:16px;">Notifications</div>
+    <div id="notifications-list" style="display:flex; flex-direction:column; gap:10px; max-height:320px; overflow:auto; color:var(--muted); min-height:60px;">
       <span>No notifications yet.</span>
     </div>
-    <button id="clear-notifications" class="secondary-btn" style="width:100%; margin-top:8px;">Clear All</button>
+    <button id="clear-notifications" class="secondary-btn" style="width:100%; margin-top:12px; padding:8px 12px; border:1px solid var(--border); background:var(--surface-soft); color:var(--text); border-radius:8px; cursor:pointer; font-weight:600;">Clear All</button>
   </div>
 
   <script>
     let inventoryData = [];
     let editingProductId = null;
+    let currentAdminId = null;
+    let notifInterval = null;
     const LOW_STOCK_THRESHOLD = 10;
 
     function formatMoney(value) {
@@ -715,7 +726,71 @@
       else if (hour < 18) greeting = 'Good Afternoon';
       else greeting = 'Good Evening';
       document.getElementById('greeting-message').textContent = `${greeting}, Admin Cashier!`;
-      document.getElementById('current-date-time').textContent = new Date().toLocaleString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      document.getElementById('current-date-time').textContent = now.toLocaleString('en-PH', options);
+    }
+
+    function startNotifPolling() {
+      if (notifInterval) clearInterval(notifInterval);
+      notifInterval = setInterval(loadNotifications, 5000);
+    }
+
+    function stopNotifPolling() {
+      if (notifInterval) clearInterval(notifInterval);
+      notifInterval = null;
+    }
+
+    function loadNotifications() {
+      if (!currentAdminId) return;
+      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
+        .then(res => res.json())
+        .then(notifs => {
+          const notificationsList = document.getElementById('notifications-list');
+          const notifBadge = document.getElementById('notif-badge');
+          notificationsList.innerHTML = '';
+          if (notifs.length === 0) {
+            notificationsList.innerHTML = '<span>No notifications yet.</span>';
+            notifBadge.style.display = 'none';
+            return;
+          }
+          const unreadCount = notifs.filter(n => n.is_read == 0).length;
+          if (unreadCount > 0) {
+            notifBadge.textContent = unreadCount;
+            notifBadge.style.display = 'inline-block';
+          } else {
+            notifBadge.style.display = 'none';
+          }
+          notifs.forEach(n => {
+            const item = document.createElement('div');
+            item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f1f5fb;';
+            item.innerHTML = `
+              <div style="flex:1;">
+                <div style="font-weight:600; color:var(--text); font-size:0.9rem;">${n.product_name || 'Notification'}</div>
+                <div style="font-size:0.8rem; color:var(--muted);">${new Date(n.notified_at).toLocaleString()}</div>
+              </div>
+            `;
+            notificationsList.appendChild(item);
+          });
+        })
+        .catch(err => console.error('Error loading notifications:', err));
+    }
+
+    function markAllNotificationsRead(callback) {
+      if (!currentAdminId) {
+        if (typeof callback === 'function') callback();
+        return;
+      }
+      fetch('http://localhost/GCST_Track_System/utils/mark_notifications_read.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ admin_id: currentAdminId })
+      }).then(() => {
+        if (typeof callback === 'function') callback();
+      });
     }
 
     function updateSummary() {
@@ -906,7 +981,68 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      setGreeting();
+      // User authentication check
+      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+        .then(res => res.json())
+        .then(data => {
+          if (data.admin_id) {
+            currentAdminId = data.admin_id;
+            setGreeting();
+            updateDateTime();
+            loadNotifications();
+            startNotifPolling();
+          } else {
+            window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html';
+          }
+        })
+        .catch(() => {
+          window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html';
+        });
+
+      // Update datetime every minute
+      setInterval(updateDateTime, 60000);
+
+      // Notification bell listener
+      const bell = document.getElementById('notification-bell');
+      const dropdown = document.getElementById('notification-dropdown');
+      const clearBtn = document.getElementById('clear-notifications');
+      bell.addEventListener('click', (e) => {
+        e.preventDefault();
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        if (dropdown.style.display === 'block') {
+          markAllNotificationsRead(() => {
+            loadNotifications();
+            startNotifPolling();
+          });
+        } else {
+          stopNotifPolling();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+          dropdown.style.display = 'none';
+          stopNotifPolling();
+        }
+      });
+
+      clearBtn.addEventListener('click', () => {
+        if (!currentAdminId) return;
+        fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id: currentAdminId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('notifications-list').innerHTML = '<span>No notifications yet.</span>';
+            document.getElementById('notif-badge').style.display = 'none';
+          }
+        });
+      });
+
+      // Menu toggle
       document.getElementById('menu-icon').addEventListener('click', (e) => {
         e.preventDefault();
         toggleMenu();
@@ -932,6 +1068,7 @@
       document.getElementById('productPrice').addEventListener('blur', autoFormatPrice);
       document.getElementById('bulkReorderBtn').addEventListener('click', handleBulkReorder);
 
+      // Load inventory products
       fetch('http://localhost/GCST_Track_System/utils/get_products.php')
         .then(response => response.json())
         .then(data => {
@@ -940,8 +1077,9 @@
           renderLowStockList();
           updateSummary();
         })
-        .catch(() => {
-          document.getElementById('inventoryTableBody').innerHTML = '<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--muted);">Unable to load inventory at this time.</td></tr>';
+        .catch(err => {
+          console.error('Error loading inventory:', err);
+          document.getElementById('inventoryTableBody').innerHTML = '<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--muted);">Unable to load inventory. Please check your connection and try again.</td></tr>';
         });
     });
   </script>

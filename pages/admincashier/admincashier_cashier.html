@@ -74,15 +74,15 @@
       .then(data => {
         if (!data.admin_id) {
           // Not logged in, redirect to sign up/login page
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
         }
       })
       .catch(() => {
         // In case of error, also redirect
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
       });
   });
-</script> 
+</script>
 </head>
 
 <body>
@@ -139,7 +139,7 @@
     <!-- Greeting Section -->
     <section class="greeting-section">
       <div class="greeting-content">
-        <h1 id="greeting-message">Point of Sale</h1>
+        <h1 id="greeting-message">Cashier</h1>
         <p id="current-date-time"></p>
       </div>
       <div class="greeting-icon">💳</div>
@@ -912,7 +912,7 @@ function confirmLogout(event) {
         localStorage.clear();
 
         // Redirect to logout handler or login page
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
     }
 }
 </script>

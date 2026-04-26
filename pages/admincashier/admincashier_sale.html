@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCST Admin Cashier Sales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f7f9ff;
+      --text: #1d2939;
+      --muted: #5f6c84;
+      --primary: #4558ff;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: #dbe3f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      background: var(--surface);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .logo img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .icon-button {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-soft);
+      color: var(--text);
+      cursor: pointer;
+      position: relative;
+      font-size: 1rem;
+    }
+    .icon-button:hover { border-color: rgba(69, 88, 255, 0.18); }
+    .icon-button span {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: var(--danger);
+      color: white;
+      font-size: 0.72rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .dropdown-menu {
+      position: absolute;
+      right: 24px;
+      top: 72px;
+      width: 240px;
+      background: var(--surface);
+      border-radius: 24px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
+      display: none;
+      z-index: 60;
+      padding: 10px 0;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      color: var(--text);
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .menu-item:hover { background: #f7f9ff; }
+    main {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 20px 40px;
+    }
+    .greeting-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      margin-bottom: 24px;
+    }
+    .greeting-content h1 {
+      margin: 0 0 12px;
+      font-size: 2.1rem;
+      line-height: 1.05;
+    }
+    .greeting-content p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      max-width: 720px;
+    }
+    .greeting-icon {
+      font-size: 2rem;
+    }
+    .quick-actions {
+      margin-bottom: 24px;
+    }
+    .quick-actions h2 {
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .action-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+    }
+    .action-card i {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    .action-card h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .period-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .period-button {
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: var(--surface-soft);
+      color: var(--text);
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .period-button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: rgba(69, 88, 255, 0.28);
+    }
+    .balance-section {
+      margin-bottom: 24px;
+    }
+    .balance-section h2 {
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .balance-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .balance-card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      min-height: 140px;
+    }
+    .balance-card h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .balance-card p {
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 700;
+    }
+    .activity-section {
+      margin-bottom: 24px;
+    }
+    .activity-section h2 {
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .chart-container {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+    .chart-container h3 {
+      margin: 0 0 18px;
+      font-size: 1.05rem;
+    }
+    .chart-wrapper {
+      position: relative;
+      min-height: 300px;
+    }
+    .history-card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+    .history-card h3 {
+      margin-top: 0;
+      margin-bottom: 18px;
+    }
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .history-table th,
+    .history-table td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #f1f5fb;
+    }
+    .history-table th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .empty-state {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+    @media (max-width: 1100px) {
+      .balance-cards,
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 680px) {
+      header { flex-direction: column; align-items: stretch; }
+      .greeting-section { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Logo" />
+      <div>
+        <strong>GCST Tracking System</strong>
+        <p style="margin: 4px 0 0; color: var(--muted); font-size: 0.95rem;">Admin Cashier Sales</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <button class="icon-button" id="notification-bell" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <span id="notif-badge"></span>
+      </button>
+      <button class="icon-button" id="menu-icon" title="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="admincashier_sales.html">
+        <i class="fas fa-cash-register"></i> Sales
+      </a>
+      <a class="menu-item" href="admincashier_inventory.html">
+        <i class="fas fa-boxes"></i> Inventory
+      </a>
+      <a class="menu-item" href="admincashier_reports.html">
+        <i class="fas fa-chart-line"></i> Reports
+      </a>
+      <a class="menu-item" href="admincashier_queuing_system.html">
+        <i class="fas fa-users"></i> Queue System
+      </a>
+      <a class="menu-item" href="admincashier_profile.html">
+        <i class="fas fa-user-circle"></i> Profile
+      </a>
+      <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </a>
+    </div>
+    <div class="notification-dropdown" id="notification-dropdown" style="display:none; width:320px; right:24px; top:78px; position:absolute; background:var(--surface); border-radius:24px; box-shadow:0 18px 40px rgba(15,23,42,.15); z-index:70;">
+      <div style="padding:18px 20px; font-weight:700; border-bottom:1px solid #eef2f7;">Notifications</div>
+      <div id="notifications-list" style="max-height:320px; overflow:auto; padding:16px;"></div>
+      <div id="clear-notifications" style="padding:14px 20px; color:var(--primary); cursor:pointer;">Clear All</div>
+    </div>
+  </header>
+
+  <main style="max-width: 1400px; margin: 0 auto;">
+
+    <!-- Greeting Section -->
+    <section class="greeting-section">
+      <div class="greeting-content">
+        <h1 id="greeting-message">Welcome, Admin Cashier!</h1>
+        <p id="current-date-time"></p>
+      </div>
+      <div class="greeting-icon">👋</div>
+    </section>
+
+    <!-- Period Filters -->
+    <div class="period-filters">
+      <button class="period-button active" data-period="today">Today</button>
+      <button class="period-button" data-period="week">This Week</button>
+      <button class="period-button" data-period="month">This Month</button>
+      <button class="period-button" data-period="year">This Year</button>
+    </div>
+
+    <!-- Summary Section -->
+    <section class="balance-section">
+      <h2>Sales Summary</h2>
+      <div class="balance-cards">
+        <div class="balance-card">
+          <h3>Total Sales</h3>
+          <p class="amount" id="totalSales">₱0.00</p>
+        </div>
+        <div class="balance-card">
+          <h3>Total Transactions</h3>
+          <p class="amount" id="totalTransactions">0</p>
+        </div>
+        <div class="balance-card">
+          <h3>Average Transaction Value</h3>
+          <p class="amount" id="avgTransaction">₱0.00</p>
+        </div>
+        <div class="balance-card">
+          <h3>Items Sold</h3>
+          <p class="amount" id="itemsSold">0</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="activity-section">
+      <h2>Analytics</h2>
+      <div class="charts-grid">
+        <div class="chart-container">
+          <h3>Daily Sales Trends</h3>
+          <div class="chart-wrapper">
+            <canvas id="salesTrendChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-container">
+          <h3>Top Selling Products</h3>
+          <div class="chart-wrapper">
+            <canvas id="topProductsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sales History Section -->
+    <section class="history-card">
+      <h3>Sales History</h3>
+      <div style="overflow-x:auto;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Transaction</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="5" class="empty-state">Loading sales history...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let currentAdminId = null;
+    let currentPeriod = 'today';
+    let salesTrendChart = null;
+    let topProductsChart = null;
+
+    // Initialize greeting and current date/time
+    window.addEventListener('DOMContentLoaded', function() {
+      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.admin_id) {
+            window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+            return;
+          }
+          currentAdminId = data.admin_id;
+          updateGreeting(data.name);
+          loadNotifications();
+          startNotifPolling();
+          loadSalesData(currentPeriod);
+        })
+        .catch(() => {
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+        });
+
+      updateDateTime();
+      setInterval(updateDateTime, 60000); // Update time every minute
+
+      // Initialize charts
+      salesTrendChart = createChart('salesTrendChart', 'line', [], [], 'Daily Sales (₱)', 'rgba(69, 88, 255, 0.16)', '#4558ff');
+      topProductsChart = createChart('topProductsChart', 'bar', [], [], 'Units Sold', 'rgba(69, 88, 255, 0.16)', '#4558ff');
+    });
+
+    function updateGreeting(adminName) {
+      const hour = new Date().getHours();
+      let greet = "Hello";
+      if (hour < 12) greet = "Good Morning";
+      else if (hour < 18) greet = "Good Afternoon";
+      else greet = "Good Evening";
+
+      document.getElementById('greeting-message').textContent = `${greet}, ${adminName}!`;
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('en-US', options);
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('current-date-time').textContent = `${dateStr} • ${timeStr}`;
+    }
+
+    function formatCurrency(value) {
+      return '₱' + Number(value || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? '-' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function setActivePeriodButton(period) {
+      document.querySelectorAll('.period-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.period === period);
+      });
+    }
+
+    async function loadSalesData(period) {
+      try {
+        const response = await fetch(`http://localhost/GCST_Track_System/utils/get_admincashier_sales.php?period=${encodeURIComponent(period)}`);
+        const data = await response.json();
+
+        document.getElementById('totalSales').textContent = formatCurrency(data.total_sales);
+        document.getElementById('totalTransactions').textContent = data.total_transactions ?? 0;
+        document.getElementById('avgTransaction').textContent = formatCurrency(data.average_transaction_value);
+        document.getElementById('itemsSold').textContent = data.total_items_sold ?? 0;
+
+        updateChart(salesTrendChart, data.sales_labels || [], data.sales_data || [], 'Daily Sales (₱)', 'line', 'rgba(69, 88, 255, 0.16)', '#4558ff');
+        updateChart(topProductsChart, data.top_products?.map(item => item.name) || [], data.top_products?.map(item => item.quantity) || [], 'Units Sold', 'bar', 'rgba(69, 88, 255, 0.16)', '#4558ff');
+
+        const historyBody = document.getElementById('historyBody');
+        historyBody.innerHTML = '';
+        if (Array.isArray(data.history) && data.history.length) {
+          data.history.forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${formatDate(entry.date)}</td>
+              <td>${entry.transaction_id ?? '—'}</td>
+              <td>${entry.item}</td>
+              <td>${entry.quantity}</td>
+              <td>${formatCurrency(entry.amount)}</td>
+            `;
+            historyBody.appendChild(row);
+          });
+        } else {
+          historyBody.innerHTML = '<tr><td colspan="5" class="empty-state">No sales history available for this period.</td></tr>';
+        }
+      } catch (error) {
+        console.error('Unable to load sales data:', error);
+        document.getElementById('historyBody').innerHTML = '<tr><td colspan="5" class="empty-state">Unable to load sales history.</td></tr>';
+      }
+    }
+
+    function createChart(elementId, type, labels, data, label, backgroundColor, borderColor) {
+      const ctx = document.getElementById(elementId).getContext('2d');
+      return new Chart(ctx, {
+        type,
+        data: {
+          labels,
+          datasets: [{
+            label,
+            data,
+            borderColor: borderColor || '#4558ff',
+            backgroundColor: backgroundColor || 'rgba(69, 88, 255, 0.16)',
+            fill: type === 'line',
+            tension: 0.4,
+            borderWidth: 2,
+            borderRadius: 12,
+            barThickness: 24
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { grid: { color: '#eef2f7' }, ticks: { beginAtZero: true } }
+          }
+        }
+      });
+    }
+
+    function updateChart(chartRef, labels, data, label, type, backgroundColor, borderColor) {
+      if (!chartRef) return;
+      chartRef.data = {
+        labels,
+        datasets: [{
+          label,
+          data,
+          borderColor: borderColor || '#4558ff',
+          backgroundColor: backgroundColor || 'rgba(69, 88, 255, 0.16)',
+          fill: type === 'line',
+          tension: 0.4,
+          borderWidth: 2,
+          borderRadius: 12,
+          barThickness: 24
+        }]
+      };
+      chartRef.update();
+    }
+
+    // Menu toggle
+    document.getElementById('menu-icon').addEventListener('click', (e) => {
+      e.preventDefault();
+      const menu = document.getElementById('dropdown-menu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('dropdown-menu');
+      if (!menu.contains(e.target) && !document.getElementById('menu-icon').contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
+
+    // Period buttons
+    document.querySelectorAll('.period-button').forEach(button => {
+      button.addEventListener('click', () => {
+        currentPeriod = button.dataset.period;
+        setActivePeriodButton(currentPeriod);
+        loadSalesData(currentPeriod);
+      });
+    });
+
+    // Notification functions
+    const bell = document.getElementById('notification-bell');
+    const dropdown = document.getElementById('notification-dropdown');
+    const notificationsList = document.getElementById('notifications-list');
+    const clearBtn = document.getElementById('clear-notifications');
+    const notifBadge = document.getElementById('notif-badge');
+
+    let notifInterval = null;
+
+    bell.addEventListener('click', (e) => {
+      e.preventDefault();
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      if (dropdown.style.display === 'block') {
+        markAllNotificationsRead(() => {
+          loadNotifications();
+          startNotifPolling();
+        });
+      } else {
+        stopNotifPolling();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+        dropdown.style.display = 'none';
+        stopNotifPolling();
+      }
+    });
+
+    function startNotifPolling() {
+      if (notifInterval) clearInterval(notifInterval);
+      notifInterval = setInterval(loadNotifications, 5000);
+    }
+
+    function stopNotifPolling() {
+      if (notifInterval) clearInterval(notifInterval);
+      notifInterval = null;
+    }
+
+    function loadNotifications() {
+      if (!currentAdminId) return;
+      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
+        .then(res => res.json())
+        .then(notifs => {
+          notificationsList.innerHTML = '';
+          if (notifs.length === 0) {
+            notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
+            notifBadge.style.display = 'none';
+            return;
+          }
+
+          const unreadCount = notifs.filter(n => n.is_read == 0).length;
+          if (unreadCount > 0) {
+            notifBadge.textContent = unreadCount;
+            notifBadge.style.display = 'inline-block';
+          } else {
+            notifBadge.style.display = 'none';
+          }
+
+          notifs.forEach(n => {
+            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
+            item.innerHTML = `
+              <img src="${imgSrc}" alt="Product">
+              <div>
+                <div class="notification-message">${n.product_name} - ${n.status}</div>
+                <div class="notification-time">${new Date(n.notified_at).toLocaleString()}</div>
+              </div>
+            `;
+            notificationsList.appendChild(item);
+          });
+        });
+    }
+
+    function markAllNotificationsRead(callback) {
+      if (!currentAdminId) {
+        if (typeof callback === 'function') callback();
+        return;
+      }
+      fetch('http://localhost/GCST_Track_System/utils/mark_notifications_read.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ admin_id: currentAdminId })
+      }).then(() => {
+        if (typeof callback === 'function') callback();
+      });
+    }
+
+    clearBtn.addEventListener('click', () => {
+      if (!currentAdminId) return;
+      fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ admin_id: currentAdminId })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
+          notifBadge.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

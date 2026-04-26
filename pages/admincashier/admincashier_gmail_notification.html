@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <title>GCST Admin Cashier Dashboard</title>
+  <title>GCST Admin Cashier Gmail Notifications</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
 <style>
@@ -36,32 +36,116 @@
     }
   }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!--
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-      .then(res => res.json())
-      .then(data => {
-        const currentId = data.student_id || data.admin_id;
-        if (!currentId) {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
-          return;
-        }
-        currentAdminId = currentId;
-        updateGreeting(data.name || 'Admin');
-        loadNotifications();
-        startNotifPolling();
-      })
-      .catch(() => {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
-      });
-  });
-</script> -->
-</head>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .balance-card p {
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 700;
+    }
+    .logs-section {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+    .logs-section h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .logs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .logs-table th,
+    .logs-table td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #f1f5fb;
+    }
+    .logs-table th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .status-sent { color: var(--success); }
+    .status-failed { color: var(--danger); }
+    .status-pending { color: #f59e0b; }
+    .empty-state {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .notification-dropdown {
+      position: absolute;
+      right: 24px;
+      top: 78px;
+      width: 320px;
+      background: var(--surface);
+      border-radius: 24px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
+      display: none;
+      z-index: 70;
+      padding: 18px 20px;
+      font-weight: 700;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .notification-dropdown .dropdown-header {
+      margin-bottom: 16px;
+    }
+    .notifications-list {
+      max-height: 320px;
+      overflow: auto;
+      padding: 0;
+    }
+    .notification-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5fb;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .notification-message {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .notification-time {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .dropdown-footer {
+      padding: 14px 0 0;
+      color: var(--primary);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+    }
+    @media (max-width: 1100px) {
+      .balance-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 680px) {
+      header { flex-direction: column; align-items: stretch; }
+      .greeting-section { flex-direction: column; }
+    }
+  </style>
+</head>
 <body>
-  <!-- Header -->
   <header>
     <div class="logo">
       <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
@@ -85,10 +169,10 @@
   </header>
 
   <div class="dropdown-menu" id="dropdown-menu">
-    <a class="menu-item" href="admincashier_cashier.html">
-      <i class="fas fa-cash-register"></i> Cashier
+    <a class="menu-item" href="admincashier_dashb.html">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
     </a>
-        <a class="menu-item" href="admincashier_sale.html">
+    <a class="menu-item" href="admincashier_sales.html">
       <i class="fas fa-cash-register"></i> Sales
     </a>
     <a class="menu-item" href="admincashier_inventory.html">
@@ -103,8 +187,8 @@
     <a class="menu-item" href="admincashier_queuing_system.html">
       <i class="fas fa-users"></i> Queue System
     </a>
-    <a class="menu-item" href="admincashier_gmail_notification.html">
-      <i class="fas fa-boxes"></i> Gmail Notification
+    <a class="menu-item" href="admincashier_gmail_notifications.html">
+      <i class="fas fa-envelope"></i> Gmail Notifications
     </a>
     <a class="menu-item" href="admincashier_profile.html">
       <i class="fas fa-user-circle"></i> Profile
@@ -114,96 +198,62 @@
     </a>
   </div>
 
-  <!-- Main Content -->
-  <main style="max-width: 1400px; margin: 0 auto;">
-
+  <main>
     <!-- Greeting Section -->
     <section class="greeting-section">
       <div class="greeting-content">
         <h1 id="greeting-message">Welcome, Admin Cashier!</h1>
         <p id="current-date-time"></p>
       </div>
-      <div class="greeting-icon">👋</div>
+      <div class="greeting-icon">�</div>
     </section>
 
-    <!-- Quick Actions -->
-    <section class="quick-actions">
-      <h2>Quick Actions</h2>
-      <div class="action-grid">
-        <a href="admincashier_sales.html" class="action-card">
-          <i class="fas fa-cash-register"></i>
-          <h3>New Sale</h3>
-        </a>
-        <a href="admincashier_inventory.html" class="action-card">
-          <i class="fas fa-boxes"></i>
-          <h3>Manage Inventory</h3>
-        </a>
-        <a href="admincashier_reports.html" class="action-card">
-          <i class="fas fa-chart-line"></i>
-          <h3>View Reports</h3>
-        </a>
-      </div>
-    </section>
-
-    <!-- Summary Section -->
+    <!-- Dashboard Overview -->
     <section class="balance-section">
-      <h2>Dashboard Summary</h2>
+      <h2>Email Metrics</h2>
       <div class="balance-cards">
         <div class="balance-card">
-          <h3>Total Sales Today</h3>
-          <p class="amount" id="totalSalesToday">₱0.00</p>
+          <h3>Sent Today</h3>
+          <p class="amount" id="sentToday">0</p>
         </div>
         <div class="balance-card">
-          <h3>Items in Inventory</h3>
-          <p class="amount" id="totalInventory">0</p>
+          <h3>Failed Emails</h3>
+          <p class="amount" id="failedEmails">0</p>
         </div>
         <div class="balance-card">
-          <h3>Pending Queue</h3>
-          <p class="amount" id="pendingQueue">0</p>
+          <h3>Pending Emails</h3>
+          <p class="amount" id="pendingEmails">0</p>
         </div>
         <div class="balance-card">
-          <h3>Books Rented</h3>
-          <p class="amount" id="booksRented">0</p>
-        </div>
-        <div class="balance-card">
-          <h3>Books Sold</h3>
-          <p class="amount" id="booksSold">0</p>
-        </div>
-        <div class="balance-card">
-          <h3>Total Transactions</h3>
-          <p class="amount" id="totalTransactions">0</p>
+          <h3>Total Emails Sent</h3>
+          <p class="amount" id="totalEmailsSent">0</p>
         </div>
       </div>
     </section>
 
-    <!-- Charts Section -->
-    <section class="activity-section">
-      <h2>Analytics</h2>
-      <div class="charts-grid">
-        <div class="chart-container">
-          <h3>Sales Overview</h3>
-          <div class="chart-wrapper">
-            <canvas id="salesChart"></canvas>
-          </div>
-        </div>
-        <div class="chart-container">
-          <h3>Inventory Distribution</h3>
-          <div class="chart-wrapper">
-            <canvas id="inventoryChart"></canvas>
-          </div>
-        </div>
-        <div class="chart-container full-width">
-          <h3>Top Selling Products</h3>
-          <div class="chart-wrapper">
-            <canvas id="topProductsChart"></canvas>
-          </div>
-        </div>
+    <!-- Email Logs Table -->
+    <section class="logs-section">
+      <h2>Email Logs</h2>
+      <div style="overflow-x:auto;">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Recipient</th>
+              <th>Subject</th>
+              <th>Email Type</th>
+              <th>Status</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="emailLogsBody">
+            <tr><td colspan="6" class="empty-state">Loading email logs...</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
-
   </main>
 
-  <!-- Scripts -->
   <script>
     let currentAdminId = null;
 
@@ -223,84 +273,8 @@
       updateDateTime();
       setInterval(updateDateTime, 60000); // Update time every minute
 
-      // Fetch dashboard data
-      fetch('http://localhost/GCST_Track_System/utils/get_admincashier_dashboard.php')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('totalSalesToday').textContent = '₱' + (data.total_sales_today ?? 0).toFixed(2);
-          document.getElementById('totalInventory').textContent = data.total_inventory ?? 0;
-          document.getElementById('pendingQueue').textContent = data.pending_queue ?? 0;
-          document.getElementById('booksRented').textContent = data.books_rented ?? 0;
-          document.getElementById('booksSold').textContent = data.books_sold ?? 0;
-          document.getElementById('totalTransactions').textContent = data.total_transactions ?? 0;
-        })
-        .catch(err => console.error('Error fetching dashboard data:', err));
-
-      // Fetch chart data
-      fetch('http://localhost/GCST_Track_System/utils/get_admincashier_charts.php')
-        .then(res => res.json())
-        .then(data => {
-          // Sales Chart
-          const salesCtx = document.getElementById('salesChart').getContext('2d');
-          new Chart(salesCtx, {
-            type: 'line',
-            data: {
-              labels: data.sales_labels,
-              datasets: [{
-                label: 'Daily Sales (₱)',
-                data: data.sales_data,
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                tension: 0.4,
-                fill: true
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: true } }
-            }
-          });
-
-          // Inventory Chart
-          const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-          new Chart(inventoryCtx, {
-            type: 'doughnut',
-            data: {
-              labels: data.inventory_labels,
-              datasets: [{
-                data: data.inventory_data,
-                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe']
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: true } }
-            }
-          });
-
-          // Top Products Chart
-          const productsCtx = document.getElementById('topProductsChart').getContext('2d');
-          new Chart(productsCtx, {
-            type: 'bar',
-            data: {
-              labels: data.products_labels,
-              datasets: [{
-                label: 'Units Sold',
-                data: data.products_data,
-                backgroundColor: '#667eea'
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              indexAxis: 'y',
-              plugins: { legend: { display: true } }
-            }
-          });
-        })
-        .catch(err => console.error('Error fetching chart data:', err));
+      // Fetch gmail data
+      loadGmailData();
     });
 
     function updateGreeting(adminName) {
@@ -319,6 +293,78 @@
       const dateStr = now.toLocaleDateString('en-US', options);
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       document.getElementById('current-date-time').textContent = `${dateStr} • ${timeStr}`;
+    }
+
+    function loadGmailData() {
+      fetch('http://localhost/GCST_Track_System/utils/get_admincashier_gmail_notifications.php')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('sentToday').textContent = data.sent_today ?? 0;
+          document.getElementById('failedEmails').textContent = data.failed_emails ?? 0;
+          document.getElementById('pendingEmails').textContent = data.pending_emails ?? 0;
+          document.getElementById('totalEmailsSent').textContent = data.total_emails_sent ?? 0;
+
+          const logsBody = document.getElementById('emailLogsBody');
+          logsBody.innerHTML = '';
+          if (Array.isArray(data.email_logs) && data.email_logs.length) {
+            data.email_logs.forEach(log => {
+              const row = document.createElement('tr');
+              const statusClass = log.status === 'sent' ? 'status-sent' : log.status === 'failed' ? 'status-failed' : 'status-pending';
+              row.innerHTML = `
+                <td>${log.id}</td>
+                <td>${log.recipient}</td>
+                <td>${log.subject}</td>
+                <td>${log.email_type}</td>
+                <td class="${statusClass}">${log.status}</td>
+                <td>${new Date(log.timestamp).toLocaleString()}</td>
+              `;
+              logsBody.appendChild(row);
+            });
+          } else {
+            logsBody.innerHTML = '<tr><td colspan="6" class="empty-state">No email logs available.</td></tr>';
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching gmail data:', err);
+          document.getElementById('emailLogsBody').innerHTML = '<tr><td colspan="6" class="empty-state">Unable to load email logs.</td></tr>';
+        });
+    }
+
+    function loadNotifications() {
+      if (!currentAdminId) return;
+      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
+        .then(res => res.json())
+        .then(notifs => {
+          notificationsList.innerHTML = '';
+          if (notifs.length === 0) {
+            notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
+            notifBadge.style.display = 'none';
+            return;
+          }
+
+          const unreadCount = notifs.filter(n => n.is_read == 0).length;
+          if (unreadCount > 0) {
+            notifBadge.textContent = unreadCount;
+            notifBadge.style.display = 'inline-block';
+          } else {
+            notifBadge.style.display = 'none';
+          }
+
+          notifs.forEach(n => {
+            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
+            item.innerHTML = `
+              <img src="${imgSrc}" alt="Product">
+              <div>
+                <div class="notification-message">${n.product_name} - ${n.status}</div>
+                <div class="notification-time">${new Date(n.notified_at).toLocaleString()}</div>
+              </div>
+            `;
+            notificationsList.appendChild(item);
+          });
+        });
     }
 
     // Menu toggle
@@ -442,5 +488,21 @@
     });
   </script>
 
+  <!--Logout Confirmation-->
+  <script>
+  function confirmLogout(event) {
+      event.preventDefault();
+
+      const confirmAction = confirm("Are you sure you want to logout?");
+
+      if (confirmAction) {
+          // Clear session storage if used
+          localStorage.clear();
+
+          // Redirect to logout handler or login page
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+      }
+  }
+  </script>
 </body>
 </html>
