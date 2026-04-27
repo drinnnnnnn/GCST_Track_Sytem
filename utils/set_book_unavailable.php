@@ -1,8 +1,8 @@
-<?php
+<?php // not used
 $host = "localhost";
 $username = "root";
 $password = "";     
-$dbname = "library_db";
+$dbname = "gcst_tracking_db";
 
 // Connect to MySQL server
 $conn = new mysqli($host, $username, $password, $dbname);

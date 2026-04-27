@@ -1,3 +1,17 @@
+:root {
+  --bg-light: #f5f8ff;
+  --bg-surface: #ffffff;
+  --border: #e5e7eb;
+  --text-primary: #1f2b45;
+  --text-secondary: #5b6c8f;
+  --accent: #667eea;
+  --accent-strong: #764ba2;
+  --accent-soft: rgba(102, 126, 234, 0.12);
+  --danger: #d32f2f;
+  --radius: 16px;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;

@@ -113,8 +113,8 @@
 <body>
 
     <div class="container">
-        <h1>Admin / Librarian Registration</h1>
-        <form action="http://localhost/GCST_Track_System/utils/process_admin_librarian.php" method="POST" onsubmit="return validateForm(this)">
+        <h1>Admin / Cashier Registration</h1>
+        <form action="http://localhost/GCST_Track_System/utils/process_admin_cashier.php" method="POST" onsubmit="return validateForm(this)">
             <div class="form-fields">
                 <div class="input-group">
                     <input type="text" name="last_name" placeholder="Last Name" required>
@@ -124,13 +124,6 @@
                 </div>
                 <div class="input-group">
                     <input type="text" name="middle_name" placeholder="Middle Name">
-                </div>
-                <div class="input-group">
-                    <select name="role" required>
-                        <option value="">Select Role</option>
-                        <option value="admin">Admin</option>
-                        <option value="librarian">Librarian</option>
-                    </select>
                 </div>
                 <div class="input-group">
                     <input type="email" name="email" placeholder="Email" required>

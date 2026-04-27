@@ -1,4 +1,4 @@
-<?php
+<?php // not use
 session_start();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'librarian') {
@@ -18,7 +18,7 @@ $student_id = $_SESSION['student_id'];
 $host = "localhost";
 $username = "root";
 $password = "";
-$dbname = "library_db";
+$dbname = "gcst_tracking_db";
 $conn = new mysqli($host, $username, $password, $dbname);
 
 if ($conn->connect_error) {
@@ -27,7 +27,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "SELECT nrb.nrb_id, nrb.book_id, nrb.date_student_received_book, nrb.return_date, nrb.days_left, nrb.overdued_book,
-               b.book_name, b.book_category, b.book_author
+            b.book_name, b.book_category, b.book_author
         FROM non_returned_books nrb
         JOIN books b ON nrb.book_id = b.book_id
         WHERE nrb.student_id = ?

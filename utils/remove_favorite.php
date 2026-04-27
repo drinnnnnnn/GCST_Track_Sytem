@@ -8,7 +8,7 @@ if (!isset($data['favorite_id'])) {
     exit;
 }
 
-$conn = new mysqli("localhost", "root", "", "library_db");
+$conn = new mysqli("localhost", "root", "", "gcst_tracking_db");
 if ($conn->connect_error) {
     echo json_encode(['success' => false]);
     exit;

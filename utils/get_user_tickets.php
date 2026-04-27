@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 $host = "localhost";
 $username = "root";
 $password = "";
-$dbname = "gcst_tracking_system";
+$dbname = "gcst_tracking_db";
 
 $student_id = $_SESSION['student_id'];
 $sql = "SELECT p.product_name, p.product_author, p.product_category, r.date_student_received_book, r.return_date 

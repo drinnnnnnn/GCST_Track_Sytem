@@ -12,11 +12,11 @@ window.addEventListener('DOMContentLoaded', function() {
     .then(res => res.json())
     .then(data => {
       if (!data.student_id) {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
       }
     })
     .catch(() => {
-      window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+      window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
     });
 });
 </script>

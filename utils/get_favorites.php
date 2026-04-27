@@ -1,4 +1,4 @@
-<?php
+<?php //not use
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
@@ -8,7 +8,7 @@ if (!isset($_GET['student_id'])) {
 }
 $student_id = $_GET['student_id'];
 
-$conn = new mysqli("localhost", "root", "", "library_db");
+$conn = new mysqli("localhost", "root", "", "gcst_tracking_db");
 if ($conn->connect_error) {
     echo json_encode([]);
     exit;

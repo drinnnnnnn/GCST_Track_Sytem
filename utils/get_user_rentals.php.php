@@ -5,7 +5,7 @@ session_start();
 $host = "localhost";
 $username = "root";
 $password = "";
-$dbname = "gcst_tracking_system";
+$dbname = "gcst_tracking_db";
 $conn = new mysqli($host, $username, $password, $dbname);
 
 $student_id = $_SESSION['student_id'];

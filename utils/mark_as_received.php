@@ -1,5 +1,4 @@
-
-<?php
+<?php // not used
 header('Content-Type: application/json');
 $data = json_decode(file_get_contents('php://input'), true);
 
@@ -11,7 +10,7 @@ if (!isset($data['request_id'], $data['duration'], $data['unit'])) {
 $host = "localhost";
 $username = "root";
 $password = "";
-$dbname = "library_db";
+$dbname = "gcst_tracking_db";
 $conn = new mysqli($host, $username, $password, $dbname);
 
 if ($conn->connect_error) {

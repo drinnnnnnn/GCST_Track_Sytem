@@ -1,4 +1,4 @@
-<?php
+<?php // not used
 session_start();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'librarian') {
@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 $host = "localhost";
 $username = "root";
 $password = "";
-$dbname = "library_db";
+$dbname = "gcst_tracking_db";
 $conn = new mysqli($host, $username, $password, $dbname);
 
 if ($conn->connect_error) {

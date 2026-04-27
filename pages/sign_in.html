@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            text-decoration: none;
+            list-style: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, rgba(116,148,236,0.18), transparent 22%),
+                        radial-gradient(circle at bottom right, rgba(116,148,236,0.16), transparent 18%),
+                        linear-gradient(135deg, #eef4ff 0%, #fbfdff 100%);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            color: #24324a;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 540px;
+            background: #ffffff;
+            border-radius: 34px;
+            box-shadow: 0 24px 60px rgba(35, 75, 155, 0.14);
+            padding: 38px 36px 32px;
+            border: 1px solid rgba(116,148,236,0.16);
+        }
+
+        .form-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .header-icon {
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #7494ec, #8fa8f8);
+            border-radius: 22px;
+            color: #ffffff;
+            font-size: 32px;
+            box-shadow: 0 18px 40px rgba(116,148,236,0.18);
+        }
+
+        .container h1 {
+            font-size: 32px;
+            margin: 0;
+            letter-spacing: -0.5px;
+            color: #1f2b45;
+        }
+
+        .container p {
+            font-size: 15px;
+            margin: 0;
+            text-align: center;
+            color: #5b6c8f;
+            line-height: 1.6;
+            max-width: 420px;
+        }
+
+        form { width: 100%; }
+
+        .input-box {
+            position: relative;
+            margin: 18px 0;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            background: #f5f8ff;
+            border-radius: 14px;
+            border: 1px solid #e7ecff;
+            outline: none;
+            font-size: 15px;
+            color: #2b3748;
+            font-weight: 500;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .input-box input:focus {
+            border-color: #7494ec;
+            box-shadow: 0 0 0 4px rgba(116,148,236,0.16);
+        }
+
+        .input-box input::placeholder {
+            color: #8d9bb1;
+            font-weight: 400;
+        }
+        
+        .input-box i {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #6b7a9e;
+        }
+
+        .toggle-password {
+            cursor: pointer;
+            color: #6b7a9e;
+            z-index: 20;
+        }
+
+        .forgot-link {
+            margin: -12px 0 18px;
+            text-align: right;
+        }
+
+        .forgot-link a {
+            font-size: 14.5px;
+            color: #5d83e2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-link a:hover {
+            color: #3f63c4;
+        }
+
+        .btn {
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(135deg, #5d83e2, #7ea0f0);
+            border-radius: 14px;
+            box-shadow: 0 18px 30px rgba(93, 130, 226, 0.24);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 20px 38px rgba(93, 130, 226, 0.32);
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 18px;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(116,148,236,0.08);
+            color: #1f2b45;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-msg {
+            color: #176f3b;
+        }
+
+        .error-msg {
+            color: #b32a2a;
+        }
+
+        .message-card {
+            border: 1px solid rgba(116,148,236,0.18);
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .fade-out {
+            animation: fadeOut 1s forwards;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14.5px;
+            color: #5b6c8f;
+        }
+
+        .signup-link a {
+            color: #5d83e2;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            color: #3f63c4;
+        }
+
+        .floating-message {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 280px;
+            background-color: #2f80ed;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 18px 34px rgba(47, 128, 237, 0.22);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            z-index: 1000;
+        }
+
+        .floating-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .floating-message.error {
+            background-color: #d32f2f;
+            box-shadow: 0 18px 34px rgba(211, 47, 47, 0.22);
+        }
+
+        @media screen and (max-width: 420px) {
+            .container {
+                padding: 24px 22px 26px;
+            }
+
+            .container h1 {
+                font-size: 28px;
+            }
+
+            .input-box {
+                margin: 16px 0;
+            }
+        }
+    </style>
+
+<body>
+    <div class="container">
+        <div id="floating-message" class="floating-message"></div>
+        
+        <form action="http://localhost/GCST_Track_System/utils/log_in.php" method="POST" onsubmit="return validateForm(this)">
+            <div class="form-header">
+                <div class="header-icon"><i class='bx bxs-user-circle'></i></div>
+                <div>
+                    <h1>Sign In</h1>
+                    <p>Welcome back! Please log in to your account.</p>
+                </div>
+            </div>
+
+            <div class="input-box">
+                <input type="text" name="student_id" placeholder="Student ID Number" required>
+                <i class='bx bxs-id-card'></i>
+            </div>
+
+            <div class="input-box">
+                <input type="password" name="password" placeholder="Password" required>
+                <i class='bx bx-show toggle-password'></i>
+            </div>
+
+            <div class="forgot-link">
+                <a href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn">Sign In</button>
+            <div id="login-message" class="message"></div>
+
+            <div class="signup-link">
+                Don't have an account? <a href="read_me.html">Read Me</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const loginMessageDiv = document.getElementById("login-message");
+        const floatingMessage = document.getElementById("floating-message");
+
+        function getQueryParam(param) {
+            return new URLSearchParams(window.location.search).get(param);
+        }
+
+        function showToast(message, isError = false) {
+            floatingMessage.textContent = message;
+            floatingMessage.classList.toggle("error", isError);
+            floatingMessage.classList.add("show");
+
+            setTimeout(() => {
+                floatingMessage.classList.remove("show");
+                setTimeout(() => {
+                    floatingMessage.textContent = "";
+                    floatingMessage.classList.remove("error");
+                }, 300);
+            }, 4200);
+        }
+
+        function showBanner(message, isError = false) {
+            loginMessageDiv.textContent = message;
+            loginMessageDiv.classList.toggle("error-msg", isError);
+            loginMessageDiv.classList.toggle("success-msg", !isError);
+            loginMessageDiv.classList.add("message-card");
+
+            setTimeout(() => {
+                loginMessageDiv.classList.add("fade-out");
+                setTimeout(() => {
+                    loginMessageDiv.style.display = "none";
+                }, 1000);
+            }, 4200);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const status = getQueryParam("status");
+
+            if (status === "invalid") {
+                showToast("Invalid Student ID or Password.", true);
+                showBanner("Invalid Student ID or Password.", true);
+            } else if (status === "suspended") {
+                showToast("Your account is suspended. Contact the admin.", true);
+                showBanner("Your account is suspended. Kindly reach out to the admin for assistance.", true);
+            }
+        });
+    </script>
+
+    <script>
+        function validateForm(form) {
+            const studentIdRegex = /^GC-\d{6}$/;
+
+            if (!studentIdRegex.test(form.student_id.value)) {
+                alert("Invalid Student ID format. Example: GC-230266");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const togglePasswords = document.querySelectorAll('.toggle-password');
+
+            togglePasswords.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const input = toggle.parentElement.querySelector('input');
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        toggle.classList.remove('bx-show');
+                        toggle.classList.add('bx-hide'); 
+                    } else {
+                        input.type = 'password';
+                        toggle.classList.remove('bx-hide');
+                        toggle.classList.add('bx-show');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

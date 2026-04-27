@@ -3,7 +3,7 @@ function connectAdminCashierDb() {
     $host = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "gcst_tracking_system";
+    $dbname = "gcst_tracking_db";
 
     $conn = new mysqli($host, $username, $password, $dbname);
     if ($conn->connect_error) {

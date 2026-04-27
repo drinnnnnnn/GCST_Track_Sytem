@@ -15,12 +15,12 @@
       .then(data => {
         if (!data.student_id) {
           // Not logged in, redirect to sign up/login page
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
         }
       })
       .catch(() => {
         // In case of error, also redirect
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
       });
   });
 </script>

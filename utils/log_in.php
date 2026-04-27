@@ -1,9 +1,9 @@
-<?php
+<?php 
 session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "library_db";
+$dbname = "gcst_tracking_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -16,9 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_input = $_POST['password'] ?? '';
 
     $stmt = $conn->prepare(
-        "SELECT first_name, middle_name, last_name, password, status 
-         FROM users 
-         WHERE student_id = ?"
+        "SELECT last_name, first_name, middle_name, password, status 
+        FROM users 
+        WHERE student_id = ?"
     );
     $stmt->bind_param("s", $student_id);
     $stmt->execute();
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
         if ($status === 'Suspended') {
-            header("Location: http://localhost/GCST_Track_System/pages/sign_up.html?status=suspended");
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?status=suspended");
             exit();
         }
 
@@ -41,11 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: http://localhost/GCST_Track_System/pages/user/InUser_home.html");
             exit();
         } else {
-            header("Location: http://localhost/GCST_Track_System/pages/sign_up.html?status=invalid");
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?status=invalid");
             exit();
         }
     } else {
-        header("Location: http://localhost/GCST_Track_System/pages/sign_up.html?status=invalid");
+        header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?status=invalid");
         exit();
     }
 

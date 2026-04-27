@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "library_db";
+$dbname = "gcst_tracking_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -33,12 +33,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $check_stmt->get_result();
 
     if ($result->num_rows > 0) {
-        header("Location: http://localhost/GCST_Track_System/pages/sign_up.html?status=exists&show=register");
+        header("Location: http://localhost/GCST_Track_System/pages/superadmin/sign_up.html?status=exists&show=register");
         exit();
     }
 
     if ($_POST['password'] !== $_POST['confirm_password']) {
-        header("Location: http://localhost/GCST_Track_System/pages/sign_up.html?status=nomatch&show=register");
+        header("Location: http://localhost/GCST_Track_System/pages/superadmin/sign_up.html?status=nomatch&show=register");
         exit();
     }
 
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
         updateMemberCount($conn);
-        header("Location: http://localhost/GCST_Track_System/pages/sign_up.html?status=success&show=register");
+        header("Location: http://localhost/GCST_Track_System/pages/superadmin/sign_up.html?status=success&show=register");
         exit();
     } else {
         echo "Error: " . $stmt->error;

@@ -1,6 +1,6 @@
-<?php
+<?php // Not used
 header('Content-Type: application/json');
-$conn = new mysqli("localhost", "root", "", "library_db");
+$conn = new mysqli("localhost", "root", "", "gcst_tracking_db");
 if ($conn->connect_error) {
     echo json_encode([
         'total_books' => 0,

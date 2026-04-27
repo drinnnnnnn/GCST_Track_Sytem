@@ -8,6 +8,459 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
 
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style: none;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(circle at top left, rgba(116,148,236,0.18), transparent 22%),
+                radial-gradient(circle at bottom right, rgba(116,148,236,0.16), transparent 18%),
+                linear-gradient(135deg, #eef4ff 0%, #fbfdff 100%);
+    color: #24324a;
+    line-height: 1.6;
+  }
+
+  header {
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .logo img {
+    height: 40px;
+  }
+
+  .logo strong {
+    color: #1f2b45;
+    font-weight: 700;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .nav-links a {
+    color: #5b6c8f;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover {
+    color: #5d83e2;
+  }
+
+  .notification-icon {
+    position: relative;
+    font-size: 1.2rem;
+  }
+
+  #notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #d32f2f;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    display: none;
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 300px;
+    display: none;
+    z-index: 200;
+  }
+
+  .dropdown-header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+  }
+
+  .notifications-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .notification-item:hover {
+    background: #f8f9fa;
+  }
+
+  .notification-item.unread {
+    background: #e3f2fd;
+  }
+
+  .dropdown-footer {
+    padding: 0.5rem 1rem;
+    text-align: center;
+    color: #5d83e2;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .menu-icon {
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 200px;
+    display: none;
+    z-index: 200;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: #333;
+    transition: background 0.2s;
+  }
+
+  .menu-item:hover {
+    background: #f8f9fa;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.05)"/></svg>') repeat;
+    opacity: 0.5;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .search-box {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 1rem 3rem 1rem 1rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 2rem;
+    border: 1px solid rgba(116,148,236,0.1);
+  }
+
+  .section h2 {
+    color: #1f2b45;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .action-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  }
+
+  .action-card i {
+    font-size: 2rem;
+  }
+
+  .balance-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .balance-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e7ecff;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .balance-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+  }
+
+  .balance-info h3 {
+    color: #1f2b45;
+    margin-bottom: 0.5rem;
+  }
+
+  .balance-info p {
+    color: #5b6c8f;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .activity-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .product-cover {
+    height: 150px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .product-title {
+    padding: 1rem;
+    font-weight: 600;
+    color: #1f2b45;
+  }
+
+  .product-author {
+    padding: 0 1rem 1rem;
+    color: #5b6c8f;
+  }
+
+  .sidebar {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 2rem;
+    height: fit-content;
+  }
+
+  .sidebar h3 {
+    color: #1f2b45;
+    margin-bottom: 1rem;
+  }
+
+  .categories {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .category {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .category.active {
+    background: #667eea;
+    color: white;
+  }
+
+  .category:hover {
+    background: #e3f2fd;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .modal-body {
+    padding: 2rem;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #5b6c8f;
+  }
+
+  @media (max-width: 768px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+    }
+
+    .action-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .balance-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
 <script>
   window.addEventListener('DOMContentLoaded', function() {
     fetch('http://localhost/GCST_Track_System/utils/get_user.php')
@@ -15,12 +468,12 @@
       .then(data => {
         if (!data.student_id) {
           // Not logged in, redirect to sign up/login page
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
         }
       })
       .catch(() => {
         // In case of error, also redirect
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_up.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
       });
   });
 </script>
@@ -73,87 +526,114 @@
   </div>
 
   <!-- Main Content -->
-  <main style="max-width: 1400px; margin: 0 auto;">
+  <section class="hero">
+    <h1 id="greeting-message">Welcome, Student!</h1>
+    <p id="current-date-time">Discover and manage your library resources</p>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for products, books, etc...">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+  </section>
 
-    <!-- Greeting Section -->
-    <section class="greeting-section">
-      <div class="greeting-content">
-        <h1 id="greeting-message">Welcome, Student!</h1>
-        <p id="current-date-time"></p>
-      </div>
-      <div class="greeting-icon">👋</div>
-    </section>
-
-    <!-- Quick Actions -->
-    <section class="quick-actions">
-      <h2>Quick Actions</h2>
-      <div class="action-grid">
-        <a href="user_browse_products.html" class="action-card">
-          <i class="fas fa-shopping-cart"></i>
-          <h3>Browse Products</h3>
-        </a>
-        <a href="user_queue_tickets.html" class="action-card">
-          <i class="fas fa-ticket-alt"></i>
-          <h3>Get Queue Ticket</h3>
-        </a>
-        <a href="user_rentals.html" class="action-card">
-          <i class="fas fa-box-open"></i>
-          <h3>My Rentals</h3>
-        </a>
-      </div>
-    </section>
-
-    <!-- Tuition Fee Balance -->
-    <section class="balance-section">
-      <h2>Tuition Fee Summary</h2>
-      <div class="balance-cards">
-        <div class="balance-card">
-          <h3>Total Balance</h3>
-          <p class="amount" id="total-balance">₱15,000.00</p>
-        </div>
-        <div class="balance-card">
-          <h3>Total Paid</h3>
-          <p class="amount paid" id="total-paid">₱5,000.00</p>
-        </div>
-        <div class="balance-card">
-          <h3>Outstanding Balance</h3>
-          <p class="amount owing" id="outstanding-balance">₱10,000.00</p>
-        </div>
-        <a href="user_tuition_fees.html" class="view-btn">View Full Details</a>
-      </div>
-    </section>
-
-    <!-- Recent Activity -->
-    <section class="activity-section">
-      <h2>Recent Activity</h2>
-      <div class="activity-list" id="activity-list">
-        <div class="activity-item">
-          <span class="activity-date">Today</span>
-          <p>Viewed: "Python Programming" book</p>
-        </div>
-        <div class="activity-item">
-          <span class="activity-date">Yesterday</span>
-          <p>Payment received: ₱2,500.00</p>
-        </div>
-        <div class="activity-item">
-          <span class="activity-date">3 days ago</span>
-          <p>Rental request approved for "Biology Textbook"</p>
-        </div>
-        <div class="activity-item">
-          <span class="activity-date">5 days ago</span>
-          <p>Queue Ticket #12458 created</p>
+  <main>
+    <div class="main-content">
+      <!-- Quick Actions -->
+      <div class="section">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+          <a href="user_browse_products.html" class="action-card">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Browse Products</h3>
+          </a>
+          <a href="user_queue_tickets.html" class="action-card">
+            <i class="fas fa-ticket-alt"></i>
+            <h3>Get Queue Ticket</h3>
+          </a>
+          <a href="user_rentals.html" class="action-card">
+            <i class="fas fa-box-open"></i>
+            <h3>My Rentals</h3>
+          </a>
+          <a href="user_profile.html" class="action-card">
+            <i class="fas fa-user"></i>
+            <h3>My Profile</h3>
+          </a>
         </div>
       </div>
-    </section>
 
-    <!-- Featured Products -->
-    <section class="featured-section">
-      <h2>Featured Products</h2>
-      <div class="product-grid" id="featured-products">
-        <!-- Products will be loaded here by JavaScript -->
+      <!-- Tuition Fee Balance -->
+      <div class="section">
+        <h2>Tuition Fee Summary</h2>
+        <div class="balance-cards">
+          <div class="balance-card">
+            <div class="balance-icon"><i class="fas fa-wallet"></i></div>
+            <div class="balance-info">
+              <h3>Total Balance</h3>
+              <p id="total-balance">₱15,000.00</p>
+            </div>
+          </div>
+          <div class="balance-card">
+            <div class="balance-icon"><i class="fas fa-credit-card"></i></div>
+            <div class="balance-info">
+              <h3>Paid Amount</h3>
+              <p id="paid-amount">₱5,000.00</p>
+            </div>
+          </div>
+          <div class="balance-card">
+            <div class="balance-icon"><i class="fas fa-clock"></i></div>
+            <div class="balance-info">
+              <h3>Pending</h3>
+              <p id="pending-amount">₱10,000.00</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
 
+      <!-- Recent Activity -->
+      <div class="section">
+        <h2>Recent Activity</h2>
+        <div class="activity-list" id="activity-list">
+          <div class="activity-item">
+            <span class="activity-date">Today</span>
+            <p>Viewed: "Python Programming" book</p>
+          </div>
+          <div class="activity-item">
+            <span class="activity-date">Yesterday</span>
+            <p>Payment received: ₱2,500.00</p>
+          </div>
+          <div class="activity-item">
+            <span class="activity-date">3 days ago</span>
+            <p>Rental request approved for "Biology Textbook"</p>
+          </div>
+          <div class="activity-item">
+            <span class="activity-date">5 days ago</span>
+            <p>Queue Ticket #12458 created</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Products -->
+      <div class="section">
+        <h2>Featured Products</h2>
+        <div class="product-grid" id="featured-products">
+          <!-- products will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>Quick Stats</h3>
+      <div class="categories">
+        <div class="category">
+          <strong>Active Rentals:</strong> <span id="active-rentals-count">0</span>
+        </div>
+        <div class="category">
+          <strong>Queue Tickets:</strong> <span id="queue-tickets-count">0</span>
+        </div>
+        <div class="category">
+          <strong>Notifications:</strong> <span id="notifications-count">0</span>
+        </div>
+      </div>
+    </aside>
   </main>
 
   <!-- Product Modal -->
@@ -178,6 +658,7 @@
             updateGreeting(data.name);
             loadNotifications();
             startNotifPolling();
+            loadStats();
           }
         });
 
@@ -203,6 +684,50 @@
       document.getElementById('current-date-time').textContent = `${dateStr} • ${timeStr}`;
     }
 
+    // Search functionality
+    const searchInput = document.getElementById('search-input');
+    const searchIcon = document.querySelector('.search-icon');
+
+    function performSearch() {
+      const query = searchInput.value.trim();
+      if (query) {
+        window.location.href = `user_browse_products.html?search=${encodeURIComponent(query)}`;
+      }
+    }
+
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+
+    searchIcon.addEventListener('click', performSearch);
+
+    function loadStats() {
+      if (!currentStudentId) return;
+
+      // Load active rentals count
+      fetch('http://localhost/GCST_Track_System/utils/get_user_rentals.php')
+        .then(res => res.json())
+        .then(data => {
+          const active = data.filter(r => r.status === 'active').length;
+          document.getElementById('active-rentals-count').textContent = active;
+        })
+        .catch(err => console.error('Error loading rentals:', err));
+
+      // Load queue tickets count
+      fetch('http://localhost/GCST_Track_System/utils/get_user_queue_tickets.php')
+        .then(res => res.json())
+        .then(data => {
+          const active = Array.isArray(data) ? data.filter(t => t.status === 'Active').length : 0;
+          document.getElementById('queue-tickets-count').textContent = active;
+        })
+        .catch(err => console.error('Error loading tickets:', err));
+
+      // Notifications count is already handled
+      document.getElementById('notifications-count').textContent = document.getElementById('notif-badge').textContent || '0';
+    }
+
     // Load featured products
     window.addEventListener('DOMContentLoaded', () => {
       fetch('http://localhost/GCST_Track_System/utils/fetch.php')
@@ -221,10 +746,8 @@
                 <div class="product-cover">
                   <img src="${imgSrc}" alt="${product.product_name}">
                 </div>
-                <h3>${product.product_name}</h3>
-                <p>${product.product_author || 'Unknown'}</p>
-                <p class="price">₱500/month</p>
-                <button>View Details</button>
+                <div class="product-title">${product.product_name}</div>
+                <div class="product-author">${product.product_author || 'Unknown'}</div>
               `;
 
               card.addEventListener('click', () => showProductModal(product, imgSrc));
