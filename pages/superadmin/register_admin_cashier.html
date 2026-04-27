@@ -108,6 +108,28 @@
             cursor: pointer;
             color: #999;
         }
+
+         @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .signin-link {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14.5px;
+            color: #5b6c8f;
+        }
+
+        .signin-link a {
+            color: #5d83e2;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .signin-link a:hover {
+            color: #3f63c4;
+        }
     </style>
 </head>
 <body>
@@ -138,6 +160,10 @@
                 </div>
             </div>
             <button type="submit">Register</button>
+
+            <div class="signin-link">
+                Already done on creating admin/cashier account? <a href="superadmin_dashb.html">Go to Dashboard</a>
+            </div>
         </form>
     </div>
 

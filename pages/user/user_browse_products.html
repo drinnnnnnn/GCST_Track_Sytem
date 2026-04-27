@@ -35,9 +35,7 @@
       <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
       <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
     </nav>
-  </header>
-
-  <div class="dropdown-menu" id="dropdown-menu">
+    <div class="dropdown-menu" id="dropdown-menu">
     <a class="menu-item" href="user_browse_products.html">
       <i class="fas fa-shopping-bag"></i> Browse Products
     </a>
@@ -57,9 +55,16 @@
       <i class="fas fa-sign-out-alt"></i> Log Out
     </a>
   </div>
+</header>
+
+  
 
   <section class="hero">
-    <h1>Browse Products</h1>
+    <div class="hero-copy">
+      <small>Browse Products</small>
+      <h1>Find Books, Uniforms, and Accessories</h1>
+      <p>Browse available GCST items, add them to your cart, and checkout securely in one flow.</p>
+    </div>
   </section>
 
   <div class="category-tabs">
@@ -69,15 +74,82 @@
     <button class="category-tab" data-category="accessories">🎒 Accessories</button>
   </div>
 
-  <div class="products-container">
-    <div class="products-grid" id="products-grid">
-      <!-- Products will be loaded here -->
+  <div class="browse-grid">
+    <section class="product-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Product Catalog</h2>
+          <p class="panel-subtitle">Available items loaded from the system</p>
+        </div>
+        <span id="product-count">0 products</span>
+      </div>
+
+      <div class="products-grid" id="products-grid">
+        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>
+      </div>
+    </section>
+
+    <aside class="cart-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Shopping Cart</h2>
+          <p class="panel-subtitle">Review selected items and complete checkout</p>
+        </div>
+        <span id="cart-count">0 items</span>
+      </div>
+
+      <div class="cart-body" id="cart-body">
+        <div class="empty-state"><i class="fas fa-shopping-cart"></i><p>Your cart is empty. Add items to get started.</p></div>
+      </div>
+
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Items total</span>
+          <span id="cart-items-total">₱0.00</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total</span>
+          <span id="cart-total">₱0.00</span>
+        </div>
+        <button id="checkout-btn" class="btn-checkout" disabled>Checkout Cart</button>
+        <button id="clear-cart-btn" class="btn-clear" disabled>Clear Cart</button>
+      </div>
+    </aside>
+  </div>
+
+  <div id="receipt-modal" class="receipt-modal">
+    <div class="receipt-panel">
+      <button class="close-modal" id="close-receipt"><i class="fas fa-times"></i></button>
+      <div id="receipt-content" class="receipt-content"></div>
+      <div class="receipt-actions">
+        <button id="print-receipt" class="btn-buy">Print Receipt</button>
+        <button id="download-receipt" class="btn-rent">Download Receipt</button>
+      </div>
     </div>
   </div>
 
   <script>
+    const apiRoot = 'http://localhost/GCST_Track_System/utils';
     const menuIcon = document.getElementById('menu-icon');
     const dropdownMenu = document.getElementById('dropdown-menu');
+    const productsGrid = document.getElementById('products-grid');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    const productCount = document.getElementById('product-count');
+    const cartCount = document.getElementById('cart-count');
+    const cartBody = document.getElementById('cart-body');
+    const cartItemsTotal = document.getElementById('cart-items-total');
+    const cartTotal = document.getElementById('cart-total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    const receiptModal = document.getElementById('receipt-modal');
+    const receiptContent = document.getElementById('receipt-content');
+    const closeReceipt = document.getElementById('close-receipt');
+    const printReceipt = document.getElementById('print-receipt');
+    const downloadReceipt = document.getElementById('download-receipt');
+
+    let allProducts = [];
+    let cart = [];
+    let currentUser = null;
 
     menuIcon.addEventListener('click', () => {
       dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
@@ -89,26 +161,51 @@
       }
     });
 
-    // Sample products data
-    const products = [
-      { id: 1, name: 'Advanced Physics', price: '$45.99', category: 'books', image: '📕' },
-      { id: 2, name: 'Chemistry Essentials', price: '$38.50', category: 'books', image: '📗' },
-      { id: 3, name: 'Biology Textbook', price: '$52.00', category: 'books', image: '📘' },
-      { id: 4, name: 'GCST Polo Shirt', price: '$24.99', category: 'uniforms', image: '👕' },
-      { id: 5, name: 'GCST Blazer', price: '$89.99', category: 'uniforms', image: '🧥' },
-      { id: 6, name: 'School Backpack', price: '$35.99', category: 'accessories', image: '🎒' },
-      { id: 7, name: 'Notebook Set', price: '$12.50', category: 'accessories', image: '📓' },
-    ];
+    async function loadUser() {
+      try {
+        const response = await fetch(`${apiRoot}/get_user.php`);
+        const data = await response.json();
+        if (!data.student_id) {
+          window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in.html';
+          return;
+        }
+        currentUser = data;
+      } catch (error) {
+        window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in.html';
+      }
+    }
 
-    const productsGrid = document.getElementById('products-grid');
-    const categoryTabs = document.querySelectorAll('.category-tab');
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${apiRoot}/get_products.php`);
+        const products = await response.json();
+        allProducts = Array.isArray(products) ? products : [];
+        updateProductGrid('all');
+      } catch (error) {
+        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load products.</p></div>';
+      }
+    }
 
-    function renderProducts(category) {
+    function formatPrice(value) {
+      return `₱${parseFloat(value || 0).toFixed(2)}`;
+    }
+
+    function normalizeImage(imagePath) {
+      if (!imagePath) return '<span class="product-image-fallback"><i class="fas fa-box-open"></i></span>';
+      const src = imagePath.startsWith('http') ? imagePath : imagePath.startsWith('/') ? `http://localhost/GCST_Track_System${imagePath}` : `http://localhost/GCST_Track_System/${imagePath}`;
+      return `<img src="${src}" alt="Product image" />`;
+    }
+
+    function updateProductGrid(category) {
+      const filtered = category === 'all'
+        ? allProducts
+        : allProducts.filter(product => product.product_category.toLowerCase() === category.toLowerCase());
+
       productsGrid.innerHTML = '';
-      const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+      productCount.textContent = `${filtered.length} product${filtered.length !== 1 ? 's' : ''}`;
 
-      if (filtered.length === 0) {
-        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products found.</p></div>';
+      if (!filtered.length) {
+        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products found in this category.</p></div>';
         return;
       }
 
@@ -116,29 +213,254 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <div class="product-image">${product.image}</div>
+          <div class="product-image">${normalizeImage(product.product_image)}</div>
           <div class="product-info">
-            <div class="product-name">${product.name}</div>
-            <div class="product-price">${product.price}</div>
+            <div class="product-name">${product.product_name}</div>
+            <div class="product-meta">${product.product_category}</div>
+            <p class="product-description">${product.product_description || 'No description available.'}</p>
+            <div class="price-block">
+              <div><span>Buy</span><strong>${formatPrice(product.buy_price)}</strong></div>
+              <div><span>Rent</span><strong>${formatPrice(product.rent_price)}</strong></div>
+            </div>
             <div class="product-actions">
-              <button class="btn-rent" onclick="alert('Rent: ${product.name}')">Rent</button>
-              <button class="btn-buy" onclick="alert('Buy: ${product.name}')">Buy</button>
+              <select class="mode-select" aria-label="Choose purchase mode">
+                <option value="buy">Buy</option>
+                <option value="rent">Rent</option>
+              </select>
+              <button class="btn-add" type="button">Add to Cart</button>
+            </div>
+            <div class="card-buttons">
+              <button class="btn-buy" type="button">Buy Now</button>
+              <button class="btn-rent" type="button">Rent Now</button>
             </div>
           </div>
         `;
+
+        const modeSelect = card.querySelector('.mode-select');
+        card.querySelector('.btn-add').addEventListener('click', () => addToCart(product, modeSelect.value));
+        card.querySelector('.btn-buy').addEventListener('click', () => checkoutSingle(product, 'buy'));
+        card.querySelector('.btn-rent').addEventListener('click', () => checkoutSingle(product, 'rent'));
+
         productsGrid.appendChild(card);
       });
+    }
+
+    function addToCart(product, mode) {
+      const price = mode === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
+      if (Number.isNaN(price) || price <= 0) {
+        alert('This product is not available for the selected option.');
+        return;
+      }
+
+      const existing = cart.find(item => item.product_id === product.product_id && item.action_type === mode);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          product_id: product.product_id,
+          product_name: product.product_name,
+          image: product.product_image,
+          unit_price: price,
+          quantity: 1,
+          action_type: mode
+        });
+      }
+      renderCart();
+    }
+
+    function renderCart() {
+      const hasItems = cart.length > 0;
+      cartBody.innerHTML = hasItems ? '' : '<div class="empty-state"><i class="fas fa-shopping-cart"></i><p>Your cart is empty. Add items to get started.</p></div>';
+      cartCount.textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''}`;
+      checkoutBtn.disabled = !hasItems;
+      clearCartBtn.disabled = !hasItems;
+
+      cart.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div class="cart-item-info">
+            <div class="cart-item-thumb">${normalizeImage(item.image)}</div>
+            <div>
+              <div class="cart-item-name">${item.product_name}</div>
+              <div class="cart-item-meta">${item.action_type.toUpperCase()} · ${formatPrice(item.unit_price)}</div>
+            </div>
+          </div>
+          <div class="cart-item-controls">
+            <div class="quantity-control">
+              <button class="qty-btn" data-index="${index}" data-action="decrease">-</button>
+              <span>${item.quantity}</span>
+              <button class="qty-btn" data-index="${index}" data-action="increase">+</button>
+            </div>
+            <div class="cart-item-total">${formatPrice(item.unit_price * item.quantity)}</div>
+            <button class="remove-item" data-index="${index}" aria-label="Remove item"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+
+        cartBody.appendChild(row);
+      });
+
+      cartBody.querySelectorAll('.qty-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const index = parseInt(button.dataset.index, 10);
+          const action = button.dataset.action;
+          updateQuantity(index, action === 'increase' ? 1 : -1);
+        });
+      });
+
+      cartBody.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', () => removeCartItem(parseInt(button.dataset.index, 10)));
+      });
+
+      updateSummary();
+    }
+
+    function updateQuantity(index, delta) {
+      if (!cart[index]) return;
+      cart[index].quantity += delta;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+      }
+      renderCart();
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function updateSummary() {
+      const total = cart.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
+      cartItemsTotal.textContent = formatPrice(total);
+      cartTotal.textContent = formatPrice(total);
+    }
+
+    async function checkoutCart() {
+      if (!cart.length) return;
+      await submitTransaction(cart.slice());
+    }
+
+    async function checkoutSingle(product, mode) {
+      const price = mode === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
+      if (Number.isNaN(price) || price <= 0) {
+        alert('This product is not available for the selected option.');
+        return;
+      }
+      await submitTransaction([{ product_id: product.product_id, product_name: product.product_name, unit_price: price, quantity: 1, action_type: mode, image: product.product_image }]);
+    }
+
+    async function submitTransaction(items) {
+      if (!currentUser) {
+        alert('Please sign in to complete the transaction.');
+        return;
+      }
+      try {
+        checkoutBtn.disabled = true;
+        const response = await fetch(`${apiRoot}/save_transaction.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ student_id: currentUser.student_id, items })
+        });
+        const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.message || 'Transaction failed.');
+        }
+        const receiptHtml = buildReceipt(items, result.transaction_group);
+        showReceipt(receiptHtml);
+        if (items.length === cart.length) {
+          cart = [];
+          renderCart();
+        }
+      } catch (error) {
+        alert(error.message || 'Unable to complete checkout.');
+      } finally {
+        checkoutBtn.disabled = !cart.length;
+      }
+    }
+
+    function buildReceipt(items, transactionGroup) {
+      const total = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
+      const date = new Date().toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
+      const rows = items.map(item => `
+        <tr>
+          <td>${item.product_name}</td>
+          <td>${item.action_type.toUpperCase()}</td>
+          <td>${item.quantity}</td>
+          <td>${formatPrice(item.unit_price)}</td>
+          <td>${formatPrice(item.unit_price * item.quantity)}</td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="receipt-header">
+          <div>
+            <h2>GCST Library Receipt</h2>
+            <p>${date}</p>
+            ${transactionGroup ? `<p class="receipt-group">Transaction ID: ${transactionGroup}</p>` : ''}
+          </div>
+          <div class="receipt-user">
+            <p><strong>Student ID:</strong> ${currentUser.student_id}</p>
+          </div>
+        </div>
+        <table class="receipt-table">
+          <thead>
+            <tr><th>Product</th><th>Type</th><th>Qty</th><th>Unit</th><th>Total</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="receipt-summary">
+          <span>Total Amount</span>
+          <strong>${formatPrice(total)}</strong>
+        </div>
+      `;
+    }
+
+    function showReceipt(html) {
+      receiptContent.innerHTML = html;
+      receiptModal.classList.add('active');
+    }
+
+    function closeReceiptModal() {
+      receiptModal.classList.remove('active');
+    }
+
+    function printCurrentReceipt() {
+      window.print();
+    }
+
+    function downloadCurrentReceipt() {
+      const text = receiptContent.innerText;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `gcst_receipt_${Date.now()}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
 
     categoryTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         categoryTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        renderProducts(tab.getAttribute('data-category'));
+        updateProductGrid(tab.dataset.category);
       });
     });
 
-    renderProducts('all');
+    checkoutBtn.addEventListener('click', checkoutCart);
+    clearCartBtn.addEventListener('click', () => { cart = []; renderCart(); });
+    closeReceipt.addEventListener('click', closeReceiptModal);
+    receiptModal.addEventListener('click', event => { if (event.target === receiptModal) closeReceiptModal(); });
+    printReceipt.addEventListener('click', printCurrentReceipt);
+    downloadReceipt.addEventListener('click', downloadCurrentReceipt);
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadUser();
+      await loadProducts();
+      renderCart();
+    });
   </script>
 </body>
 </html>
