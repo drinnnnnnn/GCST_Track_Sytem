@@ -1,156 +1,623 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Queue Tickets - GCST Library</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_queue_tickets.css" />
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-  fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-    .then(res => res.json())
-    .then(data => {
-      if (!data.student_id) {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
+  <title>GCST User - Queue Tickets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/user.css" />
+  <style>
+    .queue-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .queue-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .queue-card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      color: var(--muted);
+    }
+
+    .queue-card .amount {
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    .action-panel {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .action-panel .generate-ticket-btn {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .ticket-detail-section {
+      margin-bottom: 28px;
+    }
+
+    .ticket-detail-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .ticket-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .ticket-preview {
+      padding: 18px 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 18px;
+    }
+
+    .ticket-num {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .ticket-meta {
+      color: var(--muted);
+      margin: 6px 0 0;
+      font-size: 0.95rem;
+    }
+
+    .ticket-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ticket-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      min-width: 104px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .ticket-status.waiting {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .ticket-status.serving {
+      background: #dbf4ff;
+      color: #0369a1;
+    }
+
+    .ticket-status.completed {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .ticket-status.expired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .ticket-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .ticket-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .ticket-card-header > div {
+      min-width: 0;
+    }
+
+    .ticket-card .ticket-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .ticket-info {
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 18px 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 18px 0;
+      font-size: 0.95rem;
+    }
+
+    .ticket-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 140px;
+    }
+
+    .ticket-info-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 0;
+    }
+
+    .ticket-info-value {
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .filter-button {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: transparent;
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .filter-button.active,
+    .filter-button:hover {
+      background: var(--primary);
+      color: white;
+      border-color: transparent;
+    }
+
+    .activity-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .muted-text {
+      color: var(--muted);
+      margin: 6px 0 0;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 1024px) {
+      .queue-summary-grid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
       }
-    })
-    .catch(() => {
-      window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-    });
-});
-</script>
+    }
+
+    @media (max-width: 700px) {
+      .queue-summary-grid,
+      .action-panel,
+      .ticket-info,
+      .ticket-card-header,
+      .activity-heading {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+      }
+
+      .action-panel {
+        gap: 12px;
+      }
+
+      .ticket-card .ticket-info {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="logo">
-    <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
-    <strong>Granby Colloges of Science & Technology</strong>
-  </div>
-  
-  <nav class="nav-links">
-    <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
-    <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
-    <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
-  </nav>
-  <div class="dropdown-menu" id="dropdown-menu">
-    <a class="menu-item" href="user_browse_products.html">
-      <i class="fas fa-shopping-bag"></i> Browse Products
-    </a>
-    <a class="menu-item" href="user_rentals.html">
-      <i class="fas fa-box"></i> My Rentals
-    </a>
-    <a class="menu-item" href="user_queue_tickets.html">
-      <i class="fas fa-ticket-alt"></i> Queue Tickets
-    </a>
-    <a class="menu-item" href="user_tuition_fees.html">
-      <i class="fas fa-receipt"></i> Tuition Fees
-    </a>
-    <a class="menu-item" href="user_profile.html">
-      <i class="fas fa-user-circle"></i> Profile
-    </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
-      <i class="fas fa-sign-out-alt"></i> Log Out
-    </a>
-  </div>
-</header>
-
-  
-
-<section class="hero">
-  <h1>My Queue Tickets</h1>
-</section>
-
-<div class="stats-container">
-  <div class="stat-card">
-    <i class="fas fa-clock"></i>
-    <div>
-      <h3 id="active-count">0</h3>
-      <p>Active Tickets</p>
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
+      <div>
+        <strong>GCST Tracking System</strong>
+        <p>Generate, view, and track your queue numbers for faster and organized service.</p>
+      </div>
     </div>
-  </div>
-  <div class="stat-card">
-    <i class="fas fa-check-circle"></i>
-    <div>
-      <h3 id="completed-count">0</h3>
-      <p>Completed</p>
+    <nav class="nav-links">
+      <a href="#" class="notification-icon" id="notification-bell" title="Notifications">
+        🔔
+        <span id="notif-badge"></span>
+      </a>
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="dropdown-header">Notifications</div>
+        <div class="notifications-list" id="notifications-list"></div>
+        <div class="dropdown-footer" id="clear-notifications">Clear All</div>
+      </div>
+      <a href="#" class="menu-icon" id="menu-icon">☰</a>
+    </nav>
+    <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="InUser_home.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a class="menu-item" href="user_browse_products.html"><i class="fas fa-shopping-bag"></i> Browse Products</a>
+      <a class="menu-item" href="user_rentals.html"><i class="fas fa-book"></i> My Rentals</a>
+      <a class="menu-item" href="user_queue_tickets.html"><i class="fas fa-ticket-alt"></i> Queue Tickets</a>
+      <a class="menu-item" href="user_tuition_fees.html"><i class="fas fa-receipt"></i> Tuition Fees</a>
+      <a class="menu-item" href="user_profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+      <a class="menu-item" href="javascript:void(0)" id="logout-trigger"><i class="fas fa-sign-out-alt"></i> Log Out</a>
     </div>
-  </div>
-  <div class="stat-card">
-    <i class="fas fa-ticket-alt"></i>
-    <div>
-      <h3 id="total-count">0</h3>
-      <p>Total Generated</p>
-    </div>
-  </div>
-</div>
+  </header>
 
-<div class="tickets-table-container">
-  <table class="tickets-table">
-    <thead>
-      <tr>
-        <th>Ticket Number</th>
-        <th>Status</th>
-        <th>Date Created</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-</div>
+  <main>
+    <section class="greeting-section">
+      <div class="greeting-content">
+        <h1>Queue Tickets</h1>
+        <p>Manage your queue number and track the current service status in real time.</p>
+      </div>
+      <div class="greeting-icon">🎟️</div>
+    </section>
 
-<script>
-  const menuIcon = document.getElementById('menu-icon');
-  const dropdownMenu = document.getElementById('dropdown-menu');
+    <section class="balance-section">
+      <div class="queue-summary-grid">
+        <div class="queue-card">
+          <h3>Current Time</h3>
+          <p class="amount" id="current-clock">--:--:--</p>
+        </div>
+        <div class="queue-card">
+          <h3>Now Serving</h3>
+          <p class="amount" id="nowServing">-</p>
+        </div>
+        <div class="queue-card">
+          <h3>Next Queue</h3>
+          <p class="amount" id="nextQueue">-</p>
+        </div>
+        <div class="queue-card">
+          <h3>Waiting Count</h3>
+          <p class="amount" id="waitingCount">0</p>
+        </div>
+      </div>
+    </section>
 
-  menuIcon.addEventListener('click', () => {
-    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-  });
+    <section class="action-panel">
+      <button id="generate-ticket-btn" class="generate-ticket-btn"><i class="fas fa-plus"></i> Generate New Ticket</button>
+      <button id="refresh-status-btn" class="generate-ticket-btn" style="background: #1f2937; color: white;"><i class="fas fa-sync"></i> Refresh Queue Status</button>
+    </section>
 
-  document.addEventListener('click', (e) => {
-    if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
-      dropdownMenu.style.display = 'none';
+    <div id="confirmation-msg" class="confirmation-message"><i class="fas fa-check-circle"></i> <strong id="confirmation-text">Ticket generated successfully!</strong></div>
+
+    <section class="ticket-detail-section">
+      <div class="ticket-detail-card" id="latest-ticket-card">
+        <div class="ticket-card-header">
+          <div>
+            <h2>Latest Ticket</h2>
+            <p class="muted-text">Your most recent queue ticket is shown here.</p>
+          </div>
+          <span class="ticket-status waiting" id="latest-ticket-status">Waiting</span>
+        </div>
+        <div class="ticket-preview">
+          <p class="ticket-num" id="latest-ticket-number">-</p>
+          <p class="ticket-meta" id="latest-ticket-created">Generated: -</p>
+          <p class="ticket-meta" id="latest-ticket-wait">Waiting time: -</p>
+        </div>
+        <div class="ticket-actions" id="latest-ticket-actions">
+          <button class="btn-action btn-save" onclick="saveTicket(currentTicketId)"><i class="fas fa-download"></i> Save Ticket</button>
+          <button class="btn-action btn-print" onclick="printTicket(currentTicketId)"><i class="fas fa-print"></i> Print Ticket</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="activity-section">
+      <div class="activity-heading">
+        <h2>My Ticket History</h2>
+        <div class="filter-group">
+          <button class="filter-button active" data-filter="all">All</button>
+          <button class="filter-button" data-filter="waiting">Waiting</button>
+          <button class="filter-button" data-filter="serving">Serving</button>
+          <button class="filter-button" data-filter="completed">Completed</button>
+          <button class="filter-button" data-filter="expired">Expired</button>
+        </div>
+      </div>
+      <div class="tickets-grid" id="tickets-container">
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>Loading tickets...</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="http://localhost/GCST_Track_System/assets/js/user.js"></script>
+  <script>
+    let allTickets = [];
+    let currentFilter = 'all';
+    let currentTicketId = null;
+
+    function formatDateTime(datetime) {
+      if (!datetime) return '-';
+      const date = new Date(datetime);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
-  });
-</script>
 
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-  fetch('http://localhost/GCST_Track_System/utils/get_user_queue_tickets.php')
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.querySelector('.tickets-table tbody');
-      tbody.innerHTML = '';
-      
-      if (Array.isArray(data) && data.length > 0) {
-        let activeCount = 0, completedCount = 0;
-        
-        data.forEach(ticket => {
-          if (ticket.status === 'Active') activeCount++;
-          if (ticket.status === 'Completed') completedCount++;
-          
-          tbody.innerHTML += `
-            <tr>
-              <td>${ticket.ticket_number}</td>
-              <td><span class="status-badge status-${ticket.status.toLowerCase()}">${ticket.status}</span></td>
-              <td>${ticket.date_created}</td>
-            </tr>
-          `;
-        });
-        
-        document.getElementById('active-count').textContent = activeCount;
-        document.getElementById('completed-count').textContent = completedCount;
-        document.getElementById('total-count').textContent = data.length;
-      } else {
-        tbody.innerHTML = `<tr><td colspan="3">No queue tickets found.</td></tr>`;
-        document.getElementById('active-count').textContent = '0';
-        document.getElementById('completed-count').textContent = '0';
-        document.getElementById('total-count').textContent = '0';
+    function mapStatus(status) {
+      const normalized = String(status || 'waiting').toLowerCase();
+      if (normalized === 'cancelled' || normalized === 'expired') return 'Expired';
+      return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+    }
+
+    function statusClass(status) {
+      const normalized = String(status || 'waiting').toLowerCase();
+      if (normalized === 'cancelled' || normalized === 'expired') return 'expired';
+      if (normalized === 'completed') return 'completed';
+      if (normalized === 'serving') return 'serving';
+      return 'waiting';
+    }
+
+    function getWaitingDuration(createdAt) {
+      if (!createdAt) return '-';
+      const diff = Date.now() - new Date(createdAt).getTime();
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      return `${minutes}m ${seconds}s`;
+    }
+
+    function showConfirmation(message, isError = false) {
+      const msgElement = document.getElementById('confirmation-msg');
+      const textElement = document.getElementById('confirmation-text');
+      if (!msgElement || !textElement) return;
+      textElement.textContent = message;
+      msgElement.style.display = 'block';
+      msgElement.style.borderLeftColor = isError ? '#f87171' : '#22c55e';
+      msgElement.style.background = isError ? '#fef2f2' : '#d4edda';
+      msgElement.style.color = isError ? '#991b1b' : '#155724';
+      window.setTimeout(() => { msgElement.style.display = 'none'; }, 5000);
+    }
+
+    function renderTickets() {
+      const container = document.getElementById('tickets-container');
+      if (!container) return;
+      let filtered = allTickets;
+      if (currentFilter !== 'all') {
+        filtered = allTickets.filter(ticket => statusClass(ticket.status) === currentFilter);
       }
-    });
-});
-</script>
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1; text-align:center;">
+            <i class="fas fa-inbox"></i>
+            <h3>No tickets found</h3>
+            <p>You don't have any ${mapStatus(currentFilter).toLowerCase()} queue tickets yet.</p>
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = filtered.map(ticket => `
+        <div class="ticket-card">
+          <div class="ticket-card-header">
+            <div>
+              <div class="ticket-number">${ticket.queue_number}</div>
+              <p class="ticket-meta">${mapStatus(ticket.status)}</p>
+            </div>
+            <span class="ticket-status ${statusClass(ticket.status)}">${mapStatus(ticket.status)}</span>
+          </div>
+          <div class="ticket-info">
+            <div class="ticket-info-item">
+              <span class="ticket-info-label">Created</span>
+              <span class="ticket-info-value">${formatDateTime(ticket.created_at)}</span>
+            </div>
+            <div class="ticket-info-item">
+              <span class="ticket-info-label">Elapsed</span>
+              <span class="ticket-info-value">${getWaitingDuration(ticket.created_at)}</span>
+            </div>
+          </div>
+          ${ticket.served_at ? `
+            <div class="ticket-info" style="justify-content: center;">
+              <div class="ticket-info-item">
+                <span class="ticket-info-label">Served</span>
+                <span class="ticket-info-value">${formatDateTime(ticket.served_at)}</span>
+              </div>
+            </div>
+          ` : ''}
+          <div class="ticket-actions">
+            <button class="btn-action btn-save" onclick="saveTicket(${ticket.id})"><i class="fas fa-download"></i> Save</button>
+            <button class="btn-action btn-print" onclick="printTicket(${ticket.id})"><i class="fas fa-print"></i> Print</button>
+          </div>
+        </div>
+      `).join('');
+    }
 
+    async function loadQueueStatus() {
+      try {
+        const data = await fetchWithError('http://localhost/GCST_Track_System/actions/get_queue_status.php');
+        document.getElementById('nowServing').textContent = data.now_serving || '-';
+        document.getElementById('nextQueue').textContent = data.next_queue || '-';
+        document.getElementById('waitingCount').textContent = data.counts?.waiting ?? 0;
+      } catch (error) {
+        console.error('Error loading queue status:', error);
+      }
+    }
+
+    async function loadUserTickets() {
+      try {
+        const data = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_tickets.php');
+        allTickets = data.tickets || [];
+        currentTicketId = allTickets.length ? allTickets[0].id : null;
+        updateLatestTicketCard();
+        renderTickets();
+      } catch (error) {
+        console.error('Error loading user tickets:', error);
+        document.getElementById('tickets-container').innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1; text-align:center;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error loading tickets</h3>
+            <p>Unable to load your queue tickets. Please try again later.</p>
+          </div>
+        `;
+      }
+    }
+
+    function updateLatestTicketCard() {
+      const ticket = allTickets.length ? allTickets[0] : null;
+      currentTicketId = ticket ? ticket.id : null;
+      const numberEl = document.getElementById('latest-ticket-number');
+      const createdEl = document.getElementById('latest-ticket-created');
+      const waitEl = document.getElementById('latest-ticket-wait');
+      const statusEl = document.getElementById('latest-ticket-status');
+      const actionsEl = document.getElementById('latest-ticket-actions');
+      if (!ticket) {
+        if (numberEl) numberEl.textContent = '-';
+        if (createdEl) createdEl.textContent = 'Generated: -';
+        if (waitEl) waitEl.textContent = 'Waiting time: -';
+        if (statusEl) statusEl.textContent = 'Waiting';
+        if (actionsEl) actionsEl.style.display = 'none';
+        return;
+      }
+      if (numberEl) numberEl.textContent = ticket.queue_number;
+      if (createdEl) createdEl.textContent = `Generated: ${formatDateTime(ticket.created_at)}`;
+      if (waitEl) waitEl.textContent = `Waiting time: ${getWaitingDuration(ticket.created_at)}`;
+      if (statusEl) {
+        statusEl.textContent = mapStatus(ticket.status);
+        statusEl.className = `ticket-status ${statusClass(ticket.status)}`;
+      }
+      if (actionsEl) actionsEl.style.display = 'flex';
+    }
+
+    async function refreshQueueStatus() {
+      await Promise.all([loadQueueStatus(), loadUserTickets()]);
+    }
+
+    async function generateNewTicket() {
+      const button = document.getElementById('generate-ticket-btn');
+      if (button) button.disabled = true;
+      try {
+        const response = await fetchWithError('http://localhost/GCST_Track_System/actions/generate_queue.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queue_number: null })
+        });
+        if (!response.success) {
+          showConfirmation(response.error || 'Failed to generate ticket', true);
+          return;
+        }
+        await refreshQueueStatus();
+        showConfirmation(`Queue ticket ${response.queue_number} generated successfully.`);
+      } catch (error) {
+        console.error('Error generating ticket:', error);
+        showConfirmation('Unable to generate ticket. Please try again.', true);
+      } finally {
+        if (button) button.disabled = false;
+      }
+    }
+
+    function saveTicket(ticketId) {
+      const ticket = allTickets.find(t => t.id === ticketId);
+      if (!ticket) return;
+      const content = `Queue Ticket\n\nTicket Number: ${ticket.queue_number}\nStatus: ${mapStatus(ticket.status)}\nGenerated: ${formatDateTime(ticket.created_at)}\n${ticket.served_at ? `Served: ${formatDateTime(ticket.served_at)}\n` : ''}`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `queue-ticket-${ticket.queue_number}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function printTicket(ticketId) {
+      const ticket = allTickets.find(t => t.id === ticketId);
+      if (!ticket) return;
+      const printWindow = window.open('', '_blank', 'width=600,height=700');
+      if (!printWindow) return;
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Queue Ticket</title>
+            <style>body{font-family:Arial,sans-serif;padding:24px;} .ticket{border:1px solid #ddd;border-radius:12px;padding:24px;} h1{margin-bottom:16px;} p{margin:8px 0;}</style>
+          </head>
+          <body>
+            <div class="ticket">
+              <h1>Queue Ticket</h1>
+              <p><strong>Ticket Number:</strong> ${ticket.queue_number}</p>
+              <p><strong>Status:</strong> ${mapStatus(ticket.status)}</p>
+              <p><strong>Generated:</strong> ${formatDateTime(ticket.created_at)}</p>
+              ${ticket.served_at ? `<p><strong>Served:</strong> ${formatDateTime(ticket.served_at)}</p>` : ''}
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
+
+    function updateLiveClock() {
+      const now = new Date();
+      const formatted = now.toLocaleTimeString('en-US', { hour12: false });
+      const clock = document.getElementById('current-clock');
+      if (clock) clock.textContent = formatted;
+    }
+
+    document.querySelectorAll('.filter-button').forEach(btn => {
+      btn.addEventListener('click', e => {
+        document.querySelectorAll('.filter-button').forEach(item => item.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentFilter = e.currentTarget.dataset.filter;
+        renderTickets();
+      });
+    });
+
+    document.getElementById('refresh-status-btn')?.addEventListener('click', () => {
+      refreshQueueStatus();
+    });
+
+    initializeAdminCashierPage(async () => {
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+      await refreshQueueStatus();
+      setInterval(refreshQueueStatus, 30000);
+    });
+  </script>
+    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler.js"></script>
 </body>
 </html>

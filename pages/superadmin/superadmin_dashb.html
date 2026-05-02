@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
   <title>GCST Super Admin Dashboard</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-<link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
 <style>
   .charts-grid {
     display: grid;
@@ -41,19 +41,19 @@
 <!--
 <script> // Check if super admin is logged in and fetch their name
   window.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+    fetch('http://localhost/GCST_Track_System/actions/get_user.php')
       .then(res => res.json())
       .then(data => {
         const currentId = data.admin_id;
         if (!currentId) {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
           return;
         }
         currentSuperAdminId = currentId;
         updateGreeting(data.name || 'Super Admin');
       })
       .catch(() => {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
       });
   });
 </script> --> 
@@ -63,7 +63,7 @@
   <!-- Header -->
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
       <strong>GCST Tracking System</strong>
     </div>
     
@@ -71,6 +71,9 @@
       <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
     <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="superadmin_dashb.html">
+        <i class="fas fa-users"></i>Dashboard
+      </a>
       <a class="menu-item" href="superadmin_manage_acc.html">
         <i class="fas fa-users"></i> Manage Admins Acc
       </a>
@@ -83,7 +86,7 @@
       <a class="menu-item" href="register_admin_cashier.html">
         <i class="fas fa-user-circle"></i> Register Admin/Cashier Acc
       </a>
-      <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+      <a class="menu-item" href="http://localhost/GCST_Track_System/actions/log_out.php">
         <i class="fas fa-sign-out-alt"></i> Log Out
       </a>
     </div>
@@ -107,15 +110,15 @@
     <section class="quick-actions">
       <h2>Quick Actions</h2>
       <div class="action-grid">
-        <a href="superadmin_manage_admins.html" class="action-card">
+        <a href="superadmin_manage_acc\.php" class="action-card">
           <i class="fas fa-users"></i>
           <h3>Manage Admins</h3>
         </a>
-        <a href="superadmin_system_status.html" class="action-card">
+        <a href="superadmin_system_maintenance\.php" class="action-card">
           <i class="fas fa-server"></i>
           <h3>System Status</h3>
         </a>
-        <a href="superadmin_reports.html" class="action-card">
+        <a href="superadmin_system_maintenance\.php" class="action-card">
           <i class="fas fa-chart-line"></i>
           <h3>View Reports</h3>
         </a>
@@ -172,7 +175,7 @@
 
     // Initialize greeting and current date/time
     window.addEventListener('DOMContentLoaded', () => {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_user.php')
         .then(res => res.json())
         .then(data => {
           if (data.admin_id) {
@@ -185,7 +188,7 @@
       setInterval(updateDateTime, 60000); // Update time every minute
 
       // Fetch dashboard data
-      fetch('http://localhost/GCST_Track_System/utils/get_superadmin_dashboard.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_superadmin_dashboard.php')
         .then(res => res.json())
         .then(data => {
           document.getElementById('totalAdminAccounts').textContent = data.total_admin_accounts ?? 0;
@@ -196,7 +199,7 @@
         .catch(err => console.error('Error fetching dashboard data:', err));
 
       // Fetch chart data
-      fetch('http://localhost/GCST_Track_System/utils/get_superadmin_charts.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_superadmin_charts.php')
         .then(res => res.json())
         .then(data => {
           // Admin Activities Chart
@@ -277,3 +280,7 @@
 
 </body>
 </html>
+
+
+
+

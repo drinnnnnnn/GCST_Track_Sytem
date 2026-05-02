@@ -1,12 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
   <title>GCST Admin Cashier Queuing System</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-<link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
   .queue-display-panel {
     position: fixed;
@@ -164,30 +166,82 @@
     background: #dc3545;
     color: white;
   }
+  .ticket-preview-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+  .ticket-preview-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+  }
+  .ticket-preview-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+  }
+  .ticket-label {
+    text-transform: uppercase;
+    color: #667eea;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+  .ticket-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+  .ticket-info {
+    color: #4b5563;
+    font-size: 0.95rem;
+  }
+  .action-btn {
+    padding: 12px 22px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .action-btn:hover {
+    background: #5563d4;
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.admin_id) {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
-        }
-      })
-      .catch(() => {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
-      });
-  });
-</script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      fetch('http://localhost/GCST_Track_System/actions/get_user.php')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.admin_id) {
+            window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+          }
+        })
+        .catch(() => {
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+        });
+    });
+  </script> 
 </head>
 
 <body>
   <!-- Header -->
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
       <strong>GCST Tracking System</strong>
     </div>
     
@@ -205,17 +259,17 @@
 
       <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
-    <div class="dropdown-menu" id="dropdown-menu">
-    <a class="menu-item" href="admincashier_dashb.html">
-      <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a>
+        <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="admincashier_dashb.html">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
     <a class="menu-item" href="admincashier_cashier.html">
       <i class="fas fa-cash-register"></i> Cashier
     </a>
         <a class="menu-item" href="admincashier_sale.html">
       <i class="fas fa-cash-register"></i> Sales
     </a>
-    <a class="menu-item" href="admincashier_inventory.html">
+    <a class="menu-item" href="admincashier_inventorys.html">
       <i class="fas fa-boxes"></i> Inventory
     </a>
     <a class="menu-item" href="admincashier_products.html">
@@ -224,19 +278,20 @@
     <a class="menu-item" href="admincashier_reports.html">
       <i class="fas fa-chart-line"></i> Reports
     </a>
+    <a class="menu-item" href="admincashier_queuing_system.html">
+      <i class="fas fa-users"></i> Queue System
+    </a>
     <a class="menu-item" href="admincashier_gmail_notification.html">
       <i class="fas fa-boxes"></i> Gmail Notification
     </a>
     <a class="menu-item" href="admincashier_profile.html">
       <i class="fas fa-user-circle"></i> Profile
     </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+    <a class="menu-item" href="javascript:void(0)" id="logout-trigger">
       <i class="fas fa-sign-out-alt"></i> Log Out
     </a>
-  </div>
+    </div>
 </header>
-
-  
 
   <!-- Queue Display Panel -->
   <div class="queue-display-panel" id="queue-display-panel">
@@ -260,9 +315,7 @@
     </div>
   </div>
 
-  <!-- Main Content -->
-  <main style="max-width: 1400px; margin: 0 auto;">
-
+  <main>
     <!-- Greeting Section -->
     <section class="greeting-section">
       <div class="greeting-content">
@@ -285,6 +338,26 @@
       </div>
     </section>
 
+    <!-- Ticket Preview Panel -->
+    <section class="ticket-preview-panel" id="ticket-preview-panel" style="display: none; margin-bottom: 20px;">
+      <h2>Last Generated Ticket</h2>
+      <div class="ticket-card ticket-preview-card">
+        <div class="ticket-preview-body">
+          <div class="ticket-label">Ticket Number</div>
+          <div class="ticket-number" id="preview-queue-number">--</div>
+          <div class="ticket-info">Generated: <span id="preview-generated-at">--</span></div>
+        </div>
+        <div class="ticket-actions">
+          <button class="action-btn" id="save-ticket-btn" onclick="saveTicket()">
+            <i class="fas fa-download"></i> Save Ticket
+          </button>
+          <button class="action-btn" id="print-ticket-btn" onclick="printTicket()">
+            <i class="fas fa-print"></i> Print Ticket
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Waiting Queue Dashboard -->
     <section class="queue-dashboard">
       <h2>Active Queues</h2>
@@ -292,16 +365,16 @@
         <!-- Queue items will be loaded here -->
       </div>
     </section>
-
   </main>
 
   <!-- Scripts -->
   <script>
     let currentAdminId = null;
+    let currentTicket = null;
 
     // Initialize greeting and current date/time
     window.addEventListener('DOMContentLoaded', () => {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_process_admin_cashier.php')
         .then(res => res.json())
         .then(data => {
           if (data.admin_id) {
@@ -315,8 +388,8 @@
       updateDateTime();
       setInterval(updateDateTime, 60000); // Update time every minute
 
-      // Load active queues
       loadActiveQueues();
+      loadQueueStatus();
     });
 
     function updateGreeting(adminName) {
@@ -392,7 +465,7 @@
 
     function loadNotifications() {
       if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
+      fetch('http://localhost/GCST_Track_System/actions/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
         .then(res => res.json())
         .then(notifs => {
           notificationsList.innerHTML = '';
@@ -411,7 +484,7 @@
           }
 
           notifs.forEach(n => {
-            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
+            const imgSrc = n.product_image || '/assets/images/bg/product_details.png';
             const item = document.createElement('div');
             item.className = 'notification-item';
             item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
@@ -432,7 +505,7 @@
         if (typeof callback === 'function') callback();
         return;
       }
-      fetch('http://localhost/GCST_Track_System/utils/mark_notifications_read.php', {
+      fetch('http://localhost/GCST_Track_System/actions/mark_notifications_read.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ admin_id: currentAdminId })
@@ -443,7 +516,7 @@
 
     clearBtn.addEventListener('click', () => {
       if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
+      fetch('http://localhost/GCST_Track_System/actions/clear_notifications.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ admin_id: currentAdminId })
@@ -468,7 +541,7 @@
     }
 
     function loadQueueStatus() {
-      fetch('http://localhost/GCST_Track_System/utils/get_queue_status.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_queue_status.php')
         .then(res => res.json())
         .then(data => {
           document.getElementById('display-current-time').textContent = data.current_time;
@@ -479,14 +552,18 @@
     }
 
     function generateQueue() {
-      fetch('http://localhost/GCST_Track_System/utils/generate_queue.php', {
+      fetch('http://localhost/GCST_Track_System/actions/generate_queue.php', {
         method: 'POST'
       })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('New queue number generated: ' + data.queue_number);
+          const ticket = data.ticket || {};
+          currentTicket = ticket;
+          showTicketPreview(ticket);
+          alert('New queue number generated: ' + ticket.queue_number);
           loadActiveQueues();
+          loadQueueStatus();
         } else {
           alert('Failed to generate queue: ' + data.error);
         }
@@ -494,12 +571,71 @@
       .catch(err => console.error('Error generating queue:', err));
     }
 
+    function showTicketPreview(ticket) {
+      if (!ticket || !ticket.queue_number) return;
+      const panel = document.getElementById('ticket-preview-panel');
+      panel.style.display = 'block';
+      document.getElementById('preview-queue-number').textContent = ticket.queue_number;
+      document.getElementById('preview-generated-at').textContent = new Date(ticket.created_at).toLocaleString();
+    }
+
+    function saveTicket() {
+      if (!currentTicket || !currentTicket.queue_number) {
+        alert('No ticket available to save. Please generate a queue number first.');
+        return;
+      }
+
+      const ticketContent = `Queue Ticket\nTicket Number: ${currentTicket.queue_number}\nStatus: ${currentTicket.status || 'waiting'}\nGenerated: ${new Date(currentTicket.created_at).toLocaleString()}\n`;
+      const blob = new Blob([ticketContent], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `queue-ticket-${currentTicket.queue_number}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function printTicket() {
+      if (!currentTicket || !currentTicket.queue_number) {
+        alert('No ticket available to print. Please generate a queue number first.');
+        return;
+      }
+
+      const printWindow = window.open('', '_blank');
+      const html = `
+        <html>
+          <head>
+            <title>Print Queue Ticket</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 30px; }
+              .ticket { border: 2px dashed #667eea; padding: 20px; border-radius: 12px; max-width: 500px; margin: auto; text-align: center; }
+              .ticket h1 { margin: 0 0 20px; font-size: 2.5rem; color: #2d3748; }
+              .ticket p { margin: 8px 0; font-size: 1rem; color: #4a5568; }
+            </style>
+          </head>
+          <body>
+            <div class="ticket">
+              <h1>Queue Ticket</h1>
+              <p><strong>Ticket Number:</strong> ${currentTicket.queue_number}</p>
+              <p><strong>Status:</strong> ${currentTicket.status || 'waiting'}</p>
+              <p><strong>Generated:</strong> ${new Date(currentTicket.created_at).toLocaleString()}</p>
+            </div>
+          </body>
+        </html>
+      `;
+      printWindow.document.write(html);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+
     function loadActiveQueues() {
-      fetch('http://localhost/GCST_Track_System/utils/get_active_queues.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_active_queues.php')
         .then(res => res.json())
-        .then(queues => {
+        .then(data => {
           const queueList = document.getElementById('queue-list');
           queueList.innerHTML = '';
+          const queues = data.queues || [];
 
           if (queues.length === 0) {
             queueList.innerHTML = '<p>No active queues.</p>';
@@ -520,7 +656,7 @@
               <div class="queue-actions">
                 ${queue.status === 'waiting' ? '<button class="queue-btn btn-serve" onclick="updateQueueStatus(' + queue.id + ', \'serving\')">Serve</button>' : ''}
                 ${queue.status === 'serving' ? '<button class="queue-btn btn-complete" onclick="updateQueueStatus(' + queue.id + ', \'completed\')">Complete</button>' : ''}
-                <button class="queue-btn btn-remove" onclick="updateQueueStatus(' + queue.id + ', \'completed\')">Remove</button>
+                ${queue.status !== 'completed' ? '<button class="queue-btn btn-remove" onclick="updateQueueStatus(' + queue.id + ', \'cancelled\')">Cancel</button>' : ''}
               </div>
             `;
             queueList.appendChild(item);
@@ -530,7 +666,7 @@
     }
 
     function updateQueueStatus(queueId, status) {
-      fetch('http://localhost/GCST_Track_System/utils/update_queue_status.php', {
+      fetch('http://localhost/GCST_Track_System/actions/update_queue_status.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ queue_id: queueId, status: status })
@@ -539,6 +675,7 @@
       .then(data => {
         if (data.success) {
           loadActiveQueues();
+          loadQueueStatus();
         } else {
           alert('Failed to update queue status: ' + data.error);
         }
@@ -546,6 +683,6 @@
       .catch(err => console.error('Error updating queue status:', err));
     }
   </script>
-
+    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
 </body>
 </html>

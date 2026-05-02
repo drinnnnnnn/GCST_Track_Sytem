@@ -1,44 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
   <title>GCST Admin Cashier Gmail Notifications</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-<link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
-<style>
-  .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  .chart-container {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  .chart-container h3 {
-    margin-top: 0;
-    color: #333;
-  }
-  .chart-wrapper {
-    position: relative;
-    height: 300px;
-  }
-  .full-width {
-    grid-column: 1 / -1;
-  }
-  @media (max-width: 768px) {
-    .charts-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
 <style>
     .balance-card p {
       margin: 0;
@@ -54,94 +22,206 @@
     .logs-section h2 {
       margin-top: 0;
       margin-bottom: 18px;
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       color: var(--text);
+    }
+    .logs-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .toolbar-group input,
+    .toolbar-group select {
+      min-width: 160px;
+      padding: 12px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color 0.2s ease;
+    }
+    .toolbar-group input:focus,
+    .toolbar-group select:focus {
+      outline: none;
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+    .toolbar-group .search-input {
+      width: 320px;
+      min-width: 240px;
+    }
+    .toolbar-button,
+    .action-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .toolbar-button:hover,
+    .action-button:hover {
+      transform: translateY(-1px);
+    }
+    .toolbar-button.primary,
+    .action-button.primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 12px 26px rgba(59, 130, 246, 0.18);
+    }
+    .toolbar-button.secondary,
+    .action-button.secondary {
+      background: var(--surface);
+      color: var(--text);
+      border-color: rgba(15, 23, 42, 0.08);
     }
     .logs-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.95rem;
+      min-width: 820px;
     }
     .logs-table th,
     .logs-table td {
       padding: 14px 12px;
       text-align: left;
       border-bottom: 1px solid #f1f5fb;
+      vertical-align: middle;
     }
     .logs-table th {
       color: var(--muted);
       font-weight: 600;
+      letter-spacing: 0.02em;
     }
-    .status-sent { color: var(--success); }
-    .status-failed { color: var(--danger); }
-    .status-pending { color: #f59e0b; }
+    .logs-table tbody tr:hover {
+      background: rgba(59, 130, 246, 0.04);
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+    .status-sent { background: rgba(34, 197, 94, 0.12); color: var(--success); }
+    .status-failed { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
+    .status-pending { background: rgba(245, 158, 11, 0.12); color: #b45309; }
     .empty-state {
       padding: 24px;
       color: var(--muted);
       text-align: center;
     }
-    .notification-dropdown {
-      position: absolute;
-      right: 24px;
-      top: 78px;
-      width: 320px;
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-card {
+      width: min(760px, 100%);
       background: var(--surface);
       border-radius: 24px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
-      display: none;
-      z-index: 70;
-      padding: 18px 20px;
-      font-weight: 700;
-      border-bottom: 1px solid #eef2f7;
+      padding: 28px;
+      box-shadow: 0 32px 80px rgba(15, 23, 42, 0.18);
+      position: relative;
     }
-    .notification-dropdown .dropdown-header {
-      margin-bottom: 16px;
+    .modal-card h3 {
+      margin: 0 0 18px;
+      font-size: 1.35rem;
     }
-    .notifications-list {
-      max-height: 320px;
-      overflow: auto;
-      padding: 0;
+    .modal-row {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 20px;
     }
-    .notification-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid #f1f5fb;
+    .modal-row.split {
+      grid-template-columns: 1fr 1fr;
     }
-    .notification-item:last-child {
-      border-bottom: none;
-    }
-    .notification-item img {
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .notification-message {
+    .modal-row label {
       font-size: 0.9rem;
       font-weight: 600;
-      color: var(--text);
-    }
-    .notification-time {
-      font-size: 0.8rem;
       color: var(--muted);
     }
-    .dropdown-footer {
-      padding: 14px 0 0;
-      color: var(--primary);
-      cursor: pointer;
-      text-align: center;
-      font-weight: 600;
+    .modal-row input,
+    .modal-row textarea,
+    .modal-row select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: var(--bg);
+      color: var(--text);
+      resize: vertical;
+      min-height: 42px;
     }
-    @media (max-width: 1100px) {
-      .balance-cards {
-        grid-template-columns: 1fr;
-      }
+    .modal-row textarea {
+      min-height: 120px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .modal-close {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .action-button {
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .action-button.view { color: #2563eb; background: rgba(37, 99, 235, 0.08); }
+    .action-button.retry { color: #d97706; background: rgba(251, 191, 36, 0.14); }
+    .action-button.delete { color: #dc2626; background: rgba(239, 68, 68, 0.12); }
+    @media (max-width: 900px) {
+      .logs-toolbar { flex-direction: column; }
+      .toolbar-group { width: 100%; justify-content: flex-start; }
+      .toolbar-group .search-input { width: 100%; min-width: unset; }
+      .modal-row.split { grid-template-columns: 1fr; }
     }
     @media (max-width: 680px) {
       header { flex-direction: column; align-items: stretch; }
       .greeting-section { flex-direction: column; }
+      .logs-table { min-width: 100%; }
     }
   </style>
 </head>
@@ -149,7 +229,7 @@
 <body>
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
       <strong>GCST Tracking System</strong>
     </div>
     
@@ -168,16 +248,16 @@
       <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
     <div class="dropdown-menu" id="dropdown-menu">
-    <a class="menu-item" href="admincashier_dashb.html">
-      <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a>
+      <a class="menu-item" href="admincashier_dashb.html">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
     <a class="menu-item" href="admincashier_cashier.html">
       <i class="fas fa-cash-register"></i> Cashier
     </a>
         <a class="menu-item" href="admincashier_sale.html">
       <i class="fas fa-cash-register"></i> Sales
     </a>
-    <a class="menu-item" href="admincashier_inventory.html">
+    <a class="menu-item" href="admincashier_inventorys.html">
       <i class="fas fa-boxes"></i> Inventory
     </a>
     <a class="menu-item" href="admincashier_products.html">
@@ -189,16 +269,17 @@
     <a class="menu-item" href="admincashier_queuing_system.html">
       <i class="fas fa-users"></i> Queue System
     </a>
+    <a class="menu-item" href="admincashier_gmail_notification.html">
+      <i class="fas fa-boxes"></i> Gmail Notification
+    </a>
     <a class="menu-item" href="admincashier_profile.html">
       <i class="fas fa-user-circle"></i> Profile
     </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+    <a class="menu-item" href="javascript:void(0)" id="logout-trigger">
       <i class="fas fa-sign-out-alt"></i> Log Out
     </a>
   </div>
 </header>
-
-  
 
   <main>
     <!-- Greeting Section -->
@@ -207,7 +288,7 @@
         <h1 id="greeting-message">Welcome, Admin Cashier!</h1>
         <p id="current-date-time"></p>
       </div>
-      <div class="greeting-icon">�</div>
+      <div class="greeting-icon">📩</div>
     </section>
 
     <!-- Dashboard Overview -->
@@ -236,6 +317,26 @@
     <!-- Email Logs Table -->
     <section class="logs-section">
       <h2>Email Logs</h2>
+      <div class="logs-toolbar">
+        <div class="toolbar-group">
+          <input id="searchInput" class="search-input" type="search" placeholder="Search recipient, subject or type" />
+          <button id="refreshLogsBtn" class="toolbar-button secondary"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+        <div class="toolbar-group">
+          <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="sent">Sent</option>
+            <option value="failed">Failed</option>
+            <option value="pending">Pending</option>
+          </select>
+          <select id="typeFilter">
+            <option value="">All Types</option>
+          </select>
+          <input id="fromDate" type="date" />
+          <input id="toDate" type="date" />
+          <button id="sendEmailBtn" class="toolbar-button primary"><i class="fas fa-paper-plane"></i> Send Email</button>
+        </div>
+      </div>
       <div style="overflow-x:auto;">
         <table class="logs-table">
           <thead>
@@ -243,49 +344,133 @@
               <th>ID</th>
               <th>Recipient</th>
               <th>Subject</th>
-              <th>Email Type</th>
+              <th>Notification Type</th>
               <th>Status</th>
-              <th>Timestamp</th>
+              <th>Date & Time Sent</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="emailLogsBody">
-            <tr><td colspan="6" class="empty-state">Loading email logs...</td></tr>
+            <tr><td colspan="7" class="empty-state">Loading email logs...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <script>
-    let currentAdminId = null;
+  <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
 
-    // Initialize greeting and current date/time
+  <div class="modal-overlay" id="emailModal">
+    <div class="modal-card">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close modal">×</button>
+      <h3 id="modalTitle">Send Email Notification</h3>
+      <div class="modal-row split">
+        <div>
+          <label for="modalRecipient">Recipient Email</label>
+          <input id="modalRecipient" type="email" placeholder="user@example.com" />
+        </div>
+        <div>
+          <label for="modalType">Notification Type</label>
+          <select id="modalType">
+            <option value="System Alert">System Alert</option>
+            <option value="User Notification">User Notification</option>
+            <option value="Reminder">Reminder</option>
+            <option value="Report">Report</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-row">
+        <label for="modalSubject">Subject</label>
+        <input id="modalSubject" type="text" placeholder="Enter email subject" />
+      </div>
+      <div class="modal-row">
+        <label for="modalMessage">Message</label>
+        <textarea id="modalMessage" placeholder="Write your notification message"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="toolbar-button secondary" id="modalCancelBtn">Cancel</button>
+        <button class="toolbar-button primary" id="modalSendBtn">Send Email</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'http://localhost/GCST_Track_System/actions/get_admincashier_gmail_notifications.php';
+    const notificationsApiUrl = 'http://localhost/GCST_Track_System/actions/get_notifications.php';
+    let currentAdminId = null;
+    let emailLogs = [];
+
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const fromDate = document.getElementById('fromDate');
+    const toDate = document.getElementById('toDate');
+    const refreshLogsBtn = document.getElementById('refreshLogsBtn');
+    const sendEmailBtn = document.getElementById('sendEmailBtn');
+    const emailModal = document.getElementById('emailModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalSendBtn = document.getElementById('modalSendBtn');
+    const modalRecipient = document.getElementById('modalRecipient');
+    const modalType = document.getElementById('modalType');
+    const modalSubject = document.getElementById('modalSubject');
+    const modalMessage = document.getElementById('modalMessage');
+
+    const bell = document.getElementById('notification-bell');
+    const dropdown = document.getElementById('notification-dropdown');
+    const notificationsList = document.getElementById('notifications-list');
+    const clearBtn = document.getElementById('clear-notifications');
+    const notifBadge = document.getElementById('notif-badge');
+    let notifInterval = null;
+
     window.addEventListener('DOMContentLoaded', () => {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_user.php')
         .then(res => res.json())
         .then(data => {
-          if (data.admin_id) {
-            currentAdminId = data.admin_id;
-            updateGreeting(data.name);
-            loadNotifications();
-            startNotifPolling();
+          if (!data.admin_id) {
+            window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html';
+            return;
           }
+          currentAdminId = data.admin_id;
+          updateGreeting(data.name || data.username || 'Admin Cashier');
+          loadNotifications();
+          startNotifPolling();
+        })
+        .catch(() => {
+          window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html';
         });
 
       updateDateTime();
-      setInterval(updateDateTime, 60000); // Update time every minute
-
-      // Fetch gmail data
+      setInterval(updateDateTime, 60000);
       loadGmailData();
+      attachFilterListeners();
     });
+
+    function attachFilterListeners() {
+      [searchInput, statusFilter, typeFilter, fromDate, toDate].forEach(element => {
+        element.addEventListener('change', loadGmailData);
+        element.addEventListener('keyup', event => {
+          if (event.key === 'Enter') loadGmailData();
+        });
+      });
+      refreshLogsBtn.addEventListener('click', loadGmailData);
+      sendEmailBtn.addEventListener('click', () => openModal('send'));
+      modalCloseBtn.addEventListener('click', closeModal);
+      modalCancelBtn.addEventListener('click', closeModal);
+      modalSendBtn.addEventListener('click', submitSendEmail);
+      emailModal.addEventListener('click', (event) => {
+        if (event.target === emailModal) closeModal();
+      });
+    }
 
     function updateGreeting(adminName) {
       const hour = new Date().getHours();
-      let greet = "Hello";
-      if (hour < 12) greet = "Good Morning";
-      else if (hour < 18) greet = "Good Afternoon";
-      else greet = "Good Evening";
-
+      let greet = 'Hello';
+      if (hour < 12) greet = 'Good Morning';
+      else if (hour < 18) greet = 'Good Afternoon';
+      else greet = 'Good Evening';
       document.getElementById('greeting-message').textContent = `${greet}, ${adminName}!`;
     }
 
@@ -298,69 +483,214 @@
     }
 
     function loadGmailData() {
-      fetch('http://localhost/GCST_Track_System/utils/get_admincashier_gmail_notifications.php')
+      const params = new URLSearchParams();
+      if (statusFilter.value) params.set('status', statusFilter.value);
+      if (typeFilter.value) params.set('email_type', typeFilter.value);
+      if (fromDate.value) params.set('from_date', fromDate.value);
+      if (toDate.value) params.set('to_date', toDate.value);
+      if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
+
+      fetch(`${apiUrl}?${params.toString()}`)
         .then(res => res.json())
         .then(data => {
           document.getElementById('sentToday').textContent = data.sent_today ?? 0;
           document.getElementById('failedEmails').textContent = data.failed_emails ?? 0;
           document.getElementById('pendingEmails').textContent = data.pending_emails ?? 0;
           document.getElementById('totalEmailsSent').textContent = data.total_emails_sent ?? 0;
-
-          const logsBody = document.getElementById('emailLogsBody');
-          logsBody.innerHTML = '';
-          if (Array.isArray(data.email_logs) && data.email_logs.length) {
-            data.email_logs.forEach(log => {
-              const row = document.createElement('tr');
-              const statusClass = log.status === 'sent' ? 'status-sent' : log.status === 'failed' ? 'status-failed' : 'status-pending';
-              row.innerHTML = `
-                <td>${log.id}</td>
-                <td>${log.recipient}</td>
-                <td>${log.subject}</td>
-                <td>${log.email_type}</td>
-                <td class="${statusClass}">${log.status}</td>
-                <td>${new Date(log.timestamp).toLocaleString()}</td>
-              `;
-              logsBody.appendChild(row);
-            });
-          } else {
-            logsBody.innerHTML = '<tr><td colspan="6" class="empty-state">No email logs available.</td></tr>';
-          }
+          emailLogs = Array.isArray(data.email_logs) ? data.email_logs : [];
+          renderEmailLogs(emailLogs);
+          populateEmailTypes(data.email_types || []);
         })
         .catch(err => {
           console.error('Error fetching gmail data:', err);
-          document.getElementById('emailLogsBody').innerHTML = '<tr><td colspan="6" class="empty-state">Unable to load email logs.</td></tr>';
+          document.getElementById('emailLogsBody').innerHTML = '<tr><td colspan="7" class="empty-state">Unable to load email logs.</td></tr>';
         });
+    }
+
+    function renderEmailLogs(logs) {
+      const logsBody = document.getElementById('emailLogsBody');
+      logsBody.innerHTML = '';
+      if (!logs.length) {
+        logsBody.innerHTML = '<tr><td colspan="7" class="empty-state">No email logs available.</td></tr>';
+        return;
+      }
+
+      logs.forEach(log => {
+        const row = document.createElement('tr');
+        const statusClass = log.status === 'sent' ? 'status-sent' : log.status === 'failed' ? 'status-failed' : 'status-pending';
+        row.innerHTML = `
+          <td>${log.id}</td>
+          <td>${escapeHtml(log.recipient)}</td>
+          <td>${escapeHtml(log.subject)}</td>
+          <td>${escapeHtml(log.email_type)}</td>
+          <td><span class="status-badge ${statusClass}">${escapeHtml(log.status)}</span></td>
+          <td>${formatDateTime(log.timestamp)}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="action-button view" type="button" data-action="view" data-id="${log.id}">View</button>
+              <button class="action-button retry" type="button" data-action="retry" data-id="${log.id}">Retry</button>
+              <button class="action-button delete" type="button" data-action="delete" data-id="${log.id}">Delete</button>
+            </div>
+          </td>
+        `;
+        logsBody.appendChild(row);
+      });
+      logsBody.querySelectorAll('.action-button').forEach(button => {
+        button.addEventListener('click', () => handleRowAction(button.dataset.action, Number(button.dataset.id)));
+      });
+    }
+
+    function populateEmailTypes(types) {
+      const existingValues = Array.from(typeFilter.options).map(opt => opt.value);
+      const uniqueTypes = Array.from(new Set(types.filter(type => type && !existingValues.includes(type))));
+      uniqueTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        typeFilter.appendChild(option);
+      });
+    }
+
+    function formatDateTime(value) {
+      const date = new Date(value);
+      return isNaN(date.getTime()) ? value : date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function openModal(mode, log = null) {
+      emailModal.classList.add('open');
+      if (mode === 'send') {
+        modalTitle.textContent = 'Send Email Notification';
+        modalSendBtn.style.display = 'inline-flex';
+        modalRecipient.value = '';
+        modalSubject.value = '';
+        modalMessage.value = '';
+        modalType.value = 'System Alert';
+      } else if (mode === 'view' && log) {
+        modalTitle.textContent = 'Email Details';
+        modalSendBtn.style.display = 'none';
+        modalRecipient.value = log.recipient;
+        modalSubject.value = log.subject;
+        modalMessage.value = log.message || 'No message content available.';
+        modalType.value = log.email_type;
+      }
+    }
+
+    function closeModal() {
+      emailModal.classList.remove('open');
+    }
+
+    function submitSendEmail() {
+      const payload = {
+        action: 'send_email',
+        recipient: modalRecipient.value.trim(),
+        subject: modalSubject.value.trim(),
+        message: modalMessage.value.trim(),
+        email_type: modalType.value.trim()
+      };
+      if (!payload.recipient || !payload.subject) {
+        alert('Please provide a recipient and subject.');
+        return;
+      }
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          closeModal();
+          loadGmailData();
+        } else {
+          alert(result.error || 'Unable to send email notification.');
+        }
+      })
+      .catch(err => {
+        console.error('Error sending email:', err);
+        alert('Unable to send email notification.');
+      });
+    }
+
+    function handleRowAction(action, id) {
+      const log = emailLogs.find(entry => entry.id === id);
+      if (action === 'view' && log) {
+        openModal('view', log);
+      }
+      if (action === 'retry') {
+        retryEmailLog(id);
+      }
+      if (action === 'delete' && confirm('Delete this email log entry?')) {
+        deleteEmailLog(id);
+      }
+    }
+
+    function retryEmailLog(id) {
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'retry_email', id })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          loadGmailData();
+        } else {
+          alert(result.error || 'Unable to retry email.');
+        }
+      })
+      .catch(err => {
+        console.error('Retry error:', err);
+        alert('Unable to retry email.');
+      });
+    }
+
+    function deleteEmailLog(id) {
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_log', id })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          loadGmailData();
+        } else {
+          alert(result.error || 'Unable to delete log.');
+        }
+      })
+      .catch(err => {
+        console.error('Delete error:', err);
+        alert('Unable to delete log.');
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&"'<>]/g, tag => ({ '&': '&amp;', '"': '&quot;', "'": '&#39;', '<': '&lt;', '>': '&gt;' })[tag]);
     }
 
     function loadNotifications() {
       if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
+      fetch(`${notificationsApiUrl}?admin_id=${encodeURIComponent(currentAdminId)}`)
         .then(res => res.json())
         .then(notifs => {
           notificationsList.innerHTML = '';
-          if (notifs.length === 0) {
+          if (!Array.isArray(notifs) || notifs.length === 0) {
             notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
             notifBadge.style.display = 'none';
             return;
           }
-
           const unreadCount = notifs.filter(n => n.is_read == 0).length;
-          if (unreadCount > 0) {
-            notifBadge.textContent = unreadCount;
-            notifBadge.style.display = 'inline-block';
-          } else {
-            notifBadge.style.display = 'none';
-          }
-
+          notifBadge.textContent = unreadCount > 0 ? unreadCount : '';
+          notifBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
           notifs.forEach(n => {
-            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
+            const imgSrc = n.product_image || '/assets/images/bg/product_details.png';
             const item = document.createElement('div');
             item.className = 'notification-item';
             item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
             item.innerHTML = `
               <img src="${imgSrc}" alt="Product">
               <div>
-                <div class="notification-message">${n.product_name} - ${n.status}</div>
+                <div class="notification-message">${escapeHtml(n.product_name)} - ${escapeHtml(n.status)}</div>
                 <div class="notification-time">${new Date(n.notified_at).toLocaleString()}</div>
               </div>
             `;
@@ -369,7 +699,6 @@
         });
     }
 
-    // Menu toggle
     document.getElementById('menu-icon').addEventListener('click', (e) => {
       e.preventDefault();
       const menu = document.getElementById('dropdown-menu');
@@ -383,19 +712,11 @@
       }
     });
 
-    // Notification functions
-    const bell = document.getElementById('notification-bell');
-    const dropdown = document.getElementById('notification-dropdown');
-    const notificationsList = document.getElementById('notifications-list');
-    const clearBtn = document.getElementById('clear-notifications');
-    const notifBadge = document.getElementById('notif-badge');
-
-    let notifInterval = null;
-
     bell.addEventListener('click', (e) => {
       e.preventDefault();
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-      if (dropdown.style.display === 'block') {
+      const isOpen = dropdown.style.display === 'block';
+      dropdown.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) {
         markAllNotificationsRead(() => {
           loadNotifications();
           startNotifPolling();
@@ -422,49 +743,12 @@
       notifInterval = null;
     }
 
-    function loadNotifications() {
-      if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
-        .then(res => res.json())
-        .then(notifs => {
-          notificationsList.innerHTML = '';
-          if (notifs.length === 0) {
-            notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
-            notifBadge.style.display = 'none';
-            return;
-          }
-
-          const unreadCount = notifs.filter(n => n.is_read == 0).length;
-          if (unreadCount > 0) {
-            notifBadge.textContent = unreadCount;
-            notifBadge.style.display = 'inline-block';
-          } else {
-            notifBadge.style.display = 'none';
-          }
-
-          notifs.forEach(n => {
-            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
-            const item = document.createElement('div');
-            item.className = 'notification-item';
-            item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
-            item.innerHTML = `
-              <img src="${imgSrc}" alt="Product">
-              <div>
-                <div class="notification-message">${n.product_name} - ${n.status}</div>
-                <div class="notification-time">${new Date(n.notified_at).toLocaleString()}</div>
-              </div>
-            `;
-            notificationsList.appendChild(item);
-          });
-        });
-    }
-
     function markAllNotificationsRead(callback) {
       if (!currentAdminId) {
         if (typeof callback === 'function') callback();
         return;
       }
-      fetch('http://localhost/GCST_Track_System/utils/mark_notifications_read.php', {
+      fetch('http://localhost/GCST_Track_System/actions/mark_notifications_read.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ admin_id: currentAdminId })
@@ -475,7 +759,7 @@
 
     clearBtn.addEventListener('click', () => {
       if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
+      fetch('http://localhost/GCST_Track_System/actions/clear_notifications.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ admin_id: currentAdminId })
@@ -488,23 +772,6 @@
         }
       });
     });
-  </script>
-
-  <!--Logout Confirmation-->
-  <script>
-  function confirmLogout(event) {
-      event.preventDefault();
-
-      const confirmAction = confirm("Are you sure you want to logout?");
-
-      if (confirmAction) {
-          // Clear session storage if used
-          localStorage.clear();
-
-          // Redirect to logout handler or login page
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
-      }
-  }
   </script>
 </body>
 </html>

@@ -1,0 +1,177 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "gcst_tracking_db";
+
+$mysqli = new mysqli($host, $username, $password);
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+
+$mysqli->query("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+$mysqli->select_db($dbname);
+$mysqli->set_charset('utf8mb4');
+
+function addColumnIfNotExists($conn, $table, $column, $definition) {
+    $result = $conn->query("SHOW COLUMNS FROM `$table` LIKE '$column'");
+    if (!$result || $result->num_rows === 0) {
+        return $conn->query("ALTER TABLE `$table` ADD COLUMN `$column` $definition");
+    }
+    return true;
+}
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `users` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `student_id` VARCHAR(50) NOT NULL UNIQUE,
+        `first_name` VARCHAR(100) NOT NULL,
+        `last_name` VARCHAR(100) NOT NULL,
+        `middle_name` VARCHAR(100) DEFAULT NULL,
+        `email` VARCHAR(150) NOT NULL UNIQUE,
+        `password` VARCHAR(255) NOT NULL,
+        `sex` ENUM('Male','Female') DEFAULT NULL,
+        `course` VARCHAR(100) DEFAULT NULL,
+        `year_section` VARCHAR(100) DEFAULT NULL,
+        `contact_number` VARCHAR(25) DEFAULT NULL,
+        `phone` VARCHAR(25) DEFAULT NULL,
+        `address` VARCHAR(255) DEFAULT NULL,
+        `role` ENUM('user','admin','cashier','admincashier','superadmin') NOT NULL DEFAULT 'user',
+        `status` ENUM('Active','Inactive','Suspended') NOT NULL DEFAULT 'Active',
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `admincashier_acc` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `username` VARCHAR(100) DEFAULT NULL,
+        `last_name` VARCHAR(100) NOT NULL,
+        `first_name` VARCHAR(100) NOT NULL,
+        `middle_name` VARCHAR(100) DEFAULT NULL,
+        `email` VARCHAR(150) NOT NULL UNIQUE,
+        `password` VARCHAR(255) NOT NULL,
+        `role` ENUM('admincashier','cashier','superadmin') NOT NULL DEFAULT 'admincashier',
+        `status` ENUM('active','inactive') NOT NULL DEFAULT 'active',
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `products` (
+        `product_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `product_name` VARCHAR(150) NOT NULL,
+        `product_author` VARCHAR(100) DEFAULT 'Unknown',
+        `product_category` VARCHAR(50) DEFAULT NULL,
+        `product_description` TEXT DEFAULT NULL,
+        `product_image` VARCHAR(255) DEFAULT NULL,
+        `price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        `rent_price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        `stock` INT(11) NOT NULL DEFAULT 0,
+        `stock_count` INT(11) NOT NULL DEFAULT 0,
+        `product_status` ENUM('available','unavailable') NOT NULL DEFAULT 'available',
+        `barcode` VARCHAR(50) DEFAULT NULL,
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `transactions` (
+        `transaction_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `user_id` INT(11) NOT NULL,
+        `product_id` INT(11) NOT NULL,
+        `type` ENUM('buy','rent') NOT NULL,
+        `quantity` INT(11) NOT NULL DEFAULT 1,
+        `total_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        `transaction_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+        FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `queue` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `user_id` INT(11) DEFAULT NULL,
+        `queue_number` VARCHAR(20) NOT NULL,
+        `status` ENUM('waiting','serving','completed') NOT NULL DEFAULT 'waiting',
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `served_at` TIMESTAMP NULL DEFAULT NULL,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `tuition_fees` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `user_id` INT(11) NOT NULL,
+        `total_fees` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        `total_paid` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        `payment_status` ENUM('Unpaid','Partial','Paid') NOT NULL DEFAULT 'Unpaid',
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+// Add missing columns or alter column types in existing schemas.
+addColumnIfNotExists($mysqli, 'users', 'role', "ENUM('user','admin','cashier','admincashier','superadmin') NOT NULL DEFAULT 'user'");
+addColumnIfNotExists($mysqli, 'users', 'phone', "VARCHAR(25) DEFAULT NULL");
+addColumnIfNotExists($mysqli, 'users', 'created_at', "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+addColumnIfNotExists($mysqli, 'users', 'updated_at', "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+addColumnIfNotExists($mysqli, 'admincashier_acc', 'role', "ENUM('admincashier','cashier','superadmin') NOT NULL DEFAULT 'admincashier'");
+addColumnIfNotExists($mysqli, 'admincashier_acc', 'status', "ENUM('active','inactive') NOT NULL DEFAULT 'active'");
+addColumnIfNotExists($mysqli, 'admincashier_acc', 'created_at', "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+addColumnIfNotExists($mysqli, 'admincashier_acc', 'updated_at', "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+addColumnIfNotExists($mysqli, 'products', 'rent_price', "DECIMAL(10,2) NOT NULL DEFAULT 0.00");
+addColumnIfNotExists($mysqli, 'products', 'stock', "INT(11) NOT NULL DEFAULT 0");
+addColumnIfNotExists($mysqli, 'products', 'product_status', "ENUM('available','unavailable') NOT NULL DEFAULT 'available'");
+addColumnIfNotExists($mysqli, 'products', 'barcode', "VARCHAR(50) DEFAULT NULL");
+addColumnIfNotExists($mysqli, 'queue', 'queue_number', "VARCHAR(20) NOT NULL");
+addColumnIfNotExists($mysqli, 'queue', 'served_at', "TIMESTAMP NULL DEFAULT NULL");
+addColumnIfNotExists($mysqli, 'queue', 'user_id', "INT(11) DEFAULT NULL");
+addColumnIfNotExists($mysqli, 'queue', 'status', "ENUM('waiting','serving','completed','cancelled') NOT NULL DEFAULT 'waiting'");
+
+// If the queue_number column exists as INT, ensure it is text-capable.
+$columnInfo = $mysqli->query("SHOW COLUMNS FROM `queue` LIKE 'queue_number'");
+if ($columnInfo && $columnInfo->num_rows > 0) {
+    $info = $columnInfo->fetch_assoc();
+    if (strpos($info['Type'], 'int') !== false) {
+        $mysqli->query("ALTER TABLE `queue` MODIFY `queue_number` VARCHAR(20) NOT NULL");
+    }
+}
+
+$columnInfo = $mysqli->query("SHOW COLUMNS FROM `queue` LIKE 'status'");
+if ($columnInfo && $columnInfo->num_rows > 0) {
+    $info = $columnInfo->fetch_assoc();
+    if (strpos($info['Type'], "'cancelled'") === false) {
+        $mysqli->query("ALTER TABLE `queue` MODIFY `status` ENUM('waiting','serving','completed','cancelled') NOT NULL DEFAULT 'waiting'");
+    }
+}
+
+// Avoid generated columns for compatibility; use aliases in queries instead.
+
+// Indexes for queue table.
+$columnInfo = $mysqli->query("SHOW INDEX FROM `queue` WHERE Key_name = 'idx_queue_status'");
+if ($columnInfo && $columnInfo->num_rows === 0) {
+    $mysqli->query("ALTER TABLE `queue` ADD INDEX idx_queue_status (`status`)");
+}
+
+$columnInfo = $mysqli->query("SHOW INDEX FROM `transactions` WHERE Key_name = 'idx_transactions_user'");
+if ($columnInfo && $columnInfo->num_rows === 0) {
+    $mysqli->query("ALTER TABLE `transactions` ADD INDEX idx_transactions_user (`user_id`)");
+}
+
+$columnInfo = $mysqli->query("SHOW INDEX FROM `transactions` WHERE Key_name = 'idx_transactions_product'");
+if ($columnInfo && $columnInfo->num_rows === 0) {
+    $mysqli->query("ALTER TABLE `transactions` ADD INDEX idx_transactions_product (`product_id`)");
+}
+
+echo "Database and tables created or updated successfully.";
+$mysqli->close();
+?>

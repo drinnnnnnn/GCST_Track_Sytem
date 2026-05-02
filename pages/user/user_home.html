@@ -1,231 +1,1008 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GCST Track</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_home.css" />
+  
+  <title>GCST User - Welcome</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-soft: #eff6ff;
+      --slate-900: #0f172a;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --glass: rgba(255, 255, 255, 0.7);
+    }
+
+    body { 
+      font-family: 'Outfit', sans-serif; 
+      background-color: #f8fafc; 
+      color: var(--slate-900);
+      margin: 0;
+    }
+
+    .glass { 
+      background: var(--glass); 
+      backdrop-filter: blur(12px); 
+      border: 1px solid rgba(255, 255, 255, 0.3); 
+    }
+
+    .welcome-banner {
+      /* Keep your original background settings */
+      background-image: url('http://localhost/GCST_Track_System/assets/images/bg/Granby.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      
+      /* Enhanced Styling */
+      color: white;
+      padding: 80px 40px; /* Slightly more vertical breathing room */
+      border-radius: 2rem;
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      
+      /* Softer, more modern shadow */
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+      
+      /* Smooth entrance animation */
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    /* Superior Overlay: Mixes a dark tint with a subtle gradient */
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg, 
+        rgba(0, 0, 0, 0.7) 0%, 
+        rgba(0, 0, 0, 0.3) 100%
+      );
+      z-index: 1;
+    }
+
+    /* Glassmorphism accent to make the banner feel "high-end" */
+    .welcome-banner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      transform: skewX(-25deg);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Ensures text stays above the overlays */
+    .welcome-banner > * {
+      position: relative;
+      z-index: 3;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Entrance Animation Keyframes */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Quick Link Card Refinement */
+    .quick-link-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .quick-link-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+
+    .quick-link-icon {
+      font-size: 2rem;
+      width: 60px;
+      height: 60px;
+      background: var(--primary-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1rem;
+      margin-bottom: 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .quick-link-card:hover .quick-link-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Feature Grid Styling */
+    .features-section {
+      background: white;
+      border-radius: 2rem;
+      padding: 40px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f1f5f9;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover .feature-icon {
+      background: var(--primary);
+      color: white;
+    }
+
+    .products-panel {
+      background: white;
+      border-radius: 2rem;
+      padding: 32px;
+      box-shadow: 0 20px 35px rgba(15, 23, 42, 0.05);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .products-panel h2 {
+      font-size: 2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .products-meta {
+      color: #475569;
+      max-width: 44rem;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 1.75rem;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
+      transform: translateY(24px);
+      opacity: 0;
+      transition: transform 0.35s ease, opacity 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .product-card.animate-card {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 28px 45px rgba(15, 23, 42, 0.18);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+
+    .product-card-body {
+      padding: 1.5rem;
+    }
+
+    .product-category-pill {
+      display: inline-flex;
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .product-name {
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.4;
+      color: #0f172a;
+    }
+
+    .product-details {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-top: 0.75rem;
+    }
+
+    .product-card-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .product-stock {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .stock-available { background: #d1fae5; color: #065f46; }
+    .stock-low { background: #fef3c7; color: #92400e; }
+    .stock-unavailable { background: #fee2e2; color: #991b1b; }
+
+    .product-actions {
+      display: inline-flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .product-button {
+      padding: 0.85rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-buy {
+      background: #2563eb;
+      color: white;
+      border-color: transparent;
+    }
+
+    .btn-view {
+      background: #111827;
+      color: white;
+      border-color: transparent;
+    }
+
+    .product-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-rent {
+      display: none;
+    }
+
+    .btn-rent:hover {
+      background: #eff6ff;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 60;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .product-modal {
+      width: min(100%, 720px);
+      background: white;
+      border-radius: 2rem;
+      overflow: hidden;
+      box-shadow: 0 35px 80px rgba(15, 23, 42, 0.2);
+      animation: fadeInUp 0.32s ease;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.5rem 1.75rem 0.75rem;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      color: #475569;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.45rem;
+      border-radius: 999px;
+      transition: background-color 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: #f1f5f9;
+    }
+
+    .modal-body {
+      padding: 0 1.75rem 1.75rem;
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .modal-body img {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: 1.5rem;
+      background: #f8fafc;
+    }
+
+    .modal-meta {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .modal-meta-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+
+    .modal-meta-item span {
+      display: block;
+      color: #64748b;
+      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .modal-meta-item strong {
+      display: block;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+
+    .modal-description {
+      color: #475569;
+      line-height: 1.75;
+      font-size: 0.98rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 1.75rem 1.5rem;
+    }
+
+    .btn-secondary {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      padding: 0.85rem 1.35rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .products-loading,
+    .products-empty {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      border-radius: 1.5rem;
+      background: #f8fafc;
+      color: #475569;
+      text-align: center;
+      padding: 2rem;
+      border: 1px dashed #cbd5e1;
+      margin-top: 1.5rem;
+    }
+
+    .products-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .products-controls {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      width: 100%;
+      max-width: 38rem;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .search-input-wrapper input {
+      flex: 1;
+      padding: 0.95rem 1rem;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      color: #0f172a;
+      outline: none;
+    }
+
+    .search-input-wrapper button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .search-input-wrapper button:hover {
+      background: #1d4ed8;
+    }
+
+    .category-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .category-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .category-pill.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .category-pill:hover {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .fade-in-section {
+      opacity: 0;
+      transform: translateY(28px);
+      animation: fadeInUp 0.85s ease forwards;
+    }
+
+    .fade-in-delay {
+      animation-delay: 0.15s;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 16px 24px;
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
 </head>
 
-<body>
+<body class="antialiased">
+
+  <!-- Elegant Navigation (Consistent with Index) -->
   <header>
-    <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
-      <strong>Granby Colloges of Science & Technology - Tracking System</strong>
-    </div>
-
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <div class="auth-links">
-        <a href="http://localhost/GCST_Track_System/pages/sign_in.html" class="signin">Sign in</a>
+    <div class="nav-container glass rounded-2xl px-6 py-3 shadow-lg">
+      <div class="flex items-center space-x-4">
+        <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Logo" class="w-10 h-10 drop-shadow-sm">
+        <div class="hidden sm:block">
+          <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none">GCST TRACK</h1>
+          <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Student Portal</span>
+        </div>
       </div>
-
-      <nav class="nav-links">
-        <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+      
+      <nav class="flex items-center space-x-2">
+        <a href="http://localhost/GCST_Track_System/pages/sign_in.html" class="p-3 text-slate-600 hover:text-blue-600 transition-colors" title="Sign In">
+          <i class="fas fa-sign-in-alt text-lg"></i>
+        </a>
+        <a href="http://localhost/GCST_Track_System/pages/index.html" class="p-3 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-md" title="About Us">
+          <i class="fas fa-circle-info"></i>
+        </a>
       </nav>
     </div>
-</header>
+  </header>
 
-  <div class="floating-box" id="floating-box">
-    <a href="http://localhost/GCST_Track_System/index1.html"><i class="fas fa-info-circle"></i> About Us</a>
-  </div>
-
-
-  <section class="hero">
-    <h1>Discover Your Next Products</h1>
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Search for products, uniforms, etc...">
-      <i class="fas fa-search search-icon"></i>
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <span class="px-4 py-1 bg-blue-500/20 text-blue-300 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] mb-4 inline-block">Student Access Only</span>
+      <h1 class="text-4xl md:text-5xl font-black mb-3">Welcome to GCST Tracking</h1>
+      <p class="text-slate-400 text-lg font-light">Your Tracking Portal.</p>
     </div>
-  </section>
 
-<main>
-  <div class="section">
-    <h3 id="products-title">All Products</h3>
-    <div class="products-grid">
-      <!-- products will be injected here -->
-    </div>
-  </div>
-  <aside class="sidebar">
-    <h3>Categories</h3>
-      <div class="categories" id="categories-list">
-        <!-- Categories will be injected here by JS -->
+    <!-- Quick Links -->
+    <section class="mb-12">
+      <div class="flex items-center space-x-3 mb-8">
+        <div class="h-1 w-8 bg-blue-600 rounded-full"></div>
+        <h2 class="text-xl font-bold text-slate-800 uppercase tracking-wider">Our Services</h2>
       </div>
-    </aside>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="#" class="quick-link-card">
+          <div class="quick-link-icon text-blue-600">📊</div>
+          <h3 class="text-lg font-bold text-slate-800">Dashboard</h3>
+          <p class="text-sm text-slate-500 mt-2">Personalized rental summaries and real-time statistics.</p>
+        </a>
+        <a href="#" class="quick-link-card">
+          <div class="quick-link-icon text-emerald-600">🛍️</div>
+          <h3 class="text-lg font-bold text-slate-800">Browse Products</h3>
+          <p class="text-sm text-slate-500 mt-2">Shop for books, school supplies, and uniforms.</p>
+        </a>
+        <a href="#" class="quick-link-card">
+          <div class="quick-link-icon text-indigo-600">📚</div>
+          <h3 class="text-lg font-bold text-slate-800">My Rentals</h3>
+          <p class="text-sm text-slate-500 mt-2">Track return dates and manage your borrowed materials.</p>
+        </a>
+        <a href="#" class="quick-link-card">
+          <div class="quick-link-icon text-amber-600">🎟️</div>
+          <h3 class="text-lg font-bold text-slate-800">Queue Tickets</h3>
+          <p class="text-sm text-slate-500 mt-2">Skip the line with digital queue management.</p>
+        </a>
+        <a href="#" class="quick-link-card">
+          <div class="quick-link-icon text-rose-600">💰</div>
+          <h3 class="text-lg font-bold text-slate-800">Tuition Fees</h3>
+          <p class="text-sm text-slate-500 mt-2">Transparent billing and easy fee management.</p>
+        </a>
+        <a href="#" class="quick-link-card">
+          <div class="quick-link-icon text-slate-600">👤</div>
+          <h3 class="text-lg font-bold text-slate-800">My Profile</h3>
+          <p class="text-sm text-slate-500 mt-2">Securely update your personal information.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section mb-12">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+          <h2 class="text-3xl font-black text-slate-900">Platform Features</h2>
+          <p class="text-slate-500">Everything you need for a streamlined student experience.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <!-- Feature 1 -->
+        <div class="feature-item flex space-x-5">
+          <div class="feature-icon shrink-0 shadow-lg shadow-blue-100">
+            <i class="fas fa-book-open"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 mb-1">Book Rentals</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Rent reference materials for your courses with a few clicks.</p>
+          </div>
+        </div>
+        <!-- Feature 2 -->
+        <div class="feature-item flex space-x-5">
+          <div class="feature-icon shrink-0 shadow-lg shadow-blue-100">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 mb-1">Online Shop</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Official uniforms and supplies available for direct purchase.</p>
+          </div>
+        </div>
+        <!-- Feature 3 -->
+        <div class="feature-item flex space-x-5">
+          <div class="feature-icon shrink-0 shadow-lg shadow-blue-100">
+            <i class="fas fa-ticket-alt"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 mb-1">Queue System</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Digital ticketing to save time during administrative visits.</p>
+          </div>
+        </div>
+        <!-- Feature 4 -->
+        <div class="feature-item flex space-x-5">
+          <div class="feature-icon shrink-0 shadow-lg shadow-blue-100">
+            <i class="fas fa-credit-card"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 mb-1">Fee Management</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Real-time tracking of balances and payment histories.</p>
+          </div>
+        </div>
+        <!-- Feature 5 -->
+        <div class="feature-item flex space-x-5">
+          <div class="feature-icon shrink-0 shadow-lg shadow-blue-100">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 mb-1">Smart Alerts</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Notifications for due dates and institutional announcements.</p>
+          </div>
+        </div>
+        <!-- Feature 6 -->
+        <div class="feature-item flex space-x-5">
+          <div class="feature-icon shrink-0 shadow-lg shadow-blue-100">
+            <i class="fas fa-user-check"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 mb-1">Full Control</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">End-to-end management of your student profile and preferences.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Available Products Section -->
+    <section id="products-section" class="products-panel fade-in-section fade-in-delay mb-12">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-8">
+        <div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold uppercase tracking-[0.24em]">Live inventory</span>
+          <h2 class="mt-4 font-black text-slate-900">Available Products</h2>
+          <p class="products-meta mt-3">Browse the latest items in stock with real-time availability, rental options, and price details.</p>
+        </div>
+        <button onclick="toggleProductsPopup()" class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-5 py-3 text-sm font-semibold transition hover:bg-blue-600 shadow-lg">View all products <i class="fas fa-arrow-right"></i></button>
+      </div>
+
+      <div class="products-controls mb-6">
+        <div class="search-input-wrapper">
+          <input id="product-search" type="search" placeholder="Search products, categories, or names" autocomplete="off">
+          <button id="product-search-btn" type="button"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="category-filters" class="category-filters" aria-label="Product categories"></div>
+      </div>
+
+      <div id="products-grid" class="products-grid"></div>
+      <div id="products-loading" class="products-loading">Loading available products...</div>
+      <div id="products-empty" class="products-empty hidden">No available products found right now. Check back soon.</div>
+    </section>
+
+    <div id="product-details-modal" class="modal-backdrop" aria-hidden="true" onclick="closeProductDetails(event)">
+      <div class="product-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3 id="modal-title" class="modal-title">Product details</h3>
+            <p id="modal-subtitle" class="text-sm text-slate-500">View information about the selected book.</p>
+          </div>
+          <button type="button" class="modal-close" onclick="closeProductDetails()" aria-label="Close product details">×</button>
+        </div>
+        <div class="modal-body">
+          <img id="modal-image" src="http://localhost/GCST_Track_System/assets/img_bg/product_details.png" alt="Product image">
+          <div class="modal-meta">
+            <div class="modal-meta-item">
+              <span>Category</span>
+              <strong id="modal-category">—</strong>
+            </div>
+            <div class="modal-meta-item">
+              <span>Available stock</span>
+              <strong id="modal-stock">—</strong>
+            </div>
+            <div class="modal-meta-item">
+              <span>Price</span>
+              <strong id="modal-price">—</strong>
+            </div>
+          </div>
+          <div>
+            <h4 class="font-semibold text-slate-900">Description</h4>
+            <p id="modal-description" class="modal-description">No description available.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeProductDetails()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Getting Started Section -->
+    <section class="bg-white rounded-[2rem] p-10 border border-slate-100 shadow-sm">
+      <h2 class="text-2xl font-black text-slate-900 mb-6">Getting Started</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <p class="text-slate-500 leading-loose">
+          Welcome to your personal command center. This portal was designed to eliminate paperwork and long queues, putting the power of management in your hands. Explore our services to see how we can assist your academic journey today.
+        </p>
+        <ul class="space-y-3">
+          <li class="flex items-center text-sm text-slate-600">
+            <i class="fas fa-check-circle text-blue-600 mr-3"></i> Unified library and uniform shop
+          </li>
+          <li class="flex items-center text-sm text-slate-600">
+            <i class="fas fa-check-circle text-blue-600 mr-3"></i> Real-time payment and fee tracking
+          </li>
+          <li class="flex items-center text-sm text-slate-600">
+            <i class="fas fa-check-circle text-blue-600 mr-3"></i> Instant digital queue generation
+          </li>
+        </ul>
+      </div>
+    </section>
+
   </main>
 
-<script>
-  const floatingBox = document.getElementById('floating-box');
-  const trigger = document.getElementById('menu-icon'); // or your custom trigger element
-
-  trigger.addEventListener('click', () => {
-    floatingBox.style.display = floatingBox.style.display === 'block' ? 'none' : 'block';
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!floatingBox.contains(e.target) && !trigger.contains(e.target)) {
-      floatingBox.style.display = 'none';
-    }
-  });
-</script>
+  <!-- Footer -->
+  <footer class="py-12 border-t border-slate-200 mt-12 text-center">
+    <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" class="w-8 h-8 grayscale opacity-50 inline-block mb-4">
+    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2026 Granby Colleges - Track System</p>
+  </footer>
 
   <script>
-  window.addEventListener('DOMContentLoaded', () => {
-  fetch('http://localhost/GCST_Track_System/utils/fetch.php')
-    .then(response => response.json())
-    .then(data => {
-      const container = document.querySelector('.products-grid');
-      container.innerHTML = ''; // Clear existing content
+    const API_PRODUCTS = 'http://localhost/GCST_Track_System/actions/get_admincashier_products.html';
+    const productsGrid = document.getElementById('products-grid');
+    const productsLoading = document.getElementById('products-loading');
+    const productsEmpty = document.getElementById('products-empty');
+    const productsSection = document.getElementById('products-section');
+    const categoryFilters = document.getElementById('category-filters');
+    const searchInput = document.getElementById('product-search');
+    const searchButton = document.getElementById('product-search-btn');
 
-      if (Array.isArray(data)) {
-        data.forEach(product => {
-          const card = document.createElement('div');
-          card.className = 'product-card';
+    let allProducts = [];
+    let activeCategory = 'all';
+    let searchTerm = '';
 
-          // Use product_image if exists, else fallback image
-          const imgSrc = product.product_image ? product.product_image : '/assets/img_bg/product_details.png';
-
-          card.innerHTML = `
-            <div class="product-cover">
-              <img src="${imgSrc}" alt="Cover of ${product.product_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
-            </div>
-            <div class="product-title">${product.product_name}</div>
-            <div class="product-author">${product.product_author}</div>
-          `;
-          container.appendChild(card);
-        });
-      } else {
-        container.innerHTML = '<p>Failed to load products.</p>';
+    function normalizeImagePath(value) {
+      if (!value) {
+        return 'http://localhost/GCST_Track_System/assets/img_bg/product_details.png';
       }
-    })
-    .catch(error => {
-      console.error('Error loading products:', error);
-      document.querySelector('.products-grid').innerHTML = '<p>Error loading products.</p>';
-    });
-});
-
-</script>
-
-<script>
-  let allproducts = [];
-  let selectedCategory = null;
-  let searchTerm = "";
-  let lastSearchText = "";
-
-// Fetch all products and render categories/products
-  window.addEventListener('DOMContentLoaded', () => {
-    fetch('http://localhost/GCST_Track_System/utils/fetch.php')
-      .then(response => response.json())
-      .then(data => {
-        if (!Array.isArray(data)) {
-          document.querySelector('.products-grid').innerHTML = '<p>Failed to load products.</p>';
-          return;
-        }
-        allproducts = data;
-        renderCategories();
-        renderproducts();
-      })
-      .catch(error => {
-        console.error('Error loading products:', error);
-        document.querySelector('.products-grid').innerHTML = '<p>Error loading products.</p>';
-      });
-
-  // Search logic
-  const searchInput = document.getElementById('search-input');
-  const searchIcon = document.querySelector('.search-icon');
-
-  function doSearch() {
-    searchTerm = searchInput.value.trim();
-    lastSearchText = searchTerm;
-    renderproducts();
-    updateproductsTitle();
-    searchInput.value = "";
-  }
-
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      doSearch();
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        return value;
+      }
+      if (value.startsWith('/')) {
+        return `http://localhost/GCST_Track_System${value}`;
+      }
+      return value;
     }
-  });
 
-  searchIcon.addEventListener('click', () => {
-    doSearch();
-    searchInput.focus();
-  });
-});
+    function formatPrice(value) {
+      if (value === null || value === undefined || Number(value) === 0) {
+        return null;
+      }
+      return Number(value).toFixed(2);
+    }
 
-// Render categories dynamically
-function renderCategories() {
-  const categoriesDiv = document.getElementById('categories-list');
-  categoriesDiv.innerHTML = '';
-  const categories = Array.from(new Set(allproducts.map(product => product.product_category).filter(Boolean)));
-  // Add "All" option
-  categoriesDiv.innerHTML += `<div class="category${selectedCategory ? '' : ' active'}" data-category="">All</div>`;
-  categories.forEach(cat => {
-    categoriesDiv.innerHTML += `<div class="category${selectedCategory === cat ? ' active' : ''}" data-category="${cat}">${cat}</div>`;
-  });
+    function createProductCard(product, index) {
+      const imageSrc = normalizeImagePath(product.product_image);
+      const stockCount = Number(product.stock_count || 0);
+      const buyPrice = formatPrice(product.buy_price);
+      const rentPrice = formatPrice(product.rent_price);
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      card.style.transitionDelay = `${index * 80}ms`;
+      card.innerHTML = `
+        <img src="${imageSrc}" alt="${product.product_name}" loading="lazy">
+        <div class="product-card-body">
+          <span class="product-category-pill">${product.product_category || 'General'}</span>
+          <h3 class="product-name">${product.product_name}</h3>
+          <p class="product-details">${buyPrice ? `Buy ₱${buyPrice}` : ''}${rentPrice ? `${buyPrice ? ' ·' : ''} Rent ₱${rentPrice}` : ''}</p>
+          <div class="product-card-footer">
+            <span class="product-stock ${stockCount > 10 ? 'stock-available' : stockCount > 0 ? 'stock-low' : 'stock-unavailable'}">${stockCount > 0 ? `${stockCount} in stock` : 'Out of stock'}</span>
+            <div class="product-actions">
+              <button class="product-button btn-view" onclick="openProductDetails(${product.product_id})">View details</button>
+            </div>
+          </div>
+        </div>
+      `;
+      return card;
+    }
 
-  // Add click listeners
-  categoriesDiv.querySelectorAll('.category').forEach(el => {
-    el.addEventListener('click', () => {
-      selectedCategory = el.dataset.category || null;
-      renderCategories();
-      renderproducts();
+    function getFilteredProducts() {
+      return allProducts
+        .filter(item => Number(item.stock_count || 0) > 0)
+        .filter(item => activeCategory === 'all' || (item.product_category || '').toLowerCase() === activeCategory.toLowerCase())
+        .filter(item => {
+          if (!searchTerm.trim()) return true;
+          const term = searchTerm.toLowerCase();
+          return [item.product_name, item.product_category, item.barcode, item.product_description]
+            .filter(Boolean)
+            .some(value => value.toLowerCase().includes(term));
+        });
+    }
+
+    function renderCategories(products) {
+      const categories = ['all', ...new Set(products.map(item => (item.product_category || 'General').toLowerCase()))];
+      categoryFilters.innerHTML = categories.map(category => `
+        <button type="button" class="category-pill ${category === activeCategory ? 'active' : ''}" data-category="${category}">
+          ${category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}
+        </button>
+      `).join('');
+
+      categoryFilters.querySelectorAll('.category-pill').forEach(button => {
+        button.addEventListener('click', () => {
+          activeCategory = button.dataset.category;
+          renderCategories(allProducts);
+          renderProducts(getFilteredProducts());
+        });
+      });
+    }
+
+    function renderProducts(products) {
+      productsGrid.innerHTML = '';
+      productsEmpty.classList.add('hidden');
+
+      if (!products.length) {
+        productsEmpty.classList.remove('hidden');
+        return;
+      }
+
+      products.forEach((product, index) => {
+        const card = createProductCard(product, index);
+        productsGrid.appendChild(card);
+        requestAnimationFrame(() => card.classList.add('animate-card'));
+      });
+    }
+
+    async function loadAvailableProducts() {
+      try {
+        const response = await fetch(API_PRODUCTS, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('Unable to load products');
+        }
+        const data = await response.json();
+        allProducts = Array.isArray(data) ? data : [];
+        renderCategories(allProducts);
+        renderProducts(getFilteredProducts());
+      } catch (error) {
+        console.error('Product load failed:', error);
+        productsEmpty.textContent = 'Unable to load products. Please refresh or try again later.';
+        productsEmpty.classList.remove('hidden');
+      } finally {
+        productsLoading.classList.add('hidden');
+      }
+    }
+
+    function handleModalEscape(event) {
+      if (event.key === 'Escape') {
+        closeProductDetails();
+      }
+    }
+
+    function openProductDetails(productId) {
+      const product = allProducts.find(item => Number(item.product_id) === Number(productId));
+      if (!product) return;
+
+      document.getElementById('modal-title').textContent = product.product_name || 'Product details';
+      document.getElementById('modal-subtitle').textContent = `Category • ${product.product_category || 'General'}`;
+      document.getElementById('modal-image').src = normalizeImagePath(product.product_image);
+      document.getElementById('modal-image').alt = product.product_name || 'Product image';
+      document.getElementById('modal-category').textContent = product.product_category || 'General';
+      document.getElementById('modal-stock').textContent = Number(product.stock_count || 0) > 0 ? `${product.stock_count} in stock` : 'Out of stock';
+      const buyPrice = formatPrice(product.buy_price);
+      const rentPrice = formatPrice(product.rent_price);
+      document.getElementById('modal-price').textContent = buyPrice && rentPrice ? `Buy ₱${buyPrice} · Rent ₱${rentPrice}` : buyPrice ? `Buy ₱${buyPrice}` : rentPrice ? `Rent ₱${rentPrice}` : 'Not available';
+      document.getElementById('modal-description').textContent = product.product_description || 'No description available.';
+
+      const modal = document.getElementById('product-details-modal');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.addEventListener('keydown', handleModalEscape);
+    }
+
+    function closeProductDetails(event) {
+      if (event && event.target !== event.currentTarget) {
+        return;
+      }
+
+      const modal = document.getElementById('product-details-modal');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.removeEventListener('keydown', handleModalEscape);
+    }
+
+    function updateSearch() {
+      searchTerm = searchInput.value || '';
+      renderProducts(getFilteredProducts());
+    }
+
+    function toggleProductsPopup() {
+      const productsSection = document.getElementById('products-section');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      productsSection.classList.add('fade-in-section');
+      loadAvailableProducts();
+      if (searchInput) {
+        searchInput.addEventListener('input', updateSearch);
+        searchInput.addEventListener('keypress', event => {
+          if (event.key === 'Enter') {
+            updateSearch();
+          }
+        });
+      }
+      if (searchButton) {
+        searchButton.addEventListener('click', updateSearch);
+      }
     });
-  });
-}
-
-// Update the products title based on search
-function updateproductsTitle() {
-  const title = document.getElementById('products-title');
-  if (lastSearchText.length > 0) {
-    title.textContent = 'Search Results: ' + lastSearchText;
-  } else {
-    title.textContent = 'All Products';
-  }
-}
-
-// Render products based on selected category and search term
-function renderproducts() {
-  const container = document.querySelector('.products-grid');
-  container.innerHTML = '';
-  let filtered = allproducts;
-
-  // Filter by category if selected
-  if (selectedCategory) {
-    filtered = filtered.filter(product => product.product_category === selectedCategory);
-  }
-
-  // Filter by search term
-  if (searchTerm && searchTerm.length > 0) {
-    const term = searchTerm.toLowerCase();
-    filtered = filtered.filter(product =>
-      (product.product_name && product.product_name.toLowerCase().includes(term)) ||
-      (product.product_author && product.product_author.toLowerCase().includes(term)) ||
-      (product.product_category && product.product_category.toLowerCase().includes(term))
-    );
-  }
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<p>No products found.</p>';
-    return;
-  }
-  filtered.forEach(product => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    const imgSrc = product.product_image ? product.product_image : '/assets/img_bg/product_details.png';
-    card.innerHTML = `
-      <div class="product-cover">
-        <img src="${imgSrc}" alt="Cover of ${product.product_name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
-      </div>
-      <div class="product-title">${product.product_name}</div>
-      <div class="product-author">${product.product_author}</div>
-    `;
-    container.appendChild(card);
-  });
-  updateproductsTitle();
-}
-</script>
+  </script>
 
 </body>
 </html>

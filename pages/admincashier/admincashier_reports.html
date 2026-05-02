@@ -1,15 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GCST Admin Cashier Reports</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root {
       --bg: #f4f7fb;
@@ -25,27 +23,6 @@
 
     * {
       box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: 'Poppins', sans-serif;
-      color: var(--text);
-      background: var(--bg);
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 24px;
-      background: var(--surface);
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
     }
 
     .logo {
@@ -103,32 +80,7 @@
       justify-content: center;
     }
 
-    .dropdown-menu {
-      position: absolute;
-      right: 24px;
-      top: 72px;
-      width: 240px;
-      background: var(--surface);
-      border-radius: 24px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
-      display: none;
-      z-index: 60;
-      padding: 10px 0;
-    }
-
-    .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 18px;
-      color: var(--text);
-      text-decoration: none;
-      transition: background 0.2s ease;
-    }
-
-    .menu-item:hover {
-      background: #f7f9ff;
-    }
+    
 
     main {
       max-width: 1400px;
@@ -403,42 +355,66 @@
       }
     }
   </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        fetch('http://localhost/GCST_Track_System/actions/get_user.php')
+          .then(res => res.json())
+          .then(data => {
+            if (!data.admin_id) {
+              window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+            }
+          })
+          .catch(() => {
+            window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
+          });
+      });
+    </script> 
 </head>
 <body>
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Logo" />
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Logo" />
       <div>
         <strong>GCST Tracking System</strong>
         <p style="margin: 4px 0 0; color: var(--muted); font-size: 0.95rem;">Admin Cashier Reports</p>
       </div>
     </div>
 
-    <div class="nav-links">
-      <button class="icon-button" id="notification-bell" title="Notifications">
-        <i class="fas fa-bell"></i>
+    <nav class="nav-links">
+      <a href="#" class="notification-icon" id="notification-bell" title="Notifications">
+        🔔
         <span id="notif-badge"></span>
-      </button>
-      <button class="icon-button" id="menu-icon" title="Menu">
-        <i class="fas fa-bars"></i>
-      </button>
-    </div>
+      </a>
+
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="dropdown-header">Notifications</div>
+        <div class="notifications-list" id="notifications-list"></div>
+        <div class="dropdown-footer" id="clear-notifications">Clear All</div>
+      </div>
+
+      <a href="#" class="menu-icon" id="menu-icon">☰</a>
+    </nav>
 
     <div class="dropdown-menu" id="dropdown-menu">
       <a class="menu-item" href="admincashier_dashb.html">
-      <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a>
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
     <a class="menu-item" href="admincashier_cashier.html">
       <i class="fas fa-cash-register"></i> Cashier
     </a>
         <a class="menu-item" href="admincashier_sale.html">
       <i class="fas fa-cash-register"></i> Sales
     </a>
-    <a class="menu-item" href="admincashier_inventory.html">
+    <a class="menu-item" href="admincashier_inventorys.html">
       <i class="fas fa-boxes"></i> Inventory
     </a>
     <a class="menu-item" href="admincashier_products.html">
       <i class="fas fa-boxes"></i> Products
+    </a>
+    <a class="menu-item" href="admincashier_reports.html">
+      <i class="fas fa-chart-line"></i> Reports
     </a>
     <a class="menu-item" href="admincashier_queuing_system.html">
       <i class="fas fa-users"></i> Queue System
@@ -449,19 +425,21 @@
     <a class="menu-item" href="admincashier_profile.html">
       <i class="fas fa-user-circle"></i> Profile
     </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+    <a class="menu-item" href="javascript:void(0)" id="logout-trigger">
       <i class="fas fa-sign-out-alt"></i> Log Out
     </a>
   </div>
-
-    <div class="notification-dropdown" id="notification-dropdown" style="display:none; width:320px; right:24px; top:78px; position:absolute; background:var(--surface); border-radius:24px; box-shadow:0 18px 40px rgba(15,23,42,.15); z-index:70;">
-      <div style="padding:18px 20px; font-weight:700; border-bottom:1px solid #eef2f7;">Notifications</div>
-      <div id="notifications-list" style="max-height:320px; overflow:auto; padding:16px;"></div>
-      <div id="clear-notifications" style="padding:14px 20px; color:var(--primary); cursor:pointer;">Clear All</div>
-    </div>
-  </header>
+</header>
 
   <main>
+    <section class="greeting-section">
+      <div class="greeting-content">
+        <h1 id="greeting-message">Welcome, Admin Cashier!</h1>
+        <p id="current-date-time"></p>
+      </div>
+      <div class="greeting-icon">👋</div>
+    </section>
+
     <section class="hero-card">
       <div class="hero-copy">
         <h1>Sales & Inventory Reports</h1>
@@ -572,13 +550,42 @@
     let inventoryChart = null;
     let topProductsChart = null;
 
+    // Initialize greeting and current date/time
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('http://localhost/GCST_Track_System/actions/get_user.php')
+        .then(res => res.json())
+        .then(data => {
+          if (data.admin_id) {
+            currentAdminId = data.admin_id;
+            updateGreeting(data.name);
+            loadNotifications();
+            startNotifPolling();
+          }
+        });
+
+      updateDateTime();
+      setInterval(updateDateTime, 60000); // Update time every minute
+
+      // Fetch gmail data
+      loadGmailData();
+    });
+
     function updateGreeting(adminName) {
       const hour = new Date().getHours();
-      let greet = 'Hello';
-      if (hour < 12) greet = 'Good Morning';
-      else if (hour < 18) greet = 'Good Afternoon';
-      else greet = 'Good Evening';
-      document.title = `${greet}, ${adminName} — GCST Reports`;
+      let greet = "Hello";
+      if (hour < 12) greet = "Good Morning";
+      else if (hour < 18) greet = "Good Afternoon";
+      else greet = "Good Evening";
+
+      document.getElementById('greeting-message').textContent = `${greet}, ${adminName}!`;
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('en-US', options);
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('current-date-time').textContent = `${dateStr} • ${timeStr}`;
     }
 
     function formatCurrency(value) {
@@ -621,7 +628,7 @@
 
     async function loadNotifications() {
       try {
-        const res = await fetch('http://localhost/GCST_Track_System/utils/get_notifications.php');
+        const res = await fetch('http://localhost/GCST_Track_System/actions/get_notifications.php');
         const notifs = await res.json();
         renderNotifications(notifs);
       } catch (error) {
@@ -637,7 +644,7 @@
         if (from) params.set('from', from);
         if (to) params.set('to', to);
 
-        const res = await fetch(`http://localhost/GCST_Track_System/utils/get_admincashier_reports.php?${params.toString()}`);
+        const res = await fetch(`http://localhost/GCST_Track_System/actions/get_admincashier_reports.html?${params.toString()}`);
         const data = await res.json();
 
         document.getElementById('revenueToday').textContent = formatCurrency(data.total_sales_today);
@@ -790,27 +797,6 @@
       dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-        .then(res => res.json())
-        .then(data => {
-          if (!data.name && !data.student_id && !data.admin_id) {
-            window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html';
-            return;
-          }
-          currentUser = data.student_id || data.admin_id || null;
-          updateGreeting(data.name || 'Admin');
-          loadNotifications();
-          loadReports();
-        })
-        .catch(() => {
-          window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html';
-        }); 
-
-      revenueChart = createChart('revenueChart', 'line', [], [], 'Revenue (₱)', 'rgba(69, 88, 255, 0.18)', '#4558ff');
-      inventoryChart = createChart('inventoryChart', 'doughnut', [], [], 'Category Stock', ['#667eea', '#7c53ff', '#f093fb', '#4facfe'], '#4558ff');
-      topProductsChart = createChart('topProductsChart', 'bar', [], [], 'Top Products', 'rgba(69, 88, 255, 0.18)', '#4558ff');
-
       document.getElementById('menu-icon').addEventListener('click', (e) => {
         e.preventDefault();
         toggleMenu();
@@ -836,13 +822,13 @@
       document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSV);
       document.getElementById('printReportBtn').addEventListener('click', () => window.print());
       document.getElementById('clear-notifications').addEventListener('click', () => {
-        fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
+        fetch('http://localhost/GCST_Track_System/actions/clear_notifications.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({})
         }).then(() => loadNotifications());
       });
-    });
   </script>
+    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
 </body>
 </html>

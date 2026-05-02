@@ -1,53 +1,72 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <title>Student Sign Up</title>
+    
+    <!-- Boxicons & Fonts -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             text-decoration: none;
-            list-style: none;
         }
 
         body {
             min-height: 100vh;
-            background: radial-gradient(circle at top left, rgba(116,148,236,0.18), transparent 22%),
-                        radial-gradient(circle at bottom right, rgba(116,148,236,0.16), transparent 18%),
-                        linear-gradient(135deg, #eef4ff 0%, #fbfdff 100%);
-            overflow-x: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(-45deg, #c9d6ff, #e2e2e2, #aec0ff, #f0f2f5);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             padding: 24px;
-            color: #24324a;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
-            position: relative;
             width: 100%;
             max-width: 540px;
-            background: #ffffff;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 34px;
-            box-shadow: 0 24px 60px rgba(35, 75, 155, 0.14);
-            padding: 38px 36px 32px;
-            border: 1px solid rgba(116,148,236,0.16);
+            box-shadow: 0 24px 60px rgba(35, 75, 155, 0.12);
+            padding: 40px;
+            position: relative;
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Header & Floating Icon */
         .form-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
+            text-align: center;
+            margin-bottom: 25px;
         }
 
         .header-icon {
@@ -56,435 +75,277 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #7494ec, #8fa8f8);
+            background: linear-gradient(135deg, var(--primary), #764ba2);
             border-radius: 22px;
             color: #ffffff;
-            font-size: 32px;
-            box-shadow: 0 18px 40px rgba(116,148,236,0.18);
+            font-size: 35px;
+            margin: 0 auto 15px;
+            box-shadow: 0 12px 25px var(--primary-glow);
+            animation: iconFloat 3s ease-in-out infinite;
         }
 
-        .container h1 {
-            font-size: 32px;
-            margin: 0;
-            letter-spacing: -0.5px;
-            color: #1f2b45;
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
-        .container p {
-            font-size: 15px;
-            margin: 0;
-            text-align: center;
-            color: #5b6c8f;
-            line-height: 1.6;
-            max-width: 420px;
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
-        form { width: 100%; }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14.5px;
+            line-height: 1.5;
+        }
+
+        /* Scrollable Form Section */
+        .register-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        .register-scroll::-webkit-scrollbar { width: 5px; }
+        .register-scroll::-webkit-scrollbar-thumb { 
+            background: #cbd5e1; 
+            border-radius: 10px; 
+        }
 
         .input-box {
             position: relative;
-            margin: 18px 0;
+            margin-bottom: 16px;
         }
 
         .input-box input {
             width: 100%;
-            padding: 14px 50px 14px 20px;
-            background: #f5f8ff;
+            padding: 14px 45px 14px 18px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid transparent;
             border-radius: 14px;
-            border: 1px solid #e7ecff;
-            outline: none;
             font-size: 15px;
-            color: #2b3748;
+            color: var(--text-dark);
             font-weight: 500;
-            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+            outline: none;
+            transition: all 0.3s ease;
         }
 
         .input-box input:focus {
-            border-color: #7494ec;
-            box-shadow: 0 0 0 4px rgba(116,148,236,0.16);
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 8px 15px -3px var(--primary-glow);
+            transform: translateY(-2px);
         }
 
-        .input-box input::placeholder {
-            color: #8d9bb1;
-            font-weight: 400;
-        }
-        
         .input-box i {
             position: absolute;
             right: 18px;
             top: 50%;
             transform: translateY(-50%);
             font-size: 20px;
-            color: #6b7a9e;
+            color: #94a3b8;
+            transition: 0.3s;
         }
 
-        .toggle-password {
-            cursor: pointer;
-            color: #6b7a9e;
-            z-index: 20;
-        }
+        .toggle-password { cursor: pointer; z-index: 5; }
+        .toggle-password:hover { color: var(--primary); }
 
+        /* Buttons & Footer */
         .btn {
             width: 100%;
-            height: 52px;
-            background: linear-gradient(135deg, #5d83e2, #7ea0f0);
-            border-radius: 14px;
-            box-shadow: 0 18px 30px rgba(93, 130, 226, 0.24);
+            padding: 16px;
+            background: var(--text-dark);
+            color: white;
             border: none;
-            cursor: pointer;
+            border-radius: 16px;
             font-size: 16px;
-            color: #fff;
             font-weight: 700;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
         .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 20px 38px rgba(93, 130, 226, 0.32);
-        }
-
-        .message {
-            text-align: center;
-            margin-top: 18px;
-            font-weight: 600;
-            font-size: 15px;
-            padding: 14px 16px;
-            border-radius: 16px;
-            background: rgba(116,148,236,0.08);
-            color: #1f2b45;
-            transition: opacity 0.3s ease;
-        }
-
-        .success-msg {
-            color: #176f3b;
-        }
-
-        .error-msg {
-            color: #b32a2a;
-        }
-
-        .message-card {
-            border: 1px solid rgba(116,148,236,0.18);
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        .fade-out {
-            animation: fadeOut 1s forwards;
-        }
-
-        .register-scroll {
-            max-height: 420px;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .register-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-        .register-scroll::-webkit-scrollbar-thumb {
-            background: #c5cfe6;
-            border-radius: 10px;
-        }
-
-        .floating-message {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            min-width: 280px;
-            background-color: #2f80ed;
-            color: white;
-            padding: 14px 22px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 15px;
-            box-shadow: 0 18px 34px rgba(47, 128, 237, 0.22);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.35s ease, transform 0.35s ease;
-            z-index: 1000;
-        }
-
-        .floating-message.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .floating-message.error {
-            background-color: #d32f2f;
-            box-shadow: 0 18px 34px rgba(211, 47, 47, 0.22);
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px var(--primary-glow);
         }
 
         .signin-link {
             text-align: center;
             margin-top: 22px;
-            font-size: 14.5px;
-            color: #5b6c8f;
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
         .signin-link a {
-            color: #5d83e2;
+            color: var(--primary);
             font-weight: 700;
-            text-decoration: none;
         }
 
-        .signin-link a:hover {
-            color: #3f63c4;
+        /* Toast / Messages */
+        .floating-message {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            min-width: 280px;
+            background: var(--primary);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 16px;
+            font-weight: 700;
+            box-shadow: 0 18px 34px var(--primary-glow);
+            opacity: 0;
+            transition: 0.4s;
+            z-index: 1000;
         }
 
-        @media screen and (max-width: 420px) {
-            .container {
-                padding: 24px 22px 26px;
-            }
+        .floating-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .floating-message.error { background: #ef4444; box-shadow: 0 18px 34px rgba(239, 68, 68, 0.3); }
 
-            .container h1 {
-                font-size: 28px;
-            }
+        /* Animation Classes */
+        .animate-item { opacity: 0; animation: fadeInUp 0.5s ease forwards; }
+        .header-anim { animation-delay: 0.1s; }
+        .form-anim { animation-delay: 0.2s; }
+        .btn-anim { animation-delay: 0.3s; }
+        .footer-anim { animation-delay: 0.4s; }
 
-            .input-box {
-                margin: 16px 0;
-            }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
+</head>
 
 <body>
+    <div id="floating-message" class="floating-message"></div>
+
     <div class="container">
-        <div id="floating-message" class="floating-message"></div>
-        
-        <form action="http://localhost/GCST_Track_System/utils/sign_up.php" method="POST" onsubmit="return validateForm(this)">
-            <div class="form-header">
+        <form action="http://localhost/GCST_Track_System/actions/sign_up.php" method="POST" onsubmit="return validateForm(this)">
+            
+            <div class="form-header header-anim animate-item">
                 <div class="header-icon"><i class='bx bxs-user-circle'></i></div>
-                <div>
-                    <h1>Sign Up</h1>
-                    <p>Create a new account and manage your library profile easily.</p>
+                <h1>Sign Up</h1>
+                <p class="subtitle">Create a new account and manage your library profile easily.</p>
+            </div>
+
+            <div class="register-scroll form-anim animate-item">
+                <div class="input-box">
+                    <input type="text" name="student_id" placeholder="Student ID (GC-XXXXXX)" required pattern="^GC-\d{6}$" title="Format: GC-XXXXXX">
+                    <i class='bx bxs-id-card'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="last_name" placeholder="Last Name" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="first_name" placeholder="First Name" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="middle_name" placeholder="Middle Name" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="sex" placeholder="Male or Female" required pattern="Male|Female">
+                    <i class='bx bx-male-female'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="course" placeholder="Course" required>
+                    <i class='bx bxs-graduation'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="year_section" placeholder="Year Level (e.g., 1-A)" required pattern="[1-5]-[A-Z]">
+                    <i class='bx bxs-layer'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="contact_number" placeholder="Contact Number (11 digits)" required pattern="\d{11}">
+                    <i class='bx bxs-phone'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="text" name="address" placeholder="Address" required>
+                    <i class='bx bxs-map'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="email" name="email" placeholder="Email (example@email.com)" required>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" name="password" id="password" placeholder="Password (min 8 chars, 1 special)" required pattern="^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$">
+                    <i class='bx bx-show toggle-password' data-target="password"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required>
+                    <i class='bx bx-show toggle-password' data-target="confirm_password"></i>
                 </div>
             </div>
-            <div class="register-scroll">
-        <div class="input-box">
-            <input 
-                type="text" 
-                name="student_id" 
-                placeholder="Student ID Number (GC-XXXXXX)" 
-                required
-                pattern="^GC-\d{6}$"
-                title="Student ID must be in the format GC-XXXXXX (e.g. GC-230266)">
-            <i class='bx bxs-id-card'></i>
-        </div>
+            
+            <button type="submit" class="btn btn-anim animate-item">Register Account</button>
 
-        <div class="input-box">
-            <input type="text" name="last_name" placeholder="Last Name" required>
-            <i class='bx bxs-user'></i>
-        </div>
-
-        <div class="input-box">
-            <input type="text" name="first_name" placeholder="First Name" required>
-            <i class='bx bxs-user'></i>
-        </div>
-
-        <div class="input-box">
-            <input type="text" name="middle_name" placeholder="Middle Name" required>
-            <i class='bx bxs-user'></i>
-        </div>
-
-        <div class="input-box">
-            <input 
-                type="text" 
-                name="sex" 
-                placeholder="Male or Female" 
-                required
-                pattern="Male|Female"
-                title="Sex must be either 'Male' or 'Female'">
-            <i class='bx bxs-user'></i>
-        </div>
-
-         <div class="input-box">
-            <input 
-                type="text" 
-                name="course" 
-                placeholder="Course" 
-                required
-                pattern="[A-Za-z\s]{2,50}"
-                title="Enter a valid course name (letters only)">
-            <i class='bx bxs-user'></i>
-        </div>
-
-         <div class="input-box">
-            <input 
-                type="text" 
-                name="year_section" 
-                placeholder="Year Level (e.g., 1-A)" 
-                required
-                pattern="[1-5]-[A-Z]"
-                title="Year Section must be in format like '1-A', '2-B'">
-            <i class='bx bxs-user'></i>
-        </div>
-
-       <div class="input-box">
-            <input 
-                type="text" 
-                name="contact_number" 
-                placeholder="Contact Number" 
-                required
-                pattern="\d{11}"
-                title="Contact number must be 11 digits">
-            <i class='bx bxs-user'></i>
-        </div>
-
-        <div class="input-box">
-            <input 
-                type="text" 
-                name="address" 
-                placeholder="Address" 
-                required
-                pattern=".{5,100}"
-                title="Address">
-            <i class='bx bxs-user'></i>
-        </div>
-
-        <div class="input-box">
-            <input 
-                type="email" 
-                name="email" 
-                placeholder="Email (example@email.com)" 
-                required
-                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                title="Please enter a valid email address (example@email.com)">
-            <i class='bx bxs-envelope'></i>
-        </div>
-
-        <div class="input-box">
-            <input 
-                type="password" 
-                name="password" 
-                placeholder="Password (min 8 chars, 1 special char)" 
-                required
-                pattern="^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$"
-                title="Password must be at least 8 characters and contain at least one special character (!@#$%^&*)">
-            <i class='bx bx-show toggle-password'></i>
-        </div>
-
-        <div class="input-box">
-            <input 
-                type="password" 
-                name="confirm_password" 
-                placeholder="Confirm Password" 
-                required>
-            <i class='bx bx-show toggle-password'></i>
-        </div>
-    </div>
-    
-    <button type="submit" class="btn">Register</button>
-    <div id="register-message" class="message"></div>
-
-    <div class="signin-link">
-        Already done on creating student account? <a href="superadmin_dashb.html">Go to Dashboard</a>
-    </div>
-</form>
+            <div class="signin-link footer-anim animate-item">
+                Already have an account? <a href="superadmin_dashb.html">Go to Dashboard</a>
+            </div>
+        </form>
     </div>
 
     <script>
-        const registerMessageDiv = document.getElementById("register-message");
         const floatingMessage = document.getElementById("floating-message");
-
-        function getQueryParam(param) {
-            return new URLSearchParams(window.location.search).get(param);
-        }
 
         function showToast(message, isError = false) {
             floatingMessage.textContent = message;
             floatingMessage.classList.toggle("error", isError);
             floatingMessage.classList.add("show");
-
-            setTimeout(() => {
-                floatingMessage.classList.remove("show");
-                setTimeout(() => {
-                    floatingMessage.textContent = "";
-                    floatingMessage.classList.remove("error");
-                }, 300);
-            }, 4200);
+            setTimeout(() => floatingMessage.classList.remove("show"), 4000);
         }
 
-        function showBanner(message, isError = false) {
-            registerMessageDiv.textContent = message;
-            registerMessageDiv.classList.toggle("error-msg", isError);
-            registerMessageDiv.classList.toggle("success-msg", !isError);
-            registerMessageDiv.classList.add("message-card");
-
-            setTimeout(() => {
-                registerMessageDiv.classList.add("fade-out");
-                setTimeout(() => {
-                    registerMessageDiv.style.display = "none";
-                }, 1000);
-            }, 4200);
-        }
-
+        // URL Status Handling
         document.addEventListener("DOMContentLoaded", function () {
-            const status = getQueryParam("status");
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get("status");
 
-            if (status === "success") {
-                showToast("Successfully Registered!");
-                showBanner("Your account has been created. Please sign in to continue.");
-            } else if (status === "exists") {
-                showToast("Account already exists.", true);
-                showBanner("An account with that student ID or email already exists.", true);
-            } else if (status === "nomatch") {
-                showToast("Passwords do not match.", true);
-                showBanner("Please make sure both passwords match.", true);
-            }
+            if (status === "success") showToast("Successfully Registered!");
+            else if (status === "exists") showToast("Account already exists.", true);
+            else if (status === "nomatch") showToast("Passwords do not match.", true);
         });
-    </script>
 
-    <script>
+        // Form Validation
         function validateForm(form) {
-            const studentIdRegex = /^GC-\d{6}$/;
             const password = form.password.value;
-            const confirmPassword = form.confirm_password ? form.confirm_password.value : null;
-            const passwordRegex = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-
-            if (!studentIdRegex.test(form.student_id.value)) {
-                alert("Invalid Student ID format. Example: GC-230266");
+            const confirm = form.confirm_password.value;
+            if (password !== confirm) {
+                showToast("Passwords do not match!", true);
                 return false;
             }
-
-            if (!passwordRegex.test(password)) {
-                alert("Password must be at least 8 characters and contain at least one special character.");
-                return false;
-            }
-
-            if (confirmPassword !== null && password !== confirmPassword) {
-                alert("Passwords do not match.");
-                return false;
-            }
-
             return true;
         }
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const togglePasswords = document.querySelectorAll('.toggle-password');
-
-            togglePasswords.forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    const input = toggle.parentElement.querySelector('input');
-
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        toggle.classList.remove('bx-show');
-                        toggle.classList.add('bx-hide'); 
-                    } else {
-                        input.type = 'password';
-                        toggle.classList.remove('bx-hide');
-                        toggle.classList.add('bx-show');
-                    }
-                });
+        // Password Toggle Logic
+        document.querySelectorAll('.toggle-password').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const input = document.getElementById(this.getAttribute('data-target'));
+                const isPass = input.type === 'password';
+                input.type = isPass ? 'text' : 'password';
+                this.classList.toggle('bx-show', !isPass);
+                this.classList.toggle('bx-hide', isPass);
             });
         });
     </script>
-
 </body>
 </html>

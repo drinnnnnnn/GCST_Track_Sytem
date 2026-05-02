@@ -1,70 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <title>GCST Admin Cashier Dashboard</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-<link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
-<style>
-  .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  .chart-container {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  .chart-container h3 {
-    margin-top: 0;
-    color: #333;
-  }
-  .chart-wrapper {
-    position: relative;
-    height: 300px;
-  }
-  .full-width {
-    grid-column: 1 / -1;
-  }
-  @media (max-width: 768px) {
-    .charts-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-      .then(res => res.json())
-      .then(data => {
-        const currentId = data.student_id || data.admin_id;
-        if (!currentId) {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
-          return;
-        }
-        currentAdminId = currentId;
-        updateGreeting(data.name || 'Admin');
-        loadNotifications();
-        startNotifPolling();
-      })
-      .catch(() => {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
-      });
-  });
-</script> 
+  <title>GCST Admin Cashier - Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
   <!-- Header -->
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
       <strong>GCST Tracking System</strong>
     </div>
     
@@ -83,13 +33,16 @@
       <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
     <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="admincashier_dashb.html">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
     <a class="menu-item" href="admincashier_cashier.html">
       <i class="fas fa-cash-register"></i> Cashier
     </a>
         <a class="menu-item" href="admincashier_sale.html">
       <i class="fas fa-cash-register"></i> Sales
     </a>
-    <a class="menu-item" href="admincashier_inventory.html">
+    <a class="menu-item" href="admincashier_inventorys.html">
       <i class="fas fa-boxes"></i> Inventory
     </a>
     <a class="menu-item" href="admincashier_products.html">
@@ -107,39 +60,35 @@
     <a class="menu-item" href="admincashier_profile.html">
       <i class="fas fa-user-circle"></i> Profile
     </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+    <a class="menu-item" href="javascript:void(0)" id="logout-trigger">
       <i class="fas fa-sign-out-alt"></i> Log Out
     </a>
   </div>
 </header>
 
-  
-
-  <!-- Main Content -->
-  <main style="max-width: 1400px; margin: 0 auto;">
-
+  <main>
     <!-- Greeting Section -->
     <section class="greeting-section">
       <div class="greeting-content">
-        <h1 id="greeting-message">Welcome, Admin Cashier!</h1>
-        <p id="current-date-time"></p>
+        <h1 id="greeting-message">Welcome!</h1>
+        <p id="current-date-time">Loading...</p>
       </div>
-      <div class="greeting-icon">👋</div>
+      <div class="greeting-icon">📊</div>
     </section>
 
     <!-- Quick Actions -->
     <section class="quick-actions">
       <h2>Quick Actions</h2>
       <div class="action-grid">
-        <a href="admincashier_sales.html" class="action-card">
+        <a href="admincashier_sale\.php" class="action-card">
           <i class="fas fa-cash-register"></i>
           <h3>New Sale</h3>
         </a>
-        <a href="admincashier_inventory.html" class="action-card">
+        <a href="admincashier_inventorys\.php" class="action-card">
           <i class="fas fa-boxes"></i>
           <h3>Manage Inventory</h3>
         </a>
-        <a href="admincashier_reports.html" class="action-card">
+        <a href="admincashier_reports\.php" class="action-card">
           <i class="fas fa-chart-line"></i>
           <h3>View Reports</h3>
         </a>
@@ -205,51 +154,37 @@
   </main>
 
   <!-- Scripts -->
+  <script src="http://localhost/GCST_Track_System/assets/js/admincashier.js"></script>
+  <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
   <script>
-    let currentAdminId = null;
-
-    // Initialize greeting and current date/time
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-        .then(res => res.json())
-        .then(data => {
-          if (data.admin_id) {
-            currentAdminId = data.admin_id;
-            updateGreeting(data.name);
-            loadNotifications();
-            startNotifPolling();
-          }
-        });
-
-      updateDateTime();
-      setInterval(updateDateTime, 60000); // Update time every minute
-
+    initializeAdminCashierPage(async (userData) => {
       // Fetch dashboard data
-      fetch('http://localhost/GCST_Track_System/utils/get_admincashier_dashboard.php')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('totalSalesToday').textContent = '₱' + (data.total_sales_today ?? 0).toFixed(2);
-          document.getElementById('totalInventory').textContent = data.total_inventory ?? 0;
-          document.getElementById('pendingQueue').textContent = data.pending_queue ?? 0;
-          document.getElementById('booksRented').textContent = data.books_rented ?? 0;
-          document.getElementById('booksSold').textContent = data.books_sold ?? 0;
-          document.getElementById('totalTransactions').textContent = data.total_transactions ?? 0;
-        })
-        .catch(err => console.error('Error fetching dashboard data:', err));
+      try {
+        const dashboardData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_admincashier_dashboard.php');
+        document.getElementById('totalSalesToday').textContent = formatCurrency(dashboardData.total_sales_today ?? 0);
+        document.getElementById('totalInventory').textContent = dashboardData.total_inventory ?? 0;
+        document.getElementById('pendingQueue').textContent = dashboardData.pending_queue ?? 0;
+        document.getElementById('booksRented').textContent = dashboardData.books_rented ?? 0;
+        document.getElementById('booksSold').textContent = dashboardData.books_sold ?? 0;
+        document.getElementById('totalTransactions').textContent = dashboardData.total_transactions ?? 0;
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
 
       // Fetch chart data
-      fetch('http://localhost/GCST_Track_System/utils/get_admincashier_charts.php')
-        .then(res => res.json())
-        .then(data => {
-          // Sales Chart
-          const salesCtx = document.getElementById('salesChart').getContext('2d');
+      try {
+        const chartData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_admincashier_charts.php');
+        
+        // Sales Chart
+        const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+        if (salesCtx) {
           new Chart(salesCtx, {
             type: 'line',
             data: {
-              labels: data.sales_labels,
+              labels: chartData.sales_labels || [],
               datasets: [{
                 label: 'Daily Sales (₱)',
-                data: data.sales_data,
+                data: chartData.sales_data || [],
                 borderColor: '#667eea',
                 backgroundColor: 'rgba(102, 126, 234, 0.1)',
                 tension: 0.4,
@@ -262,15 +197,17 @@
               plugins: { legend: { display: true } }
             }
           });
+        }
 
-          // Inventory Chart
-          const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
+        // Inventory Chart
+        const inventoryCtx = document.getElementById('inventoryChart')?.getContext('2d');
+        if (inventoryCtx) {
           new Chart(inventoryCtx, {
             type: 'doughnut',
             data: {
-              labels: data.inventory_labels,
+              labels: chartData.inventory_labels || [],
               datasets: [{
-                data: data.inventory_data,
+                data: chartData.inventory_data || [],
                 backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe']
               }]
             },
@@ -280,16 +217,18 @@
               plugins: { legend: { display: true } }
             }
           });
+        }
 
-          // Top Products Chart
-          const productsCtx = document.getElementById('topProductsChart').getContext('2d');
+        // Top Products Chart
+        const productsCtx = document.getElementById('topProductsChart')?.getContext('2d');
+        if (productsCtx) {
           new Chart(productsCtx, {
             type: 'bar',
             data: {
-              labels: data.products_labels,
+              labels: chartData.products_labels || [],
               datasets: [{
                 label: 'Units Sold',
-                data: data.products_data,
+                data: chartData.products_data || [],
                 backgroundColor: '#667eea'
               }]
             },
@@ -300,146 +239,10 @@
               plugins: { legend: { display: true } }
             }
           });
-        })
-        .catch(err => console.error('Error fetching chart data:', err));
-    });
-
-    function updateGreeting(adminName) {
-      const hour = new Date().getHours();
-      let greet = "Hello";
-      if (hour < 12) greet = "Good Morning";
-      else if (hour < 18) greet = "Good Afternoon";
-      else greet = "Good Evening";
-
-      document.getElementById('greeting-message').textContent = `${greet}, ${adminName}!`;
-    }
-
-    function updateDateTime() {
-      const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const dateStr = now.toLocaleDateString('en-US', options);
-      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('current-date-time').textContent = `${dateStr} • ${timeStr}`;
-    }
-
-    // Menu toggle
-    document.getElementById('menu-icon').addEventListener('click', (e) => {
-      e.preventDefault();
-      const menu = document.getElementById('dropdown-menu');
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
-
-    document.addEventListener('click', (e) => {
-      const menu = document.getElementById('dropdown-menu');
-      if (!menu.contains(e.target) && !document.getElementById('menu-icon').contains(e.target)) {
-        menu.style.display = 'none';
-      }
-    });
-
-    // Notification functions
-    const bell = document.getElementById('notification-bell');
-    const dropdown = document.getElementById('notification-dropdown');
-    const notificationsList = document.getElementById('notifications-list');
-    const clearBtn = document.getElementById('clear-notifications');
-    const notifBadge = document.getElementById('notif-badge');
-
-    let notifInterval = null;
-
-    bell.addEventListener('click', (e) => {
-      e.preventDefault();
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-      if (dropdown.style.display === 'block') {
-        markAllNotificationsRead(() => {
-          loadNotifications();
-          startNotifPolling();
-        });
-      } else {
-        stopNotifPolling();
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
-        dropdown.style.display = 'none';
-        stopNotifPolling();
-      }
-    });
-
-    function startNotifPolling() {
-      if (notifInterval) clearInterval(notifInterval);
-      notifInterval = setInterval(loadNotifications, 5000);
-    }
-
-    function stopNotifPolling() {
-      if (notifInterval) clearInterval(notifInterval);
-      notifInterval = null;
-    }
-
-    function loadNotifications() {
-      if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/get_notifications.php?admin_id=' + encodeURIComponent(currentAdminId))
-        .then(res => res.json())
-        .then(notifs => {
-          notificationsList.innerHTML = '';
-          if (notifs.length === 0) {
-            notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
-            notifBadge.style.display = 'none';
-            return;
-          }
-
-          const unreadCount = notifs.filter(n => n.is_read == 0).length;
-          if (unreadCount > 0) {
-            notifBadge.textContent = unreadCount;
-            notifBadge.style.display = 'inline-block';
-          } else {
-            notifBadge.style.display = 'none';
-          }
-
-          notifs.forEach(n => {
-            const imgSrc = n.product_image || '/assets/img_bg/product_details.png';
-            const item = document.createElement('div');
-            item.className = 'notification-item';
-            item.style.background = n.is_read == 0 ? '#e0e7ff' : 'white';
-            item.innerHTML = `
-              <img src="${imgSrc}" alt="Product">
-              <div>
-                <div class="notification-message">${n.product_name} - ${n.status}</div>
-                <div class="notification-time">${new Date(n.notified_at).toLocaleString()}</div>
-              </div>
-            `;
-            notificationsList.appendChild(item);
-          });
-        });
-    }
-
-    function markAllNotificationsRead(callback) {
-      if (!currentAdminId) {
-        if (typeof callback === 'function') callback();
-        return;
-      }
-      fetch('http://localhost/GCST_Track_System/utils/mark_notifications_read.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ admin_id: currentAdminId })
-      }).then(() => {
-        if (typeof callback === 'function') callback();
-      });
-    }
-
-    clearBtn.addEventListener('click', () => {
-      if (!currentAdminId) return;
-      fetch('http://localhost/GCST_Track_System/utils/clear_notifications.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ admin_id: currentAdminId })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          notificationsList.innerHTML = '<div class="notification-item">No notifications yet.</div>';
-          notifBadge.style.display = 'none';
         }
-      });
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      }
     });
   </script>
 

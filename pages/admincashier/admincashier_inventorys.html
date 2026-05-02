@@ -1,0 +1,1429 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCST Admin Cashier Inventory</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
+  <style>
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .logo strong {
+      font-size: 1.1rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    } 
+
+    .greeting-section {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 24px 30px;
+      background: linear-gradient(117deg, #eff6ff 0%, #eef2ff 100%);
+      border-radius: 28px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .greeting-content h1 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    .greeting-content p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .greeting-icon {
+      width: 84px;
+      height: 84px;
+      border-radius: 28px;
+      background: #eef2ff;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+    }
+
+    .inventory-board {
+      margin-top: 30px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .inventory-toolbar {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr);
+      align-items: center;
+    }
+
+    .inventory-search,
+    .filter-pills {
+      min-width: 0;
+    }
+
+    .inventory-search {
+      display: flex;
+      gap: 12px;
+      background: var(--panel-bg);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .inventory-search input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .inventory-search input:focus {
+      border-color: rgba(59, 130, 246, 0.6);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .inventory-search button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .inventory-search button:hover,
+    .inventory-search button:focus {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 20px rgba(59, 130, 246, 0.14);
+      outline: none;
+    }
+
+    .add-product-panel {
+      display: grid;
+      gap: 18px;
+      margin-top: 12px;
+    }
+
+    .add-product-panel .panel-card {
+      padding: 24px;
+    }
+
+    .panel-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .panel-card-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .panel-card-header .subtext {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 560px;
+    }
+
+    .add-product-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .add-product-form .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .add-product-form .form-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .add-product-form textarea {
+      min-height: 120px;
+      resize: vertical;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: white;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .add-product-form input[type="file"] {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: white;
+      font-size: 0.95rem;
+    }
+
+    .image-preview {
+      position: relative;
+      width: 100%;
+      min-height: 120px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px dashed #d1d5db;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .image-preview.hidden {
+      display: none;
+    }
+
+    @media screen and (max-width: 980px) {
+      .add-product-form .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media screen and (max-width: 760px) {
+      .add-product-panel {
+        margin-top: 0;
+      }
+
+      .inventory-search {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .inventory-search button {
+        width: 100%;
+      }
+
+      .inventory-search input {
+        width: 100%;
+      }
+
+      .filter-pills {
+        justify-content: flex-start;
+      }
+
+      .detail-actions .action-row {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 8px 0;
+      min-height: 48px;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid #dbe5ff;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      font-size: 0.92rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .filter-pill:hover,
+    .filter-pill:focus {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      outline: none;
+    }
+
+    .filter-pill:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .filter-pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 0.9fr;
+      gap: 24px;
+    }
+
+    .inventory-main {
+      display: grid;
+      gap: 20px;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .summary-card {
+      background: var(--panel-bg);
+      border-radius: 24px;
+      padding: 22px;
+      border: 1px solid #f0f4ff;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+    }
+
+    .summary-card h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .summary-card strong {
+      font-size: 1.85rem;
+      color: var(--text);
+      display: block;
+    }
+
+    .view-toggle {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .view-toggle button {
+      padding: 10px 18px;
+      border-radius: 14px;
+      border: 1px solid #dbe3f0;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .view-toggle button.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .inventory-card {
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+    }
+
+    .inventory-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #e5e7eb;
+    }
+
+    .inventory-card-body {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .inventory-card-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .inventory-card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .status-instock {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .status-lowstock {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .status-out {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .inventory-card-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .inventory-card-footer button {
+      flex: 1;
+      min-width: 118px;
+    }
+
+    .inventory-table-wrapper {
+      background: var(--panel-bg);
+      border-radius: 24px;
+      padding: 18px;
+      border: 1px solid #f0f4ff;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      overflow-x: auto;
+    }
+
+    .inventory-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    .inventory-table th,
+    .inventory-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 0.95rem;
+    }
+
+    .inventory-table th {
+      background: #f7f9ff;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .inventory-table tbody tr:hover {
+      background: #f5f7ff;
+    }
+
+    .inventory-panel {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel-card {
+      background: var(--panel-bg);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid #f0f4ff;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      overflow-y: auto;
+    }
+
+    .panel-card h2 {
+      margin: 0 0 16px;
+      font-size: 1.2rem;
+    }
+
+    .product-details {
+      display: grid;
+      gap: 14px;
+    }
+
+    .product-preview {
+      display: grid;
+      gap: 14px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #eef2ff;
+      padding: 16px;
+    }
+
+    .product-preview img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .product-preview h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    .product-preview .product-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-group label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: white;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .detail-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .detail-actions .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .detail-actions button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.15s ease;
+    }
+
+    .detail-actions button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      border: 1px dashed #d1d5db;
+      border-radius: 24px;
+      background: white;
+      color: var(--muted);
+    }
+
+    .quick-note {
+      padding: 16px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media screen and (max-width: 1200px) {
+      .inventory-grid {
+        grid-template-columns: 1fr;
+      }
+      .summary-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .inventory-toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media screen and (max-width: 760px) {
+      .greeting-section {
+        grid-template-columns: 1fr;
+      }
+      .inventory-search {
+        flex-direction: column;
+      }
+      .inventory-search button {
+        width: 100%;
+      }
+      .filter-pills {
+        justify-content: flex-start;
+      }
+      .detail-actions .action-row {
+        grid-template-columns: 1fr;
+      }
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo" />
+      <strong>GCST Tracking System</strong>
+    </div>
+    <nav class="nav-links">
+      <a href="#" class="notification-icon" id="notification-bell" title="Notifications">🔔 <span id="notif-badge"></span></a>
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="dropdown-header">Notifications</div>
+        <div class="notifications-list" id="notifications-list"></div>
+        <div class="dropdown-footer" id="clear-notifications">Clear All</div>
+      </div>
+      <a href="#" class="menu-icon" id="menu-icon">☰</a>
+    </nav>
+    <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="admincashier_dashb.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a class="menu-item" href="admincashier_cashier.html"><i class="fas fa-cash-register"></i> Cashier</a>
+      <a class="menu-item" href="admincashier_sale.html"><i class="fas fa-receipt"></i> Sales</a>
+      <a class="menu-item active" href="admincashier_inventorys.html"><i class="fas fa-boxes"></i> Inventory</a>
+      <a class="menu-item" href="admincashier_products.html"><i class="fas fa-box"></i> Products</a>
+      <a class="menu-item" href="admincashier_reports.html"><i class="fas fa-chart-line"></i> Reports</a>
+      <a class="menu-item" href="admincashier_queuing_system.html"><i class="fas fa-users"></i> Queue System</a>
+      <a class="menu-item" href="admincashier_gmail_notification.html"><i class="fas fa-envelope"></i> Gmail Notification</a>
+      <a class="menu-item" href="admincashier_profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+      <a class="menu-item" href="javascript:void(0)" id="logout-trigger"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+    </div>
+  </header>
+  <main>
+    <section class="greeting-section">
+      <div class="greeting-content">
+        <h1>Inventory Management</h1>
+        <p>Manage stock, edit product data, and keep inventory synced with cashier workflows.</p>
+      </div>
+      <div class="greeting-icon">📦</div>
+    </section>
+    <section class="inventory-board">
+      <div class="inventory-toolbar">
+        <div class="inventory-search">
+          <input id="inventory-search" type="search" placeholder="Search products by name, category, barcode..." />
+          <button id="btn-open-add-product" type="button" class="btn btn-secondary">Add New Product</button>
+          <button id="refresh-button" type="button">Refresh</button>
+        </div>
+        <div class="filter-pills" id="category-filters"></div>
+      </div>
+      <div id="add-product-panel" class="add-product-panel hidden">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div>
+              <h2>Add New Product</h2>
+              <p class="subtext">Add a new product to inventory and display it immediately.</p>
+            </div>
+            <button id="btn-close-add-product" type="button" class="btn btn-secondary">Cancel</button>
+          </div>
+          <form id="add-product-form" class="add-product-form" enctype="multipart/form-data">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="new-product-image">Product Image</label>
+                <input id="new-product-image" name="product_image" type="file" accept="image/*" />
+                <div id="new-product-image-preview" class="image-preview hidden"></div>
+              </div>
+              <div class="form-group">
+                <label for="new-product-name">Product Name</label>
+                <input id="new-product-name" name="product_name" type="text" required />
+              </div>
+              <div class="form-group">
+                <label for="new-product-category">Category</label>
+                <input id="new-product-category" name="product_category" type="text" placeholder="Books, Uniform, Accessories, Other" required />
+              </div>
+              <div class="form-group">
+                <label for="new-product-price">Price</label>
+                <input id="new-product-price" name="buy_price" type="number" min="0" step="0.01" required />
+              </div>
+              <div class="form-group">
+                <label for="new-product-rent">Rent Price</label>
+                <input id="new-product-rent" name="rent_price" type="number" min="0" step="0.01" required />
+              </div>
+              <div class="form-group">
+                <label for="new-product-stock">Stock Quantity</label>
+                <input id="new-product-stock" name="stock_count" type="number" min="0" step="1" required />
+              </div>
+              <div class="form-group">
+                <label for="new-product-barcode">Barcode / QR Code</label>
+                <input id="new-product-barcode" name="barcode" type="text" required />
+              </div>
+              <div class="form-group">
+                <label for="new-product-status">Status</label>
+                <select id="new-product-status" name="product_status" required>
+                  <option value="available">In Stock</option>
+                  <option value="available">Low Stock</option>
+                  <option value="unavailable">Out of Stock</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="new-product-description">Description</label>
+              <textarea id="new-product-description" name="product_description" rows="4" required></textarea>
+            </div>
+            <div class="detail-actions">
+              <button type="submit" class="btn btn-primary">Save Product</button>
+              <button type="button" id="btn-reset-new-product" class="btn btn-secondary">Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="inventory-grid">
+        <section class="inventory-main">
+          <div class="summary-cards">
+            <div class="summary-card">
+              <h3>Total products</h3>
+              <strong id="summary-total">0</strong>
+            </div>
+            <div class="summary-card">
+              <h3>Low stock</h3>
+              <strong id="summary-low">0</strong>
+            </div>
+            <div class="summary-card">
+              <h3>Available stock</h3>
+              <strong id="summary-available">0</strong>
+            </div>
+            <div class="summary-card">
+              <h3>Inventory value</h3>
+              <strong id="summary-value">₱0.00</strong>
+            </div>
+          </div>
+          <div class="view-toggle">
+            <button type="button" data-view="cards" class="active" id="view-cards">Cards</button>
+            <button type="button" data-view="table" id="view-table">Table</button>
+          </div>
+          <div id="products-cards" class="products-grid"></div>
+          <div id="products-table-wrapper" class="inventory-table-wrapper hidden">
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Price</th>
+                  <th>Rent</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+        <aside class="inventory-panel">
+          <div class="panel-card">
+            <h2>Product details</h2>
+            <div id="detail-empty" class="empty-state">
+              Select a product from the list to view and update inventory details.
+            </div>
+            <div id="product-details" class="product-details hidden">
+              <div class="product-preview">
+                <img id="detail-image" src="" alt="Product image" />
+                <div>
+                  <h3 id="detail-name"></h3>
+                  <div class="product-meta">
+                    <span id="detail-category"></span>
+                    <span id="detail-stock" class="status-pill status-instock"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="detail-name-input">Product Name</label>
+                <input id="detail-name-input" type="text" />
+              </div>
+              <div class="form-group">
+                <label for="detail-category-input">Category</label>
+                <select id="detail-category-input">
+                  <option>Books</option>
+                  <option>Uniform</option>
+                  <option>Accessories</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="detail-buy-input">Buy Price</label>
+                <input id="detail-buy-input" type="number" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="detail-rent-input">Rent Price</label>
+                <input id="detail-rent-input" type="number" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="detail-barcode-input">Barcode</label>
+                <input id="detail-barcode-input" type="text" />
+              </div>
+              <div class="form-group">
+                <label for="detail-status-input">Product Status</label>
+                <select id="detail-status-input">
+                  <option value="available">Available</option>
+                  <option value="unavailable">Unavailable</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="detail-stock-input">Stock Quantity</label>
+                <input id="detail-stock-input" type="number" min="0" step="1" />
+              </div>
+              <div class="detail-actions">
+                <div class="action-row">
+                  <button id="btn-add-stock" type="button" class="btn btn-secondary">Add Stock</button>
+                  <button id="btn-reduce-stock" type="button" class="btn btn-secondary">Reduce Stock</button>
+                </div>
+                <button id="btn-save-product" type="button" class="btn btn-primary">Save Changes</button>
+                <button id="btn-clear-selection" type="button" class="btn btn-danger">Clear Selection</button>
+              </div>
+            </div>
+            <div class="quick-note">
+              Inventory updates are saved securely with prepared statements. Sales and rental activity will automatically reduce inventory when processed through the cashier and rental modules.
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <script src="http://localhost/GCST_Track_System/assets/js/admincashier.js"></script>
+  <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
+  <script>
+    const inventoryApi = 'http://localhost/GCST_Track_System/actions/get_admincashier_products.php';
+    const inventoryUpdateApi = 'http://localhost/GCST_Track_System/actions/admincashier_update_inventory.php';
+    const productCreateApi = 'http://localhost/GCST_Track_System/actions/admincashier_create_product.php';
+    const productDeleteApi = 'http://localhost/GCST_Track_System/actions/admincashier_delete_product.php';
+
+    let inventoryProducts = [];
+    let filteredProducts = [];
+    let selectedProduct = null;
+    const filterState = {
+      query: '',
+      category: 'All',
+      view: 'cards'
+    };
+
+    function toCurrency(value) {
+      const amount = Number(value) || 0;
+      return '₱' + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function getStockStatus(stock) {
+      if (stock <= 0) return 'Out of Stock';
+      if (stock < 10) return 'Low Stock';
+      return 'In Stock';
+    }
+
+    function getStatusClass(stock) {
+      if (stock <= 0) return 'status-out';
+      if (stock < 10) return 'status-lowstock';
+      return 'status-instock';
+    }
+
+    function resolveImagePath(path) {
+      if (!path) return 'http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png';
+      if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) {
+        return path;
+      }
+      return `http://localhost/GCST_Track_System/${path}`;
+    }
+
+    function toggleAddProductPanel(show = true) {
+      const panel = document.getElementById('add-product-panel');
+      if (!panel) return;
+      panel.classList.toggle('hidden', !show);
+      if (!show) {
+        resetAddProductForm();
+        return;
+      }
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetAddProductForm() {
+      const form = document.getElementById('add-product-form');
+      if (!form) return;
+      form.reset();
+      const preview = document.getElementById('new-product-image-preview');
+      if (preview) {
+        preview.innerHTML = '';
+        preview.classList.add('hidden');
+      }
+    }
+
+    function updateNewProductImagePreview(file) {
+      const preview = document.getElementById('new-product-image-preview');
+      if (!preview) return;
+      if (!file) {
+        preview.innerHTML = '';
+        preview.classList.add('hidden');
+        return;
+      }
+      const imageUrl = URL.createObjectURL(file);
+      preview.innerHTML = `<img src="${imageUrl}" alt="Product preview" />`;
+      preview.classList.remove('hidden');
+    }
+
+    function validateNewProductForm() {
+      const form = document.getElementById('add-product-form');
+      if (!form) return 'Add product form not found.';
+      const productName = form.querySelector('[name="product_name"]').value.trim();
+      const productCategory = form.querySelector('[name="product_category"]').value.trim();
+      const buyPrice = parseFloat(form.querySelector('[name="buy_price"]').value);
+      const rentPrice = parseFloat(form.querySelector('[name="rent_price"]').value);
+      const stockCount = parseInt(form.querySelector('[name="stock_count"]').value, 10);
+      const barcode = form.querySelector('[name="barcode"]').value.trim();
+      const description = form.querySelector('[name="product_description"]').value.trim();
+
+      if (!productName) return 'Product name is required.';
+      if (!productCategory) return 'Product category is required.';
+      if (Number.isNaN(buyPrice) || buyPrice < 0) return 'Price must be a valid non-negative number.';
+      if (Number.isNaN(rentPrice) || rentPrice < 0) return 'Rent price must be a valid non-negative number.';
+      if (Number.isNaN(stockCount) || stockCount < 0) return 'Stock quantity must be a valid non-negative number.';
+      if (!barcode) return 'Barcode / QR Code is required.';
+      if (!description) return 'Product description is required.';
+      return '';
+    }
+
+    function handleAddProductSubmit(event) {
+      event.preventDefault();
+      const errorMessage = validateNewProductForm();
+      if (errorMessage) {
+        alert(errorMessage);
+        return;
+      }
+
+      const form = document.getElementById('add-product-form');
+      const formData = new FormData(form);
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+      }
+
+      fetch(productCreateApi, {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Save Product';
+          }
+          if (!data.success) {
+            alert(data.message || 'Unable to save new product.');
+            return;
+          }
+          if (data.product) {
+            inventoryProducts.unshift(data.product);
+            filterState.query = document.getElementById('inventory-search').value.trim();
+            buildCategoryFilters(inventoryProducts);
+            applyFilters();
+            toggleAddProductPanel(false);
+            alert(data.message || 'Product added successfully.');
+          }
+        })
+        .catch(() => {
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Save Product';
+          }
+          alert('Unable to save new product. Please try again.');
+        });
+    }
+
+    function handleNewProductImageChange(event) {
+      const file = event.target.files && event.target.files[0];
+      updateNewProductImagePreview(file);
+    }
+
+    function normalizeStatusForSelect(value) {
+      if (value === 'unavailable') return 'Out of Stock';
+      return 'In Stock';
+    }
+
+    function isBookCategory(category) {
+      return String(category || '').trim().toLowerCase() === 'books';
+    }
+
+    function updateNewProductRentFieldState() {
+      const categoryInput = document.getElementById('new-product-category');
+      const rentInput = document.getElementById('new-product-rent');
+      if (!categoryInput || !rentInput) return;
+      const rentable = isBookCategory(categoryInput.value);
+      rentInput.disabled = !rentable;
+      if (!rentable) {
+        rentInput.value = '0';
+        rentInput.placeholder = 'N/A';
+        rentInput.removeAttribute('required');
+      } else {
+        rentInput.removeAttribute('placeholder');
+        rentInput.required = true;
+      }
+    }
+
+    function updateDetailRentFieldState() {
+      const categoryInput = document.getElementById('detail-category-input');
+      const rentInput = document.getElementById('detail-rent-input');
+      if (!categoryInput || !rentInput) return;
+      const rentable = isBookCategory(categoryInput.value);
+      rentInput.disabled = !rentable;
+      if (!rentable) {
+        rentInput.value = '0.00';
+      }
+    }
+
+    function buildCategoryFilters(products) {
+      const container = document.getElementById('category-filters');
+      const categories = ['All', 'Books', 'Uniform', 'Accessories'];
+      const extra = Array.from(new Set(products.map(p => p.product_category || 'Other'))).filter(cat => cat && !categories.includes(cat));
+      const allCategories = [...categories, ...extra];
+      container.innerHTML = '';
+      allCategories.forEach(category => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'filter-pill' + (filterState.category === category ? ' active' : '');
+        pill.textContent = category;
+        pill.onclick = () => {
+          filterState.category = category;
+          buildCategoryFilters(products);
+          applyFilters();
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function updateSummary() {
+      const total = filteredProducts.length;
+      const lowStock = filteredProducts.filter(p => Number(p.stock_count || 0) < 10).length;
+      const available = filteredProducts.filter(p => Number(p.stock_count || 0) > 0).length;
+      const value = filteredProducts.reduce((sum, product) => sum + ((Number(product.buy_price) || 0) * (Number(product.stock_count) || 0)), 0);
+      document.getElementById('summary-total').textContent = total;
+      document.getElementById('summary-low').textContent = lowStock;
+      document.getElementById('summary-available').textContent = available;
+      document.getElementById('summary-value').textContent = toCurrency(value);
+    }
+
+    function applyFilters() {
+      const query = filterState.query.trim().toLowerCase();
+      const category = filterState.category;
+      filteredProducts = inventoryProducts.filter(product => {
+        const matchesCategory = category === 'All' || (product.product_category || 'Other') === category;
+        const text = `${product.product_name || ''} ${product.product_category || ''} ${product.barcode || ''}`.toLowerCase();
+        const matchesQuery = !query || text.includes(query);
+        return matchesCategory && matchesQuery;
+      });
+      renderProductViews();
+      updateSummary();
+    }
+
+    function renderProductViews() {
+      renderProductCards();
+      renderProductTable();
+    }
+
+    function renderProductCards() {
+      const container = document.getElementById('products-cards');
+      container.innerHTML = '';
+      if (filteredProducts.length === 0) {
+        container.innerHTML = '<div class="empty-state">No products match the current search or filters.</div>';
+        return;
+      }
+      filteredProducts.forEach(product => {
+        const card = document.createElement('article');
+        card.className = 'inventory-card';
+        const image = resolveImagePath(product.product_image);
+        const stock = Number(product.stock_count) || 0;
+        const status = getStockStatus(stock);
+        const statusClass = getStatusClass(stock);
+        const description = product.product_description ? product.product_description.trim() : '';
+        const descriptionSnippet = description.length > 100 ? `${description.slice(0, 100)}...` : description;
+        const rentText = isBookCategory(product.product_category) ? toCurrency(product.rent_price) : 'N/A';
+        card.innerHTML = `
+          <img src="${image}" alt="${product.product_name}" />
+          <div class="inventory-card-body">
+            <h3 class="inventory-card-title">${product.product_name || 'Untitled Product'}</h3>
+            ${descriptionSnippet ? `<p class="product-description">${descriptionSnippet}</p>` : ''}
+            <div class="inventory-card-meta">
+              <span>${product.product_category || 'Other'}</span>
+              <span>${product.barcode || 'No barcode'}</span>
+            </div>
+            <div class="inventory-card-meta">
+              <span>${toCurrency(product.buy_price)}</span>
+              <span class="status-pill ${statusClass}">${product.product_status === 'unavailable' ? 'Unavailable' : status}</span>
+            </div>
+            <div class="inventory-card-meta">
+              <span>${rentText}</span>
+              <span>${stock} item${stock === 1 ? '' : 's'}</span>
+            </div>
+            <div class="inventory-card-meta">
+              <span>${product.product_status === 'unavailable' ? 'Offline' : ''}</span>
+            </div>
+            <div class="inventory-card-footer">
+              <button class="btn btn-primary" type="button" onclick="selectProduct(${product.product_id})">Manage</button>
+              <button class="btn btn-danger" type="button" onclick="deleteProduct(${product.product_id})">Delete</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderProductTable() {
+      const tbody = document.getElementById('products-table-body');
+      tbody.innerHTML = '';
+      if (filteredProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--muted);">No inventory rows found.</td></tr>';
+        return;
+      }
+      filteredProducts.forEach(product => {
+        const stock = Number(product.stock_count) || 0;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${product.product_name || 'Untitled'}</td>
+          <td>${product.product_category || 'Other'}</td>
+          <td>${stock}</td>
+          <td>${toCurrency(product.buy_price)}</td>
+          <td>${isBookCategory(product.product_category) ? toCurrency(product.rent_price) : 'N/A'}</td>
+          <td><span class="status-pill ${getStatusClass(stock)}">${product.product_status === 'unavailable' ? 'Unavailable' : getStockStatus(stock)}</span></td>
+          <td>
+            <button class="btn btn-secondary" type="button" onclick="selectProduct(${product.product_id})">Edit</button>
+            <button class="btn btn-danger" type="button" onclick="deleteProduct(${product.product_id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function setActiveView(view) {
+      filterState.view = view;
+      document.querySelectorAll('.view-toggle button').forEach(button => {
+        button.classList.toggle('active', button.dataset.view === view);
+      });
+      document.getElementById('products-cards').classList.toggle('hidden', view !== 'cards');
+      document.getElementById('products-table-wrapper').classList.toggle('hidden', view !== 'table');
+    }
+
+    function selectProduct(productId) {
+      selectedProduct = inventoryProducts.find(item => Number(item.product_id) === Number(productId)) || null;
+      updateDetailPanel();
+    }
+
+    function updateDetailPanel() {
+      const detailSection = document.getElementById('product-details');
+      const emptySection = document.getElementById('detail-empty');
+      if (!selectedProduct) {
+        detailSection.classList.add('hidden');
+        emptySection.classList.remove('hidden');
+        return;
+      }
+      detailSection.classList.remove('hidden');
+      emptySection.classList.add('hidden');
+      const stock = Number(selectedProduct.stock_count) || 0;
+      const rentable = isBookCategory(selectedProduct.product_category);
+      document.getElementById('detail-image').src = resolveImagePath(selectedProduct.product_image);
+      document.getElementById('detail-name').textContent = selectedProduct.product_name || 'Unnamed Product';
+      document.getElementById('detail-category').textContent = selectedProduct.product_category || 'Other';
+      const stockLabel = document.getElementById('detail-stock');
+      stockLabel.textContent = `${stock} in stock`;
+      stockLabel.className = `status-pill ${getStatusClass(stock)}`;
+      document.getElementById('detail-name-input').value = selectedProduct.product_name || '';
+      document.getElementById('detail-category-input').value = selectedProduct.product_category || 'Other';
+      document.getElementById('detail-buy-input').value = Number(selectedProduct.buy_price || 0).toFixed(2);
+      document.getElementById('detail-rent-input').value = rentable ? Number(selectedProduct.rent_price || 0).toFixed(2) : '0.00';
+      document.getElementById('detail-barcode-input').value = selectedProduct.barcode || '';
+      document.getElementById('detail-status-input').value = selectedProduct.product_status || 'available';
+      document.getElementById('detail-stock-input').value = stock;
+      updateDetailRentFieldState();
+    }
+
+    function updateSelectedProductFromForm() {
+      if (!selectedProduct) return;
+      selectedProduct.product_name = document.getElementById('detail-name-input').value.trim();
+      selectedProduct.product_category = document.getElementById('detail-category-input').value;
+      selectedProduct.buy_price = parseFloat(document.getElementById('detail-buy-input').value) || 0;
+      selectedProduct.rent_price = parseFloat(document.getElementById('detail-rent-input').value) || 0;
+      selectedProduct.barcode = document.getElementById('detail-barcode-input').value.trim();
+      selectedProduct.product_status = document.getElementById('detail-status-input').value;
+      selectedProduct.stock_count = parseInt(document.getElementById('detail-stock-input').value, 10) || 0;
+      if (!isBookCategory(selectedProduct.product_category)) {
+        selectedProduct.rent_price = 0;
+      }
+      updateDetailPanel();
+    }
+
+    function adjustStock(delta) {
+      if (!selectedProduct) return;
+      const stockInput = document.getElementById('detail-stock-input');
+      const current = parseInt(stockInput.value, 10) || 0;
+      const next = Math.max(0, current + delta);
+      stockInput.value = next;
+      updateSelectedProductFromForm();
+    }
+
+    function saveProductUpdates() {
+      if (!selectedProduct) {
+        alert('Select a product before saving.');
+        return;
+      }
+      updateSelectedProductFromForm();
+      const body = {
+        product_id: selectedProduct.product_id,
+        product_name: selectedProduct.product_name,
+        product_category: selectedProduct.product_category,
+        product_status: selectedProduct.product_status,
+        barcode: selectedProduct.barcode,
+        buy_price: Number(selectedProduct.buy_price) || 0,
+        rent_price: isBookCategory(selectedProduct.product_category) ? Number(selectedProduct.rent_price) || 0 : 0,
+        stock_count: Number(selectedProduct.stock_count) || 0
+      };
+      const btn = document.getElementById('btn-save-product');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      fetch(inventoryUpdateApi, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+        .then(response => response.json())
+        .then(data => {
+          btn.disabled = false;
+          btn.textContent = 'Save Changes';
+          if (!data.success) {
+            alert(data.message || 'Unable to save inventory update.');
+            return;
+          }
+          selectedProduct = data.product;
+          const index = inventoryProducts.findIndex(p => Number(p.product_id) === Number(selectedProduct.product_id));
+          if (index !== -1) {
+            inventoryProducts[index] = selectedProduct;
+          }
+          applyFilters();
+          updateDetailPanel();
+          alert('Product updated successfully.');
+        })
+        .catch(() => {
+          btn.disabled = false;
+          btn.textContent = 'Save Changes';
+          alert('Unable to save changes. Please try again.');
+        });
+    }
+
+    function deleteProduct(productId) {
+      if (!productId) {
+        alert('Invalid product selected.');
+        return;
+      }
+      if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+        return;
+      }
+      const deleteButton = document.getElementById('btn-delete-product');
+      if (deleteButton) {
+        deleteButton.disabled = true;
+        deleteButton.textContent = 'Deleting...';
+      }
+      fetch(productDeleteApi, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (deleteButton) {
+            deleteButton.disabled = false;
+            deleteButton.textContent = 'Delete Product';
+          }
+          if (!data.success) {
+            alert(data.message || 'Unable to delete product.');
+            return;
+          }
+          inventoryProducts = inventoryProducts.filter(p => Number(p.product_id) !== Number(productId));
+          if (selectedProduct && Number(selectedProduct.product_id) === Number(productId)) {
+            selectedProduct = null;
+          }
+          filterState.query = document.getElementById('inventory-search').value.trim();
+          buildCategoryFilters(inventoryProducts);
+          applyFilters();
+          updateDetailPanel();
+          alert(data.message || 'Product deleted successfully.');
+        })
+        .catch(() => {
+          if (deleteButton) {
+            deleteButton.disabled = false;
+            deleteButton.textContent = 'Delete Product';
+          }
+          alert('Unable to delete product. Please try again.');
+        });
+    }
+
+    function createDetailDeleteButton() {
+      const actions = document.querySelector('#product-details .detail-actions');
+      if (!actions || document.getElementById('btn-delete-product')) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.id = 'btn-delete-product';
+      button.className = 'btn btn-danger';
+      button.textContent = 'Delete Product';
+      button.addEventListener('click', () => {
+        if (!selectedProduct) {
+          alert('Select a product before deleting.');
+          return;
+        }
+        deleteProduct(selectedProduct.product_id);
+      });
+      actions.appendChild(button);
+    }
+
+    function clearSelection() {
+      selectedProduct = null;
+      updateDetailPanel();
+    }
+
+    function refreshInventory() {
+      const cards = document.getElementById('products-cards');
+      cards.innerHTML = '<div class="empty-state">Loading inventory...</div>';
+      fetchWithError(inventoryApi)
+        .then(data => {
+          inventoryProducts = Array.isArray(data) ? data : [];
+          filterState.query = document.getElementById('inventory-search').value.trim();
+          buildCategoryFilters(inventoryProducts);
+          applyFilters();
+        })
+        .catch(() => {
+          cards.innerHTML = '<div class="empty-state">Unable to load inventory. Please refresh.</div>';
+        });
+    }
+
+    initializeAdminCashierPage(() => {
+      refreshInventory();
+      setActiveView('cards');
+      document.getElementById('inventory-search').addEventListener('input', (event) => {
+        filterState.query = event.target.value;
+        applyFilters();
+      });
+      document.getElementById('refresh-button').addEventListener('click', refreshInventory);
+      document.getElementById('btn-open-add-product').addEventListener('click', () => {
+        toggleAddProductPanel(true);
+        updateNewProductRentFieldState();
+      });
+      document.getElementById('btn-close-add-product').addEventListener('click', () => toggleAddProductPanel(false));
+      document.getElementById('new-product-image').addEventListener('change', handleNewProductImageChange);
+      document.getElementById('new-product-category').addEventListener('input', updateNewProductRentFieldState);
+      document.getElementById('add-product-form').addEventListener('submit', handleAddProductSubmit);
+      document.getElementById('btn-reset-new-product').addEventListener('click', () => {
+        resetAddProductForm();
+        updateNewProductRentFieldState();
+      });
+      document.getElementById('view-cards').addEventListener('click', () => setActiveView('cards'));
+      document.getElementById('view-table').addEventListener('click', () => setActiveView('table'));
+      document.getElementById('btn-add-stock').addEventListener('click', () => adjustStock(1));
+      document.getElementById('btn-reduce-stock').addEventListener('click', () => adjustStock(-1));
+      document.getElementById('btn-save-product').addEventListener('click', saveProductUpdates);
+      document.getElementById('btn-clear-selection').addEventListener('click', clearSelection);
+      document.getElementById('detail-category-input').addEventListener('change', () => {
+        updateDetailRentFieldState();
+        if (selectedProduct) {
+          selectedProduct.product_category = document.getElementById('detail-category-input').value;
+          if (!isBookCategory(selectedProduct.product_category)) {
+            selectedProduct.rent_price = 0;
+            document.getElementById('detail-rent-input').value = '0.00';
+          }
+          updateDetailPanel();
+        }
+      });
+      document.getElementById('detail-stock-input').addEventListener('input', updateSelectedProductFromForm);
+      createDetailDeleteButton();
+    });
+  </script>
+    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
+</body>
+</html>

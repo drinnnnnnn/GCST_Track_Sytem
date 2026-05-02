@@ -1,375 +1,314 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In</title>
+    <title>Student Sign In | GCST Tracking System</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        :root {
+            --primary: #5d83e2;
+            --primary-glow: rgba(93, 131, 226, 0.4);
+            --text-dark: #1f2b45;
+            --text-muted: #5b6c8f;
+            --glass: rgba(255, 255, 255, 0.85);
+            --overlay: rgba(31, 43, 69, 0.4);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             text-decoration: none;
             list-style: none;
         }
 
         body {
             min-height: 100vh;
-            background: radial-gradient(circle at top left, rgba(116,148,236,0.18), transparent 22%),
-                        radial-gradient(circle at bottom right, rgba(116,148,236,0.16), transparent 18%),
-                        linear-gradient(135deg, #eef4ff 0%, #fbfdff 100%);
-            overflow-x: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(-45deg, #c9d6ff, #eef4ff, #aec0ff, #ffffff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            overflow-x: hidden;
             padding: 24px;
-            color: #24324a;
+            color: var(--text-dark);
         }
 
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Main Login Container */
         .container {
             position: relative;
             width: 100%;
-            max-width: 540px;
-            background: #ffffff;
+            max-width: 500px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 34px;
-            box-shadow: 0 24px 60px rgba(35, 75, 155, 0.14);
-            padding: 38px 36px 32px;
-            border: 1px solid rgba(116,148,236,0.16);
+            box-shadow: 0 24px 60px rgba(35, 75, 155, 0.12);
+            padding: 48px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 10;
         }
 
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Global Modal Styling */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-box {
+            background: var(--glass);
+            max-width: 450px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        /* UI Elements */
         .form-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 32px;
+            text-align: center;
         }
 
         .header-icon {
-            width: 72px;
-            height: 72px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #7494ec, #8fa8f8);
-            border-radius: 22px;
-            color: #ffffff;
-            font-size: 32px;
-            box-shadow: 0 18px 40px rgba(116,148,236,0.18);
+            width: 80px; height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #5d83e2, #7ea0f0);
+            border-radius: 24px; color: #ffffff; font-size: 40px;
+            box-shadow: 0 15px 35px var(--primary-glow);
+            animation: iconPulse 3s infinite ease-in-out;
         }
 
-        .container h1 {
-            font-size: 32px;
-            margin: 0;
-            letter-spacing: -0.5px;
-            color: #1f2b45;
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
-        .container p {
-            font-size: 15px;
-            margin: 0;
-            text-align: center;
-            color: #5b6c8f;
-            line-height: 1.6;
-            max-width: 420px;
-        }
-
-        form { width: 100%; }
-
-        .input-box {
-            position: relative;
-            margin: 18px 0;
-        }
+        .input-box { position: relative; margin-bottom: 20px; }
 
         .input-box input {
-            width: 100%;
-            padding: 14px 50px 14px 20px;
-            background: #f5f8ff;
-            border-radius: 14px;
-            border: 1px solid #e7ecff;
-            outline: none;
-            font-size: 15px;
-            color: #2b3748;
-            font-weight: 500;
-            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+            width: 100%; padding: 16px 50px 16px 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 16px; border: 1.5px solid #e7ecff;
+            outline: none; font-size: 15px; color: var(--text-dark);
+            font-weight: 500; transition: all 0.3s ease;
         }
 
         .input-box input:focus {
-            border-color: #7494ec;
-            box-shadow: 0 0 0 4px rgba(116,148,236,0.16);
+            background: #fff; border-color: var(--primary);
+            box-shadow: 0 10px 20px -5px var(--primary-glow);
+            transform: translateY(-2px);
         }
 
-        .input-box input::placeholder {
-            color: #8d9bb1;
-            font-weight: 400;
-        }
-        
-        .input-box i {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: #6b7a9e;
-        }
-
-        .toggle-password {
-            cursor: pointer;
-            color: #6b7a9e;
-            z-index: 20;
-        }
-
-        .forgot-link {
-            margin: -12px 0 18px;
-            text-align: right;
-        }
-
-        .forgot-link a {
-            font-size: 14.5px;
-            color: #5d83e2;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .forgot-link a:hover {
-            color: #3f63c4;
-        }
+        .input-box i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 22px; color: #94a3b8; }
+        .toggle-password { cursor: pointer; z-index: 10; }
 
         .btn {
-            width: 100%;
-            height: 52px;
-            background: linear-gradient(135deg, #5d83e2, #7ea0f0);
-            border-radius: 14px;
-            box-shadow: 0 18px 30px rgba(93, 130, 226, 0.24);
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            color: #fff;
-            font-weight: 700;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%; height: 56px;
+            background: var(--text-dark); border-radius: 16px; border: none;
+            cursor: pointer; font-size: 16px; color: #fff; font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(31, 43, 69, 0.2);
+            margin-top: 10px;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 20px 38px rgba(93, 130, 226, 0.32);
-        }
+        .btn:hover { background: var(--primary); transform: translateY(-3px); box-shadow: 0 15px 30px var(--primary-glow); }
 
-        .message {
-            text-align: center;
-            margin-top: 18px;
-            font-weight: 600;
-            font-size: 15px;
-            padding: 14px 16px;
-            border-radius: 16px;
-            background: rgba(116,148,236,0.08);
-            color: #1f2b45;
-            transition: opacity 0.3s ease;
-        }
+        .signup-link { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
+        .signup-link a { color: var(--primary); font-weight: 700; cursor: pointer; }
 
-        .success-msg {
-            color: #176f3b;
+        /* Animation Classes */
+        .animate-item { opacity: 0; animation: fadeInUp 0.5s ease forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .header-anim { animation-delay: 0.1s; }
+        .input-anim-1 { animation-delay: 0.2s; }
+        .input-anim-2 { animation-delay: 0.3s; }
+        .btn-anim { animation-delay: 0.5s; }
+        .footer-anim { animation-delay: 0.6s; }
 
-        .error-msg {
-            color: #b32a2a;
-        }
-
-        .message-card {
-            border: 1px solid rgba(116,148,236,0.18);
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        .fade-out {
-            animation: fadeOut 1s forwards;
-        }
-
-        .signup-link {
-            text-align: center;
-            margin-top: 22px;
-            font-size: 14.5px;
-            color: #5b6c8f;
-        }
-
-        .signup-link a {
-            color: #5d83e2;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .signup-link a:hover {
-            color: #3f63c4;
-        }
-
+        /* Floating Toast */
         .floating-message {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            min-width: 280px;
-            background-color: #2f80ed;
-            color: white;
-            padding: 14px 22px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 15px;
-            box-shadow: 0 18px 34px rgba(47, 128, 237, 0.22);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.35s ease, transform 0.35s ease;
-            z-index: 1000;
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            min-width: 300px; background: var(--text-dark); color: white;
+            padding: 16px 24px; border-radius: 20px; font-weight: 600;
+            text-align: center; opacity: 0; transition: all 0.4s ease;
+            z-index: 3000; pointer-events: none;
         }
+        .floating-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .floating-message.error { background: #dc2626; }
 
-        .floating-message.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .floating-message.error {
-            background-color: #d32f2f;
-            box-shadow: 0 18px 34px rgba(211, 47, 47, 0.22);
-        }
-
-        @media screen and (max-width: 420px) {
-            .container {
-                padding: 24px 22px 26px;
-            }
-
-            .container h1 {
-                font-size: 28px;
-            }
-
-            .input-box {
-                margin: 16px 0;
-            }
+        .info-highlight {
+            background: rgba(255, 255, 255, 0.5); padding: 16px;
+            border-radius: 16px; border: 1px dashed var(--primary);
+            margin: 20px 0; font-weight: 600; font-size: 13px;
         }
     </style>
+</head>
 
 <body>
+    <div id="floating-message" class="floating-message"></div>
+
     <div class="container">
-        <div id="floating-message" class="floating-message"></div>
-        
-        <form action="http://localhost/GCST_Track_System/utils/log_in.php" method="POST" onsubmit="return validateForm(this)">
-            <div class="form-header">
-                <div class="header-icon"><i class='bx bxs-user-circle'></i></div>
+        <!-- Main Login Form -->
+        <form action="http://localhost/GCST_Track_System/actions/log_in.php" method="POST" onsubmit="return validateForm(this)">
+            <div class="form-header header-anim animate-item">
+                <div class="header-icon"><i class='bx bxs-graduation'></i></div>
                 <div>
                     <h1>Sign In</h1>
-                    <p>Welcome back! Please log in to your account.</p>
+                    <p>Enter your student credentials to continue</p>
                 </div>
             </div>
 
-            <div class="input-box">
+            <div class="input-box input-anim-1 animate-item">
                 <input type="text" name="student_id" placeholder="Student ID Number" required>
                 <i class='bx bxs-id-card'></i>
             </div>
 
-            <div class="input-box">
-                <input type="password" name="password" placeholder="Password" required>
-                <i class='bx bx-show toggle-password'></i>
+            <div class="input-box input-anim-2 animate-item">
+                <input type="password" name="password" id="loginPass" placeholder="Password" required>
+                <i class='bx bx-show toggle-password' id="toggleLoginPass"></i>
             </div>
 
-            <div class="forgot-link">
-                <a href="#">Forgot Password?</a>
+            <div style="text-align: right; margin-bottom: 24px;" class="animate-item link-anim">
+                <a href="javascript:void(0)" onclick="toggleModal('resetModal', true)" style="font-size: 14px; color: var(--primary); font-weight: 700;">Forgot Password?</a>
             </div>
 
-            <button type="submit" class="btn">Sign In</button>
-            <div id="login-message" class="message"></div>
-
-            <div class="signup-link">
-                Don't have an account? <a href="read_me.html">Read Me</a>
+            <button type="submit" class="btn btn-anim animate-item" id="submitBtn">Sign In</button>
+            
+            <div class="signup-link footer-anim animate-item">
+                Don't have an account? <a onclick="toggleModal('readmeModal', true)">Read Me</a>
             </div>
         </form>
     </div>
 
+    <!-- Read Me Modal -->
+    <div class="modal-overlay" id="readmeModal">
+        <div class="modal-box">
+            <div class="header-icon" style="background: var(--primary-glow); color: var(--primary);"><i class='bx bx-shield-quarter'></i></div>
+            <h2>Account Access Policy</h2>
+            <p style="margin: 15px 0; color: var(--text-muted); font-size: 14px; line-height: 1.6;">
+                Accounts are pre-provisioned by the Registrar's Office to synchronize with official student records. Public registration is disabled for security.
+            </p>
+            <div class="info-highlight">
+                <i class='bx bxs-info-circle'></i> Use your official ID and department-issued password. 
+            </div>
+            <div class="info-highlight">
+                <i class='bx bxs-info-circle'></i> If you don’t have an account yet, please visit the Registrar’s Office to create one.
+            </div>
+            <button class="btn" onclick="toggleModal('readmeModal', false)">Got it, thanks!</button>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-box">
+            <div class="header-icon"><i class='bx bx-reset'></i></div>
+            <h2>Reset Password</h2>
+            <p style="margin: 15px 0; color: var(--text-muted); font-size: 14px;">Enter your ID to request a password reset from the IT department.</p>
+            
+            <form action="http://localhost/GCST_Track_System/actions/reset_request.php" method="POST" onsubmit="handleReset(event)">
+                <div class="input-box">
+                    <input type="text" name="reset_student_id" placeholder="Student ID Number" required>
+                    <i class='bx bxs-id-card'></i>
+                </div>
+                <button type="submit" class="btn">Request Reset</button>
+                <button type="button" class="btn" style="background: transparent; color: var(--text-muted); box-shadow: none;" onclick="toggleModal('resetModal', false)">Back to Sign In</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        const loginMessageDiv = document.getElementById("login-message");
-        const floatingMessage = document.getElementById("floating-message");
-
-        function getQueryParam(param) {
-            return new URLSearchParams(window.location.search).get(param);
-        }
-
-        function showToast(message, isError = false) {
-            floatingMessage.textContent = message;
-            floatingMessage.classList.toggle("error", isError);
-            floatingMessage.classList.add("show");
-
-            setTimeout(() => {
-                floatingMessage.classList.remove("show");
-                setTimeout(() => {
-                    floatingMessage.textContent = "";
-                    floatingMessage.classList.remove("error");
-                }, 300);
-            }, 4200);
-        }
-
-        function showBanner(message, isError = false) {
-            loginMessageDiv.textContent = message;
-            loginMessageDiv.classList.toggle("error-msg", isError);
-            loginMessageDiv.classList.toggle("success-msg", !isError);
-            loginMessageDiv.classList.add("message-card");
-
-            setTimeout(() => {
-                loginMessageDiv.classList.add("fade-out");
-                setTimeout(() => {
-                    loginMessageDiv.style.display = "none";
-                }, 1000);
-            }, 4200);
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const status = getQueryParam("status");
-
-            if (status === "invalid") {
-                showToast("Invalid Student ID or Password.", true);
-                showBanner("Invalid Student ID or Password.", true);
-            } else if (status === "suspended") {
-                showToast("Your account is suspended. Contact the admin.", true);
-                showBanner("Your account is suspended. Kindly reach out to the admin for assistance.", true);
+        // Modal Control
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
+            if (show) {
+                modal.classList.add('active');
+            } else {
+                modal.classList.remove('active');
             }
-        });
-    </script>
+        }
 
-    <script>
+        // Close when clicking outside the modal box
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Toast Notifications
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("floating-message");
+            toast.textContent = message;
+            toast.className = isError ? "floating-message show error" : "floating-message show";
+            setTimeout(() => toast.classList.remove("show"), 4000);
+        }
+
+        // Handle Reset Submission Mockup
+        function handleReset(e) {
+            e.preventDefault();
+            showToast("Reset request sent to IT Office.");
+            setTimeout(() => toggleModal('resetModal', false), 1500);
+        }
+
+        // Login Validation
         function validateForm(form) {
-            const studentIdRegex = /^GC-\d{6}$/;
-
-            if (!studentIdRegex.test(form.student_id.value)) {
-                alert("Invalid Student ID format. Example: GC-230266");
+            const btn = document.getElementById("submitBtn");
+            if (!form.student_id.value || !form.password.value) {
+                showToast("All fields are required", true);
                 return false;
             }
-
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Authenticating...";
             return true;
         }
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const togglePasswords = document.querySelectorAll('.toggle-password');
-
-            togglePasswords.forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    const input = toggle.parentElement.querySelector('input');
-
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        toggle.classList.remove('bx-show');
-                        toggle.classList.add('bx-hide'); 
-                    } else {
-                        input.type = 'password';
-                        toggle.classList.remove('bx-hide');
-                        toggle.classList.add('bx-show');
-                    }
-                });
-            });
+        // Password Toggle logic
+        document.getElementById('toggleLoginPass').addEventListener('click', function() {
+            const passInput = document.getElementById('loginPass');
+            const isPass = passInput.type === 'password';
+            passInput.type = isPass ? 'text' : 'password';
+            this.classList.toggle('bx-show', !isPass);
+            this.classList.toggle('bx-hide', isPass);
         });
     </script>
 </body>

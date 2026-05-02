@@ -1,21 +1,28 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin / Librarian Registration</title>
+    <title>Admin / Cashier Registration</title>
 
-    <!-- Boxicons -->
+    <!-- Boxicons & Fonts -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Styles -->
     <style>
-        /* Global Styles */
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
@@ -23,121 +30,184 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea, #7494ec);
+            background: linear-gradient(-45deg, #c9d6ff, #e2e2e2, #aec0ff, #f0f2f5);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 20px;
         }
 
-        /* Container */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
-            width: 450px;
-            max-width: 95%;
+            width: 100%;
+            max-width: 480px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 34px;
+            box-shadow: 0 24px 60px rgba(35, 75, 155, 0.12);
             padding: 40px;
-            background: #fff;
-            border-radius: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             text-align: center;
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Icon Styling */
+        .header-icon {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #764ba2);
+            border-radius: 20px;
+            color: #ffffff;
+            font-size: 35px;
+            margin: 0 auto 20px;
+            box-shadow: 0 12px 25px var(--primary-glow);
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         h1 {
-            margin-bottom: 30px;
-            color: #333;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            letter-spacing: -1px;
         }
 
-        /* Form Fields */
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* Form Fields Scroll Area */
         .form-fields {
-            max-height: 400px;
+            max-height: 380px;
             overflow-y: auto;
-            margin-bottom: 20px;
+            padding-right: 8px;
+            margin-bottom: 25px;
         }
 
-        .form-fields::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .form-fields::-webkit-scrollbar-thumb {
-            background: #bbb;
-            border-radius: 10px;
-        }
+        .form-fields::-webkit-scrollbar { width: 5px; }
+        .form-fields::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .input-group {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            text-align: left;
         }
 
-        .input-group input,
-        .input-group select {
+        .input-group input {
             width: 100%;
-            padding: 14px 40px 14px 15px;
-            border: 2px solid #e2e2e2;
-            border-radius: 12px;
-            outline: none;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid transparent;
+            border-radius: 14px;
             font-size: 15px;
+            color: var(--text-dark);
+            font-weight: 500;
+            outline: none;
             transition: all 0.3s ease;
         }
 
-        .input-group input:focus,
-        .input-group select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 10px #7494ec;
+        .input-group input:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 8px 15px -3px var(--primary-glow);
+            transform: translateY(-2px);
         }
 
-        /* Buttons */
-        button {
-            width: 100%;
-            padding: 14px 0;
-            background: linear-gradient(90deg, #667eea, #7494ec);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Show Password Icon */
         .show-password {
             position: absolute;
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #999;
+            color: #94a3b8;
+            font-size: 20px;
+            transition: 0.2s;
         }
 
-         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+        .show-password:hover { color: var(--primary); }
+
+        /* Button Styling */
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        
+
+        button:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px var(--primary-glow);
+        }
+
         .signin-link {
-            text-align: center;
-            margin-top: 22px;
-            font-size: 14.5px;
-            color: #5b6c8f;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
         .signin-link a {
-            color: #5d83e2;
+            color: var(--primary);
             font-weight: 700;
             text-decoration: none;
         }
 
-        .signin-link a:hover {
-            color: #3f63c4;
+        /* Staggered Entrance Animations */
+        .animate-item {
+            opacity: 0;
+            animation: fadeInUp 0.5s ease forwards;
         }
+
+        .header-anim { animation-delay: 0.1s; }
+        .form-anim { animation-delay: 0.2s; }
+        .btn-anim { animation-delay: 0.3s; }
+        .footer-anim { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Admin / Cashier Registration</h1>
-        <form action="http://localhost/GCST_Track_System/utils/process_admin_cashier.php" method="POST" onsubmit="return validateForm(this)">
-            <div class="form-fields">
+        <div class="header-anim animate-item">
+            <div class="header-icon"><i class='bx bx-user-plus'></i></div>
+            <h1>Create Staff Account</h1>
+            <p class="subtitle">Set up a new administrator or cashier</p>
+        </div>
+
+        <form action="http://localhost/GCST_Track_System/actions/process_admin_cashier.php" method="POST" onsubmit="return validateForm(this)">
+            <div class="form-fields form-anim animate-item">
                 <div class="input-group">
                     <input type="text" name="last_name" placeholder="Last Name" required>
                 </div>
@@ -148,7 +218,7 @@
                     <input type="text" name="middle_name" placeholder="Middle Name">
                 </div>
                 <div class="input-group">
-                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="email" name="email" placeholder="Staff Email Address" required>
                 </div>
                 <div class="input-group">
                     <input type="password" name="password" id="password" placeholder="Password" required>
@@ -159,32 +229,30 @@
                     <i class='bx bx-show show-password' id="toggleConfirm"></i>
                 </div>
             </div>
-            <button type="submit">Register</button>
 
-            <div class="signin-link">
-                Already done on creating admin/cashier account? <a href="superadmin_dashb.html">Go to Dashboard</a>
+            <button type="submit" class="btn-anim animate-item">Register Staff Member</button>
+
+            <div class="signin-link footer-anim animate-item">
+                Ready to go? <a href="superadmin_dashb.html">Return to Dashboard</a>
             </div>
         </form>
     </div>
 
-    <!-- Scripts -->
     <script>
         // Toggle password visibility
-        const togglePassword = document.getElementById('togglePassword');
-        const password = document.getElementById('password');
-        togglePassword.addEventListener('click', () => {
-            password.type = password.type === 'password' ? 'text' : 'password';
-            togglePassword.classList.toggle('bx-show');
-            togglePassword.classList.toggle('bx-hide');
-        });
+        const setupToggle = (btnId, inputId) => {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            btn.addEventListener('click', () => {
+                const isPass = input.type === 'password';
+                input.type = isPass ? 'text' : 'password';
+                btn.classList.toggle('bx-show', !isPass);
+                btn.classList.toggle('bx-hide', isPass);
+            });
+        };
 
-        const toggleConfirm = document.getElementById('toggleConfirm');
-        const confirmPassword = document.getElementById('confirm_password');
-        toggleConfirm.addEventListener('click', () => {
-            confirmPassword.type = confirmPassword.type === 'password' ? 'text' : 'password';
-            toggleConfirm.classList.toggle('bx-show');
-            toggleConfirm.classList.toggle('bx-hide');
-        });
+        setupToggle('togglePassword', 'password');
+        setupToggle('toggleConfirm', 'confirm_password');
 
         // Form validation
         function validateForm(form) {
@@ -196,12 +264,11 @@
             return true;
         }
 
-        // Show success popup and refresh page
+        // Success handling
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('success') === '1') {
                 alert("Account successfully created!");
-                // Remove the query string and refresh page without re-submitting the form
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
@@ -209,3 +276,5 @@
 
 </body>
 </html>
+
+

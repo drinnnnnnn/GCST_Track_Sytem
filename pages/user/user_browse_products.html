@@ -1,466 +1,782 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GCST Library - Browse Products</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_browse_products.css" />
+  
+  <title>GCST User - Browse Products</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/user.css" />
+  <style>
+    .product-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 200px;
+      border-radius: var(--radius);
+      object-fit: cover;
+      margin-bottom: 14px;
+    }
+    
+    .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .product-name {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .product-category {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      width: fit-content;
+    }
+    
+    .product-price {
+      display: flex;
+      gap: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .price-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .product-stock {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    
+    .stock-available {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .stock-low {
+      color: var(--warning);
+      font-weight: 600;
+    }
+    
+    .stock-unavailable {
+      color: var(--danger);
+      font-weight: 600;
+    }
+    
+    .product-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+    
+    .btn-action {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .btn-buy {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-buy:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+    
+    .btn-rent {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-rent:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    
+    .search-bar-wrapper {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .search-bar-wrapper .search-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .search-bar-wrapper input {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      background: var(--surface-soft);
+      color: var(--text);
+    }
+    
+    .search-bar-wrapper button {
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .search-bar-wrapper button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    .filter-section {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .filter-section h3 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 10px 16px;
+      border: 2px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--text);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .filter-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
 
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.student_id) {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-        }
-      })
-      .catch(() => {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-      });
-  });
-</script>
+    .browse-layout {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .cart-panel {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      position: sticky;
+      top: 20px;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .cart-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .cart-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .cart-badge {
+      background: var(--primary);
+      color: white;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .cart-items {
+      display: grid;
+      gap: 12px;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      background: var(--surface-soft);
+      border-radius: var(--radius);
+      padding: 14px;
+      align-items: center;
+    }
+
+    .cart-item-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cart-item-controls button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-remove {
+      border-color: transparent;
+      background: var(--danger);
+      color: white;
+      width: auto;
+      padding: 0 10px;
+      min-width: 32px;
+    }
+
+    .cart-summary {
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    .checkout-button {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .checkout-result {
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+      display: grid;
+      gap: 14px;
+      text-align: center;
+    }
+
+    .checkout-result img {
+      width: 100%;
+      max-width: 220px;
+      margin: 0 auto;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .order-reference {
+      display: block;
+      font-size: 0.94rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 990px) {
+      .browse-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .cart-panel {
+        position: static;
+        top: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .search-bar-wrapper .search-bar {
+        flex-direction: column;
+      }
+      
+      .search-bar-wrapper input {
+        min-width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Header -->
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
-      <strong>Granby Colleges of Science & Technology</strong>
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
+
+      <div>
+        <strong>GCST Tracking System</strong>
+        <p>Explore books, school supplies, uniforms, and other available items in the store.</p>
+      </div>
     </div>
     
     <nav class="nav-links">
-      <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
-      <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
-      <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+      <a href="#" class="notification-icon" id="notification-bell" title="Notifications">
+        🔔
+        <span id="notif-badge"></span>
+      </a>
+
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="dropdown-header">Notifications</div>
+        <div class="notifications-list" id="notifications-list"></div>
+        <div class="dropdown-footer" id="clear-notifications">Clear All</div>
+      </div>
+
+      <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
     <div class="dropdown-menu" id="dropdown-menu">
-    <a class="menu-item" href="user_browse_products.html">
-      <i class="fas fa-shopping-bag"></i> Browse Products
-    </a>
-    <a class="menu-item" href="user_rentals.html">
-      <i class="fas fa-box"></i> My Rentals
-    </a>
-    <a class="menu-item" href="user_queue_tickets.html">
-      <i class="fas fa-ticket-alt"></i> Queue Tickets
-    </a>
-    <a class="menu-item" href="user_tuition_fees.html">
-      <i class="fas fa-receipt"></i> Tuition Fees
-    </a>
-    <a class="menu-item" href="user_profile.html">
-      <i class="fas fa-user-circle"></i> Profile
-    </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
-      <i class="fas fa-sign-out-alt"></i> Log Out
-    </a>
-  </div>
-</header>
-
-  
-
-  <section class="hero">
-    <div class="hero-copy">
-      <small>Browse Products</small>
-      <h1>Find Books, Uniforms, and Accessories</h1>
-      <p>Browse available GCST items, add them to your cart, and checkout securely in one flow.</p>
+      <a class="menu-item" href="InUser_home.html">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+      <a class="menu-item" href="user_browse_products.html">
+        <i class="fas fa-shopping-bag"></i> Browse Products
+      </a>
+      <a class="menu-item" href="user_rentals.html">
+        <i class="fas fa-book"></i> My Rentals
+      </a>
+      <a class="menu-item" href="user_queue_tickets.html">
+        <i class="fas fa-ticket-alt"></i> Queue Tickets
+      </a>
+      <a class="menu-item" href="user_tuition_fees.html">
+        <i class="fas fa-receipt"></i> Tuition Fees
+      </a>
+      <a class="menu-item" href="user_profile.html">
+        <i class="fas fa-user-circle"></i> Profile
+      </a>
+      <a class="menu-item" href="javascript:void(0)" id="logout-trigger">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </a>
     </div>
-  </section>
+  </header>
 
-  <div class="category-tabs">
-    <button class="category-tab active" data-category="all">All Products</button>
-    <button class="category-tab" data-category="books">📚 Books</button>
-    <button class="category-tab" data-category="uniforms">👕 Uniforms</button>
-    <button class="category-tab" data-category="accessories">🎒 Accessories</button>
-  </div>
-
-  <div class="browse-grid">
-    <section class="product-panel">
-      <div class="panel-header">
-        <div>
-          <h2>Product Catalog</h2>
-          <p class="panel-subtitle">Available items loaded from the system</p>
-        </div>
-        <span id="product-count">0 products</span>
+  <main>
+    <!-- Greeting Section -->
+    <section class="greeting-section">
+      <div class="greeting-content">
+        <h1>Browse Products</h1>
+        <p>Find the books, supplies, uniforms, and accessories you need</p>
       </div>
-
-      <div class="products-grid" id="products-grid">
-        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>
-      </div>
+      <div class="greeting-icon">🛍️</div>
     </section>
 
-    <aside class="cart-panel">
-      <div class="panel-header">
-        <div>
-          <h2>Shopping Cart</h2>
-          <p class="panel-subtitle">Review selected items and complete checkout</p>
-        </div>
-        <span id="cart-count">0 items</span>
-      </div>
-
-      <div class="cart-body" id="cart-body">
-        <div class="empty-state"><i class="fas fa-shopping-cart"></i><p>Your cart is empty. Add items to get started.</p></div>
-      </div>
-
-      <div class="cart-summary">
-        <div class="summary-row">
-          <span>Items total</span>
-          <span id="cart-items-total">₱0.00</span>
-        </div>
-        <div class="summary-row summary-total">
-          <span>Total</span>
-          <span id="cart-total">₱0.00</span>
-        </div>
-        <button id="checkout-btn" class="btn-checkout" disabled>Checkout Cart</button>
-        <button id="clear-cart-btn" class="btn-clear" disabled>Clear Cart</button>
-      </div>
-    </aside>
-  </div>
-
-  <div id="receipt-modal" class="receipt-modal">
-    <div class="receipt-panel">
-      <button class="close-modal" id="close-receipt"><i class="fas fa-times"></i></button>
-      <div id="receipt-content" class="receipt-content"></div>
-      <div class="receipt-actions">
-        <button id="print-receipt" class="btn-buy">Print Receipt</button>
-        <button id="download-receipt" class="btn-rent">Download Receipt</button>
+    <!-- Search Bar -->
+    <div class="search-bar-wrapper">
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search for products..." />
+        <button onclick="performSearch()"><i class="fas fa-search"></i> Search</button>
       </div>
     </div>
-  </div>
 
+    <!-- Filters -->
+    <div class="filter-section">
+      <h3>Filter by Category</h3>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-category="all" onclick="filterByCategory('all', this)">All</button>
+        <button class="filter-btn" data-category="books" onclick="filterByCategory('books', this)">Books</button>
+        <button class="filter-btn" data-category="supplies" onclick="filterByCategory('supplies', this)">Supplies</button>
+        <button class="filter-btn" data-category="uniforms" onclick="filterByCategory('uniforms', this)">Uniforms</button>
+        <button class="filter-btn" data-category="accessories" onclick="filterByCategory('accessories', this)">Accessories</button>
+      </div>
+    </div>
+
+    <!-- Products + Cart -->
+    <div class="browse-layout">
+      <section class="activity-section">
+        <div class="section-heading">
+          <h2>Products</h2>
+          <p>Tap Buy or Rent to add products to your cart and prepare a checkout QR code.</p>
+        </div>
+
+        <div class="products-grid" id="products-container">
+          <div class="loading">
+            <div class="spinner"></div>
+            <span>Loading products...</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="cart-panel">
+        <div class="cart-header">
+          <div>
+            <h2>Shopping Cart</h2>
+            <p class="cart-subtitle">Review items, update quantities, and checkout securely.</p>
+          </div>
+          <span id="cart-count" class="cart-badge">0</span>
+        </div>
+
+        <div id="cart-items" class="cart-items"></div>
+        <div id="cart-empty" class="empty-state cart-empty-state">
+          <i class="fas fa-shopping-cart"></i>
+          <h3>Your cart is empty</h3>
+          <p>Add products to build your order.</p>
+        </div>
+
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Total items</span>
+            <strong id="cart-items-count">0</strong>
+          </div>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <strong id="cart-subtotal">₱0.00</strong>
+          </div>
+        </div>
+
+        <button id="checkout-button" class="btn-action btn-buy checkout-button" type="button">Checkout</button>
+
+        <div id="checkout-result" class="checkout-result hidden">
+          <div class="checkout-message">
+            <h3>Order ready for cashier</h3>
+            <p>Show this QR code at checkout.</p>
+          </div>
+          <div class="qr-box">
+            <img id="checkout-qr" src="" alt="Order QR Code" />
+          </div>
+          <div class="order-reference">
+            <strong>Order Reference:</strong>
+            <span id="order-reference"></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="http://localhost/GCST_Track_System/assets/js/admincashier.js"></script>
   <script>
-    const apiRoot = 'http://localhost/GCST_Track_System/utils';
-    const menuIcon = document.getElementById('menu-icon');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-    const productsGrid = document.getElementById('products-grid');
-    const categoryTabs = document.querySelectorAll('.category-tab');
-    const productCount = document.getElementById('product-count');
-    const cartCount = document.getElementById('cart-count');
-    const cartBody = document.getElementById('cart-body');
-    const cartItemsTotal = document.getElementById('cart-items-total');
-    const cartTotal = document.getElementById('cart-total');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    const clearCartBtn = document.getElementById('clear-cart-btn');
-    const receiptModal = document.getElementById('receipt-modal');
-    const receiptContent = document.getElementById('receipt-content');
-    const closeReceipt = document.getElementById('close-receipt');
-    const printReceipt = document.getElementById('print-receipt');
-    const downloadReceipt = document.getElementById('download-receipt');
-
     let allProducts = [];
+    let currentCategory = 'all';
+    let currentSearch = '';
     let cart = [];
-    let currentUser = null;
 
-    menuIcon.addEventListener('click', () => {
-      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    });
+    function normalizeCategory(value) {
+      return (value || 'uncategorized').toString().toLowerCase();
+    }
 
-    document.addEventListener('click', (e) => {
-      if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
-        dropdownMenu.style.display = 'none';
+    function filterByCategory(category, button) {
+      currentCategory = category;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      button?.classList.add('active');
+      renderProducts();
+    }
+
+    function performSearch() {
+      currentSearch = document.getElementById('search-input').value.toLowerCase();
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const container = document.getElementById('products-container');
+      let filtered = allProducts;
+
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(p => normalizeCategory(p.product_category) === currentCategory);
       }
-    });
 
-    async function loadUser() {
-      try {
-        const response = await fetch(`${apiRoot}/get_user.php`);
-        const data = await response.json();
-        if (!data.student_id) {
-          window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in.html';
-          return;
-        }
-        currentUser = data;
-      } catch (error) {
-        window.location.href = 'http://localhost/GCST_Track_System/pages/sign_in.html';
+      if (currentSearch) {
+        filtered = filtered.filter(p => {
+          const text = `${p.product_name} ${p.product_description || ''} ${p.product_category || ''}`.toLowerCase();
+          return text.includes(currentSearch);
+        });
       }
-    }
 
-    async function loadProducts() {
-      try {
-        const response = await fetch(`${apiRoot}/get_products.php`);
-        const products = await response.json();
-        allProducts = Array.isArray(products) ? products : [];
-        updateProductGrid('all');
-      } catch (error) {
-        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load products.</p></div>';
-      }
-    }
-
-    function formatPrice(value) {
-      return `₱${parseFloat(value || 0).toFixed(2)}`;
-    }
-
-    function normalizeImage(imagePath) {
-      if (!imagePath) return '<span class="product-image-fallback"><i class="fas fa-box-open"></i></span>';
-      const src = imagePath.startsWith('http') ? imagePath : imagePath.startsWith('/') ? `http://localhost/GCST_Track_System${imagePath}` : `http://localhost/GCST_Track_System/${imagePath}`;
-      return `<img src="${src}" alt="Product image" />`;
-    }
-
-    function updateProductGrid(category) {
-      const filtered = category === 'all'
-        ? allProducts
-        : allProducts.filter(product => product.product_category.toLowerCase() === category.toLowerCase());
-
-      productsGrid.innerHTML = '';
-      productCount.textContent = `${filtered.length} product${filtered.length !== 1 ? 's' : ''}`;
-
-      if (!filtered.length) {
-        productsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products found in this category.</p></div>';
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <i class="fas fa-search"></i>
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filters</p>
+          </div>
+        `;
         return;
       }
 
-      filtered.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <div class="product-image">${normalizeImage(product.product_image)}</div>
-          <div class="product-info">
-            <div class="product-name">${product.product_name}</div>
-            <div class="product-meta">${product.product_category}</div>
-            <p class="product-description">${product.product_description || 'No description available.'}</p>
-            <div class="price-block">
-              <div><span>Buy</span><strong>${formatPrice(product.buy_price)}</strong></div>
-              <div><span>Rent</span><strong>${formatPrice(product.rent_price)}</strong></div>
+      container.innerHTML = filtered.map(product => {
+        const imageUrl = product.product_image || 'http://localhost/GCST_Track_System/assets/book_img/placeholder.jpg';
+        const inStock = product.stock > 0;
+        const stockClass = product.stock > 10 ? 'stock-available' : product.stock > 0 ? 'stock-low' : 'stock-unavailable';
+
+        return `
+          <div class="product-card">
+            <img src="${imageUrl}" alt="${product.product_name}" class="product-image">
+            <div class="product-info">
+              <h3 class="product-name">${product.product_name}</h3>
+              <span class="product-category">${product.product_category || 'Uncategorized'}</span>
+              <p class="product-description">${product.product_description || 'No description available.'}</p>
+              <div class="product-price">
+                ${product.buy_price > 0 ? `<div><span class="price-label">Buy:</span> ₱${parseFloat(product.buy_price).toFixed(2)}</div>` : ''}
+                ${product.rent_price > 0 ? `<div><span class="price-label">Rent:</span> ₱${parseFloat(product.rent_price).toFixed(2)}</div>` : ''}
+              </div>
+              <div class="product-stock">
+                Available: <span class="${stockClass}">${inStock ? product.stock + ' pcs' : 'Out of stock'}</span>
+              </div>
             </div>
             <div class="product-actions">
-              <select class="mode-select" aria-label="Choose purchase mode">
-                <option value="buy">Buy</option>
-                <option value="rent">Rent</option>
-              </select>
-              <button class="btn-add" type="button">Add to Cart</button>
-            </div>
-            <div class="card-buttons">
-              <button class="btn-buy" type="button">Buy Now</button>
-              <button class="btn-rent" type="button">Rent Now</button>
+              ${product.buy_price > 0 ? `<button class="btn-action btn-buy" type="button" ${!inStock ? 'disabled' : ''} onclick="addToCart(${product.product_id}, 'buy')">Buy</button>` : ''}
+              ${product.rent_price > 0 ? `<button class="btn-action btn-rent" type="button" ${!inStock ? 'disabled' : ''} onclick="addToCart(${product.product_id}, 'rent')">Rent</button>` : ''}
             </div>
           </div>
         `;
-
-        const modeSelect = card.querySelector('.mode-select');
-        card.querySelector('.btn-add').addEventListener('click', () => addToCart(product, modeSelect.value));
-        card.querySelector('.btn-buy').addEventListener('click', () => checkoutSingle(product, 'buy'));
-        card.querySelector('.btn-rent').addEventListener('click', () => checkoutSingle(product, 'rent'));
-
-        productsGrid.appendChild(card);
-      });
+      }).join('');
     }
 
-    function addToCart(product, mode) {
-      const price = mode === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
-      if (Number.isNaN(price) || price <= 0) {
-        alert('This product is not available for the selected option.');
+    function addToCart(productId, type) {
+      const product = allProducts.find(item => item.product_id === productId);
+      if (!product || product.stock <= 0) {
+        alert('Product is unavailable.');
         return;
       }
 
-      const existing = cart.find(item => item.product_id === product.product_id && item.action_type === mode);
-      if (existing) {
+      const existing = cart.find(item => item.product_id === productId && item.type === type);
+      const unitPrice = type === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
+      if (!existing) {
+        cart.push({
+          product_id: productId,
+          product_name: product.product_name,
+          type,
+          quantity: 1,
+          unitPrice,
+          stock: product.stock
+        });
+      } else if (existing.quantity < product.stock) {
         existing.quantity += 1;
       } else {
-        cart.push({
-          product_id: product.product_id,
-          product_name: product.product_name,
-          image: product.product_image,
-          unit_price: price,
-          quantity: 1,
-          action_type: mode
-        });
+        alert('Maximum stock reached for this item.');
       }
+
       renderCart();
+    }
+
+    function changeCartQuantity(productId, type, delta) {
+      const item = cart.find(entry => entry.product_id === productId && entry.type === type);
+      if (!item) return;
+      item.quantity = Math.max(1, item.quantity + delta);
+      renderCart();
+    }
+
+    function removeCartItem(productId, type) {
+      cart = cart.filter(entry => !(entry.product_id === productId && entry.type === type));
+      renderCart();
+    }
+
+    function updateCartDisplay() {
+      const cartItemsContainer = document.getElementById('cart-items');
+      const cartEmpty = document.getElementById('cart-empty');
+      const checkoutButton = document.getElementById('checkout-button');
+      const cartCount = document.getElementById('cart-count');
+      const cartItemsCount = document.getElementById('cart-items-count');
+      const cartSubtotal = document.getElementById('cart-subtotal');
+
+      const totalAmount = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+      cartCount.textContent = totalItems;
+      cartItemsCount.textContent = totalItems;
+      cartSubtotal.textContent = formatCurrency(totalAmount);
+      checkoutButton.disabled = cart.length === 0;
+
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '';
+        cartEmpty.classList.remove('hidden');
+        return;
+      }
+
+      cartEmpty.classList.add('hidden');
+      cartItemsContainer.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div>
+            <strong>${item.product_name}</strong>
+            <div class="cart-item-meta">${item.type.toUpperCase()} • ₱${item.unitPrice.toFixed(2)}</div>
+          </div>
+          <div class="cart-item-controls">
+            <button type="button" onclick="changeCartQuantity(${item.product_id}, '${item.type}', -1)">−</button>
+            <span>${item.quantity}</span>
+            <button type="button" onclick="changeCartQuantity(${item.product_id}, '${item.type}', 1)">+</button>
+            <button type="button" class="btn-remove" onclick="removeCartItem(${item.product_id}, '${item.type}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
     }
 
     function renderCart() {
-      const hasItems = cart.length > 0;
-      cartBody.innerHTML = hasItems ? '' : '<div class="empty-state"><i class="fas fa-shopping-cart"></i><p>Your cart is empty. Add items to get started.</p></div>';
-      cartCount.textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''}`;
-      checkoutBtn.disabled = !hasItems;
-      clearCartBtn.disabled = !hasItems;
+      updateCartDisplay();
+    }
 
-      cart.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'cart-item';
-        row.innerHTML = `
-          <div class="cart-item-info">
-            <div class="cart-item-thumb">${normalizeImage(item.image)}</div>
-            <div>
-              <div class="cart-item-name">${item.product_name}</div>
-              <div class="cart-item-meta">${item.action_type.toUpperCase()} · ${formatPrice(item.unit_price)}</div>
-            </div>
-          </div>
-          <div class="cart-item-controls">
-            <div class="quantity-control">
-              <button class="qty-btn" data-index="${index}" data-action="decrease">-</button>
-              <span>${item.quantity}</span>
-              <button class="qty-btn" data-index="${index}" data-action="increase">+</button>
-            </div>
-            <div class="cart-item-total">${formatPrice(item.unit_price * item.quantity)}</div>
-            <button class="remove-item" data-index="${index}" aria-label="Remove item"><i class="fas fa-trash"></i></button>
+    function checkoutCart() {
+      if (cart.length === 0) {
+        alert('Please add items to the cart before checking out.');
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      const payload = {
+        items: cart.map(item => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+          type: item.type,
+          unit_price: item.unitPrice
+        })),
+        subtotal,
+        total_amount: subtotal,
+        payment_received: subtotal,
+        change_amount: 0,
+        payment_status: 'paid'
+      };
+
+      const checkoutButton = document.getElementById('checkout-button');
+      checkoutButton.textContent = 'Processing...';
+      checkoutButton.disabled = true;
+
+      fetchWithError('http://localhost/GCST_Track_System/actions/save_cashier_transaction.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(result => {
+        if (!result.success) {
+          throw new Error(result.message || 'Checkout failed');
+        }
+
+        const reference = result.transaction_number || 'ORDER-' + Date.now();
+        const qrImage = document.getElementById('checkout-qr');
+        const orderReference = document.getElementById('order-reference');
+        const checkoutResult = document.getElementById('checkout-result');
+
+        qrImage.src = `https://chart.googleapis.com/chart?cht=qr&chs=250x250&chl=${encodeURIComponent(reference)}&chld=L|1`;
+        orderReference.textContent = reference;
+        checkoutResult.classList.remove('hidden');
+        cart = [];
+        renderCart();
+        alert('Checkout successful! Show the QR code to the cashier for scanning.');
+      })
+      .catch(error => {
+        alert(error.message || 'Checkout failed. Please try again.');
+      })
+      .finally(() => {
+        checkoutButton.textContent = 'Checkout';
+        checkoutButton.disabled = cart.length === 0;
+      });
+    }
+
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') performSearch();
+    });
+
+    document.getElementById('checkout-button').addEventListener('click', checkoutCart);
+
+    initializeAdminCashierPage(async () => {
+      try {
+        const productsData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_products.php');
+        allProducts = Array.isArray(productsData) ? productsData : productsData.products || [];
+        renderProducts();
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        document.getElementById('products-container').innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error loading products</h3>
+            <p>Unable to load products. Please try again later.</p>
           </div>
         `;
-
-        cartBody.appendChild(row);
-      });
-
-      cartBody.querySelectorAll('.qty-btn').forEach(button => {
-        button.addEventListener('click', () => {
-          const index = parseInt(button.dataset.index, 10);
-          const action = button.dataset.action;
-          updateQuantity(index, action === 'increase' ? 1 : -1);
-        });
-      });
-
-      cartBody.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', () => removeCartItem(parseInt(button.dataset.index, 10)));
-      });
-
-      updateSummary();
-    }
-
-    function updateQuantity(index, delta) {
-      if (!cart[index]) return;
-      cart[index].quantity += delta;
-      if (cart[index].quantity <= 0) {
-        cart.splice(index, 1);
       }
-      renderCart();
-    }
-
-    function removeCartItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
-
-    function updateSummary() {
-      const total = cart.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
-      cartItemsTotal.textContent = formatPrice(total);
-      cartTotal.textContent = formatPrice(total);
-    }
-
-    async function checkoutCart() {
-      if (!cart.length) return;
-      await submitTransaction(cart.slice());
-    }
-
-    async function checkoutSingle(product, mode) {
-      const price = mode === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
-      if (Number.isNaN(price) || price <= 0) {
-        alert('This product is not available for the selected option.');
-        return;
-      }
-      await submitTransaction([{ product_id: product.product_id, product_name: product.product_name, unit_price: price, quantity: 1, action_type: mode, image: product.product_image }]);
-    }
-
-    async function submitTransaction(items) {
-      if (!currentUser) {
-        alert('Please sign in to complete the transaction.');
-        return;
-      }
-      try {
-        checkoutBtn.disabled = true;
-        const response = await fetch(`${apiRoot}/save_transaction.php`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ student_id: currentUser.student_id, items })
-        });
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.message || 'Transaction failed.');
-        }
-        const receiptHtml = buildReceipt(items, result.transaction_group);
-        showReceipt(receiptHtml);
-        if (items.length === cart.length) {
-          cart = [];
-          renderCart();
-        }
-      } catch (error) {
-        alert(error.message || 'Unable to complete checkout.');
-      } finally {
-        checkoutBtn.disabled = !cart.length;
-      }
-    }
-
-    function buildReceipt(items, transactionGroup) {
-      const total = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
-      const date = new Date().toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
-      const rows = items.map(item => `
-        <tr>
-          <td>${item.product_name}</td>
-          <td>${item.action_type.toUpperCase()}</td>
-          <td>${item.quantity}</td>
-          <td>${formatPrice(item.unit_price)}</td>
-          <td>${formatPrice(item.unit_price * item.quantity)}</td>
-        </tr>
-      `).join('');
-
-      return `
-        <div class="receipt-header">
-          <div>
-            <h2>GCST Library Receipt</h2>
-            <p>${date}</p>
-            ${transactionGroup ? `<p class="receipt-group">Transaction ID: ${transactionGroup}</p>` : ''}
-          </div>
-          <div class="receipt-user">
-            <p><strong>Student ID:</strong> ${currentUser.student_id}</p>
-          </div>
-        </div>
-        <table class="receipt-table">
-          <thead>
-            <tr><th>Product</th><th>Type</th><th>Qty</th><th>Unit</th><th>Total</th></tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div class="receipt-summary">
-          <span>Total Amount</span>
-          <strong>${formatPrice(total)}</strong>
-        </div>
-      `;
-    }
-
-    function showReceipt(html) {
-      receiptContent.innerHTML = html;
-      receiptModal.classList.add('active');
-    }
-
-    function closeReceiptModal() {
-      receiptModal.classList.remove('active');
-    }
-
-    function printCurrentReceipt() {
-      window.print();
-    }
-
-    function downloadCurrentReceipt() {
-      const text = receiptContent.innerText;
-      const blob = new Blob([text], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `gcst_receipt_${Date.now()}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-
-    categoryTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        categoryTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        updateProductGrid(tab.dataset.category);
-      });
-    });
-
-    checkoutBtn.addEventListener('click', checkoutCart);
-    clearCartBtn.addEventListener('click', () => { cart = []; renderCart(); });
-    closeReceipt.addEventListener('click', closeReceiptModal);
-    receiptModal.addEventListener('click', event => { if (event.target === receiptModal) closeReceiptModal(); });
-    printReceipt.addEventListener('click', printCurrentReceipt);
-    downloadReceipt.addEventListener('click', downloadCurrentReceipt);
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      await loadUser();
-      await loadProducts();
-      renderCart();
     });
   </script>
+    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler.js"></script>
 </body>
 </html>

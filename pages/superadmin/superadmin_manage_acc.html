@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
   <title>GCST Super Admin - Account Management</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-<link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/InUser_home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
 <style>
   .charts-grid {
     display: grid;
@@ -126,18 +126,18 @@
 <!--
 <script>
   window.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost/GCST_Track_System/utils/get_user.php')
+    fetch('http://localhost/GCST_Track_System/actions/get_user.php')
       .then(res => res.json())
       .then(data => {
         const currentId = data.admin_id;
         if (!currentId) {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
           return;
         }
         currentSuperAdminId = currentId;
       })
       .catch(() => {
-        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_librarian.html";
+        window.location.href = "http://localhost/GCST_Track_System/pages/sign_in_admin_cashier.html";
       });
   });
 </script> -->
@@ -147,7 +147,7 @@
   <!-- Header -->
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
       <strong>GCST Tracking System</strong>
     </div>
     
@@ -158,6 +158,9 @@
       <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
     <div class="dropdown-menu" id="dropdown-menu">
+      <a class="menu-item" href="superadmin_dashb.html">
+        <i class="fas fa-users"></i>Dashboard
+      </a>
       <a class="menu-item" href="superadmin_manage_acc.html">
         <i class="fas fa-users"></i> Manage Admins Acc
       </a>
@@ -170,13 +173,11 @@
       <a class="menu-item" href="register_admin_cashier.html">
         <i class="fas fa-user-circle"></i> Register Admin/Cashier Acc
       </a>
-      <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
+      <a class="menu-item" href="http://localhost/GCST_Track_System/actions/log_out.php">
         <i class="fas fa-sign-out-alt"></i> Log Out
       </a>
     </div>
   </header>
-
-  
 
   <!-- Main Content -->
   <main style="max-width: 1400px; margin: 0 auto;">
@@ -223,7 +224,7 @@
 
     // Load admins
     function loadAdmins() {
-      fetch('http://localhost/GCST_Track_System/utils/get_admin_accounts.php')
+      fetch('http://localhost/GCST_Track_System/actions/get_admin_accounts.php')
         .then(res => res.json())
         .then(data => {
           allAdmins = data;
@@ -263,7 +264,7 @@
 
     // Update status
     function updateStatus(adminId, status) {
-      fetch('http://localhost/GCST_Track_System/utils/update_admin_status.php', {
+      fetch('http://localhost/GCST_Track_System/actions/update_admin_status.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ admin_id: adminId, status: status })
@@ -286,7 +287,7 @@
     // Delete admin
     function deleteAdmin(adminId) {
       if (confirm('Are you sure you want to delete this admin?')) {
-        fetch('http://localhost/GCST_Track_System/utils/delete_admin.php', {
+        fetch('http://localhost/GCST_Track_System/actions/delete_admin.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ admin_id: adminId })
@@ -332,3 +333,7 @@
 
 </body>
 </html>
+
+
+
+

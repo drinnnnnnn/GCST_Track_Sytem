@@ -1,235 +1,810 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Rentals - GCST Library</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="http://localhost/GCST_Track_System/styles/user_css/user_rentals.css" />
+  
+  <title>GCST User - My Rentals</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/user.css" />
+  <style>
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
 
-  <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-        .then(res => res.json())
-        .then(data => {
-          if (!data.student_id) {
-            window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-          }
-        })
-        .catch(() => {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-        });
-    });
-  </script>
+    .page-header .header-copy {
+      max-width: 680px;
+    }
+
+    .greeting-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 22px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      font-size: 2rem;
+    }
+
+    .page-header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .page-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    .balance-section {
+      margin-bottom: 28px;
+    }
+
+    .balance-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+    }
+
+    .balance-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.2s ease;
+    }
+
+    .balance-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .balance-card h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .balance-card .amount {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .balance-card .amount.success {
+      color: var(--success);
+    }
+
+    .balance-card .amount.danger {
+      color: var(--danger);
+    }
+
+    .period-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .period-button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .period-button:hover,
+    .period-button.active {
+      border-color: rgba(102, 126, 234, 0.2);
+      background: var(--primary);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .rentals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
+    }
+
+    .rental-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow-lg);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .rental-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 65px rgba(15, 23, 42, 0.12);
+    }
+
+    .rental-card .rental-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .rental-card .rental-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    .rental-card .product-meta {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .rental-card .rental-image {
+      width: 100px;
+      height: 120px;
+      border-radius: 18px;
+      object-fit: cover;
+      background: #f3f4f6;
+      flex-shrink: 0;
+    }
+
+    .rental-card .product-info {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .product-name {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .product-id {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .rental-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .rental-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rental-detail label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .rental-detail span {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 92px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+
+    .status-badge.active {
+      background: #eef7ff;
+      color: #0f4b8a;
+    }
+
+    .status-badge.overdue {
+      background: #fce8e6;
+      color: #9b1c1c;
+    }
+
+    .status-badge.returned {
+      background: #e7f8f4;
+      color: #0f6f55;
+    }
+
+    .rental-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-renew {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-return {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-view {
+      background: var(--surface-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .details-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.55);
+      z-index: 1002;
+      padding: 24px;
+    }
+
+    .details-modal.show {
+      display: flex;
+    }
+
+    .details-card {
+      width: min(720px, 100%);
+      background: var(--surface);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .details-header {
+      display: flex;
+      gap: 18px;
+      padding: 22px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .details-header img {
+      width: 110px;
+      height: 140px;
+      border-radius: 18px;
+      object-fit: cover;
+      background: #f3f4f6;
+      flex-shrink: 0;
+    }
+
+    .details-header-content {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .details-header-content h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .details-header-content p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .details-body {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .details-row {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .details-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .details-value {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 720px) {
+      .rental-card {
+        padding: 18px;
+      }
+
+      .rental-meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .details-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .details-header-content {
+        align-items: center;
+      }
+
+      .details-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Header -->
   <header>
     <div class="logo">
-      <img src="http://localhost/GCST_Track_System/assets/img_icon/granbylogo.png" alt="Library Logo">
-      <strong>Granby Colleges of Science & Technology</strong>
+      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Library Logo">
+
+      <div>
+        <strong>GCST Tracking System</strong>
+        <p>View and manage all your borrowed books and rental history in one place.</p>
+      </div>
     </div>
     
     <nav class="nav-links">
-      <a href="http://localhost/GCST_Track_System/pages/user/InUser_home.html">Home</a>
-      <a href="#" class="notification-icon shake" title="Notifications">🔔</a>
-      <a href="#" class="menu-icon" id="menu-icon" title="Menu">&#9776;</a>
+      <a href="#" class="notification-icon" id="notification-bell" title="Notifications">
+        🔔
+        <span id="notif-badge"></span>
+      </a>
+
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="dropdown-header">Notifications</div>
+        <div class="notifications-list" id="notifications-list"></div>
+        <div class="dropdown-footer" id="clear-notifications">Clear All</div>
+      </div>
+
+      <a href="#" class="menu-icon" id="menu-icon">☰</a>
     </nav>
     <div class="dropdown-menu" id="dropdown-menu">
-    <a class="menu-item" href="user_browse_products.html">
-      <i class="fas fa-shopping-bag"></i> Browse Products
-    </a>
-    <a class="menu-item" href="user_rentals.html">
-      <i class="fas fa-box"></i> My Rentals
-    </a>
-    <a class="menu-item" href="user_queue_tickets.html">
-      <i class="fas fa-ticket-alt"></i> Queue Tickets
-    </a>
-    <a class="menu-item" href="user_tuition_fees.html">
-      <i class="fas fa-receipt"></i> Tuition Fees
-    </a>
-    <a class="menu-item" href="user_profile.html">
-      <i class="fas fa-user-circle"></i> Profile
-    </a>
-    <a class="menu-item" href="http://localhost/GCST_Track_System/utils/log_out.php">
-      <i class="fas fa-sign-out-alt"></i> Log Out
-    </a>
+      <a class="menu-item" href="InUser_home.html">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+      <a class="menu-item" href="user_browse_products.html">
+        <i class="fas fa-shopping-bag"></i> Browse Products
+      </a>
+      <a class="menu-item" href="user_rentals.html">
+        <i class="fas fa-book"></i> My Rentals
+      </a>
+      <a class="menu-item" href="user_queue_tickets.html">
+        <i class="fas fa-ticket-alt"></i> Queue Tickets
+      </a>
+      <a class="menu-item" href="user_tuition_fees.html">
+        <i class="fas fa-receipt"></i> Tuition Fees
+      </a>
+      <a class="menu-item" href="user_profile.html">
+        <i class="fas fa-user-circle"></i> Profile
+      </a>
+      <a class="menu-item" href="javascript:void(0)" id="logout-trigger">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Greeting Section -->
+    <section class="page-header">
+      <div class="header-copy">
+        <h1>My Rentals</h1>
+        <p>View and manage your rental books and items</p>
+      </div>
+      <div class="greeting-icon">📚</div>
+    </section>
+
+    <!-- Summary Cards -->
+    <section class="balance-section">
+      <h2>Rental Overview</h2>
+      <div class="balance-cards">
+        <div class="balance-card">
+          <h3>Active Rentals</h3>
+          <p class="amount" id="activeRentals">0</p>
+        </div>
+        <div class="balance-card">
+          <h3>Overdue Books</h3>
+          <p class="amount danger" id="overdueBooks">0</p>
+        </div>
+        <div class="balance-card">
+          <h3>Returned Items</h3>
+          <p class="amount success" id="returnedItems">0</p>
+        </div>
+        <div class="balance-card">
+          <h3>Total Fees</h3>
+          <p class="amount" id="totalFees">₱0.00</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Overdue Alert -->
+    <div id="overdue-alert" style="display: none;" class="alert-box">
+      <strong><i class="fas fa-exclamation-triangle"></i> Overdue Books Alert</strong>
+      <p id="overdue-message">You have overdue items. Please return them as soon as possible to avoid additional fees.</p>
+    </div>
+
+    <!-- Filters -->
+    <section style="margin-bottom: 24px;">
+      <div class="period-filters">
+        <button class="period-button active" data-filter="all">All</button>
+        <button class="period-button" data-filter="active">Active</button>
+        <button class="period-button" data-filter="returned">Returned</button>
+        <button class="period-button" data-filter="overdue">Overdue</button>
+      </div>
+    </section>
+
+    <!-- Rentals Grid -->
+    <section class="activity-section">
+      <h2>Rental Items</h2>
+      <div class="rentals-grid" id="rentals-container">
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>Loading rentals...</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="details-modal" id="detailsModal" role="dialog" aria-modal="true">
+    <div class="details-card">
+      <button class="modal-close" id="detailsModalClose" aria-label="Close details">&times;</button>
+      <div class="details-header">
+        <img id="details-image" src="http://localhost/GCST_Track_System/assets/img_bg/product_details.png" alt="Product image">
+        <div class="details-header-content">
+          <h3 id="details-title">Rental Details</h3>
+          <p id="details-product-id">Product ID: —</p>
+          <span class="status-badge active" id="details-status">Active</span>
+        </div>
+      </div>
+      <div class="details-body">
+        <div class="details-row">
+          <span class="details-label">Rental Date</span>
+          <span class="details-value" id="details-rental-date">—</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Due Date</span>
+          <span class="details-value" id="details-due-date">—</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Days Remaining</span>
+          <span class="details-value" id="details-days-remaining">—</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Rental Fee</span>
+          <span class="details-value" id="details-fee">—</span>
+        </div>
+      </div>
+    </div>
   </div>
-</header>
 
-  
-
-  <section class="hero">
-    <h1>My Rentals</h1>
-  </section>
-
-  <!-- Dashboard Cards -->
-  <div class="dashboard-cards">
-    <div class="card">
-      <div class="card-icon"><i class="fas fa-hourglass-half"></i></div>
-      <div class="card-content">
-        <h3>Active Rentals</h3>
-        <p class="card-number" id="active-count">0</p>
-      </div>
-    </div>
-
-    <div class="card overdue">
-      <div class="card-icon"><i class="fas fa-exclamation-circle"></i></div>
-      <div class="card-content">
-        <h3>Overdue Rentals</h3>
-        <p class="card-number" id="overdue-count">0</p>
-      </div>
-    </div>
-
-    <div class="card returned">
-      <div class="card-icon"><i class="fas fa-check-circle"></i></div>
-      <div class="card-content">
-        <h3>Returned Items</h3>
-        <p class="card-number" id="returned-count">0</p>
-      </div>
-    </div>
-
-    <div class="card fees">
-      <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
-      <div class="card-content">
-        <h3>Total Rental Fees</h3>
-        <p class="card-number" id="total-fees">$0.00</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Active Rentals Section -->
-  <section class="rentals-section">
-    <h2>Active Rentals</h2>
-    <div class="rentals-table-container">
-      <table class="rentals-table">
-        <thead>
-          <tr>
-            <th>Item Name</th>
-            <th>Date Borrowed</th>
-            <th>Due Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="active-rentals">
-          <tr><td colspan="4">No active rentals.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Overdue Rentals Section -->
-  <section class="rentals-section">
-    <h2>Overdue Rentals</h2>
-    <div class="rentals-table-container">
-      <table class="rentals-table">
-        <thead>
-          <tr>
-            <th>Item Name</th>
-            <th>Date Borrowed</th>
-            <th>Due Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="overdue-rentals">
-          <tr><td colspan="4">No overdue rentals.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Returned Items Section -->
-  <section class="rentals-section">
-    <h2>Returned Items</h2>
-    <div class="rentals-table-container">
-      <table class="rentals-table">
-        <thead>
-          <tr>
-            <th>Item Name</th>
-            <th>Date Borrowed</th>
-            <th>Date Returned</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="returned-items">
-          <tr><td colspan="4">No returned items.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
+  <!-- Scripts -->
+  <script src="http://localhost/GCST_Track_System/assets/js/user.js"></script>
   <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      fetch('http://localhost/GCST_Track_System/utils/get_user.php')
-        .then(res => res.json())
-        .then(user => {
-          if (!user.student_id) {
-            window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-            return;
-          }
-          
-          fetch('http://localhost/GCST_Track_System/utils/get_user_rentals.php')
-            .then(res => res.json())
-            .then(data => populateRentals(data))
-            .catch(err => console.error('Error fetching rentals:', err));
-        })
-        .catch(() => {
-          window.location.href = "http://localhost/GCST_Track_System/pages/sign_in.html";
-        });
-    });
+    const apiBase = 'http://localhost/GCST_Track_System/actions';
+    let allRentals = [];
+    let currentFilter = 'all';
 
-    function populateRentals(data) {
-      const active = data.filter(r => r.status === 'active');
-      const overdue = data.filter(r => r.status === 'overdue');
-      const returned = data.filter(r => r.status === 'returned');
+    const rentalsContainer = document.getElementById('rentals-container');
+    const overdueAlert = document.getElementById('overdue-alert');
+    const overdueMessage = document.getElementById('overdue-message');
+    const detailsModal = document.getElementById('detailsModal');
+    const detailsImage = document.getElementById('details-image');
+    const detailsTitle = document.getElementById('details-title');
+    const detailsProductId = document.getElementById('details-product-id');
+    const detailsStatus = document.getElementById('details-status');
+    const detailsRentalDate = document.getElementById('details-rental-date');
+    const detailsDueDate = document.getElementById('details-due-date');
+    const detailsDaysRemaining = document.getElementById('details-days-remaining');
+    const detailsFee = document.getElementById('details-fee');
 
-      document.getElementById('active-count').textContent = active.length;
-      document.getElementById('overdue-count').textContent = overdue.length;
-      document.getElementById('returned-count').textContent = returned.length;
-      document.getElementById('total-fees').textContent = `$${(data.reduce((sum, r) => sum + (parseFloat(r.rental_fee) || 0), 0)).toFixed(2)}`;
-
-      populateTable('active-rentals', active);
-      populateTable('overdue-rentals', overdue);
-      populateTable('returned-items', returned, true);
+    function formatDate(date) {
+      if (!date) return 'N/A';
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
     }
 
-    function populateTable(tableId, items, isReturned = false) {
-      const tbody = document.getElementById(tableId);
-      tbody.innerHTML = '';
-      
-      if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4">No items to display.</td></tr>`;
+    function getDaysRemaining(dueDate) {
+      if (!dueDate) return null;
+      const due = new Date(dueDate);
+      const today = new Date();
+      const diff = due - today;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function buildImageUrl(src) {
+      const defaultImage = 'http://localhost/GCST_Track_System/assets/img_bg/product_details.png';
+      if (!src) {
+        return defaultImage;
+      }
+      if (src.startsWith('http://') || src.startsWith('https://')) {
+        return src;
+      }
+      const basePath = window.location.pathname.split('/').slice(0, 2).join('/');
+      if (src.startsWith('/')) {
+        return `${window.location.origin}${basePath}${src}`;
+      }
+      return `${window.location.origin}${basePath}/${src}`;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.period-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderRentals();
+    }
+
+    function renderRentals() {
+      if (!rentalsContainer) return;
+
+      let filtered = allRentals;
+      if (currentFilter !== 'all') {
+        filtered = allRentals.filter(rental => rental.status === currentFilter);
+      }
+
+      if (filtered.length === 0) {
+        showEmptyState(rentalsContainer, `You don't have any ${currentFilter !== 'all' ? currentFilter : 'current'} rentals.`);
         return;
       }
 
-      items.forEach(item => {
-        const returnedDate = isReturned ? item.date_returned : item.due_date;
-        tbody.innerHTML += `
-          <tr>
-            <td>${item.item_name}</td>
-            <td>${item.date_borrowed}</td>
-            <td>${returnedDate}</td>
-            <td><span class="status-badge status-${item.status}">${item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span></td>
-          </tr>
+      rentalsContainer.innerHTML = filtered.map(rental => {
+        const daysLeft = getDaysRemaining(rental.due_date);
+        const isReturned = rental.status === 'returned';
+        const isOverdue = rental.status === 'overdue';
+        const remainingLabel = isReturned
+          ? `Returned on ${formatDate(rental.due_date)}`
+          : (isOverdue ? `Overdue by ${Math.abs(daysLeft)} days` : `${daysLeft} days remaining`);
+
+        return `
+          <div class="rental-card">
+            <div class="rental-header">
+              <div class="product-meta">
+                <img class="rental-image" src="${buildImageUrl(rental.product_image)}" alt="${rental.product_name}">
+                <div class="product-info">
+                  <h3 class="product-name">${rental.product_name || 'Untitled Product'}</h3>
+                  <p class="product-id">Product ID: ${rental.product_id || 'N/A'}</p>
+                </div>
+              </div>
+              <span class="status-badge ${rental.status}">${rental.status}</span>
+            </div>
+
+            <div class="rental-meta-grid">
+              <div class="rental-detail">
+                <label>Rental Date</label>
+                <span>${formatDate(rental.rental_date)}</span>
+              </div>
+              <div class="rental-detail">
+                <label>Due Date</label>
+                <span>${formatDate(rental.due_date)}</span>
+              </div>
+              <div class="rental-detail">
+                <label>Days Remaining</label>
+                <span style="color: ${isReturned ? 'var(--muted)' : isOverdue ? 'var(--danger)' : 'var(--success)'}; font-weight: 700;">
+                  ${remainingLabel}
+                </span>
+              </div>
+              <div class="rental-detail">
+                <label>Rental Fee</label>
+                <span>${formatCurrency(rental.rental_fee)}</span>
+              </div>
+            </div>
+
+            <div class="rental-actions">
+              <button class="btn-action btn-view" type="button" onclick="viewDetails(${rental.rental_id})">
+                <i class="fas fa-info-circle"></i> View Details
+              </button>
+              ${!isReturned ? `<button class="btn-action btn-renew" type="button" onclick="renewRental(${rental.rental_id})"><i class="fas fa-redo"></i> Renew</button>` : ''}
+              ${!isReturned ? `<button class="btn-action btn-return" type="button" onclick="markReturned(${rental.rental_id})"><i class="fas fa-check"></i> Return</button>` : ''}
+            </div>
+          </div>
         `;
-      });
+      }).join('');
     }
-  </script>
 
-  <script>
-    const menuIcon = document.getElementById('menu-icon');
-    const dropdownMenu = document.getElementById('dropdown-menu');
+    function updateRentalOverview() {
+      const stats = {
+        activeRentals: allRentals.filter(rental => rental.status === 'active').length,
+        overdueBooks: allRentals.filter(rental => rental.status === 'overdue').length,
+        returnedItems: allRentals.filter(rental => rental.status === 'returned').length,
+        totalFees: allRentals.reduce((sum, rental) => sum + (parseFloat(rental.rental_fee) || 0), 0)
+      };
 
-    menuIcon.addEventListener('click', () => {
-      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('activeRentals').textContent = stats.activeRentals;
+      document.getElementById('overdueBooks').textContent = stats.overdueBooks;
+      document.getElementById('returnedItems').textContent = stats.returnedItems;
+      document.getElementById('totalFees').textContent = formatCurrency(stats.totalFees);
+
+      if (stats.overdueBooks > 0) {
+        overdueAlert.style.display = 'block';
+        overdueMessage.textContent = `You have ${stats.overdueBooks} overdue item${stats.overdueBooks > 1 ? 's' : ''}. Please return them as soon as possible to avoid additional fees.`;
+      } else {
+        overdueAlert.style.display = 'none';
+      }
+    }
+
+    async function loadRentals() {
+      if (!rentalsContainer) return;
+      showLoading(rentalsContainer);
+
+      try {
+        const rentalsData = await fetchWithError(`${apiBase}/get_user_rentals.html`);
+        allRentals = rentalsData.rentals || [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedFilter = urlParams.get('filter');
+        if (requestedFilter && ['active', 'returned', 'overdue'].includes(requestedFilter)) {
+          currentFilter = requestedFilter;
+        }
+
+        setFilter(currentFilter);
+        updateRentalOverview();
+      } catch (error) {
+        console.error('Error fetching rentals:', error);
+        showError(rentalsContainer, 'Unable to load your rentals. Please try again later.');
+      }
+    }
+
+    async function renewRental(rentalId) {
+      try {
+        const result = await fetchWithError(`${apiBase}/renew_rental.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `rental_id=${encodeURIComponent(rentalId)}`
+        });
+
+        if (!result.success) {
+          throw new Error(result.error || 'Renew failed');
+        }
+
+        await loadRentals();
+      } catch (error) {
+        alert(`Unable to renew rental: ${error.message}`);
+      }
+    }
+
+    async function markReturned(rentalId) {
+      if (!confirm('Mark this rental as returned?')) return;
+
+      try {
+        const result = await fetchWithError(`${apiBase}/return_rental.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `rental_id=${encodeURIComponent(rentalId)}`
+        });
+
+        if (!result.success) {
+          throw new Error(result.error || 'Return failed');
+        }
+
+        await loadRentals();
+      } catch (error) {
+        alert(`Unable to mark rental as returned: ${error.message}`);
+      }
+    }
+
+    function viewDetails(rentalId) {
+      const rental = allRentals.find(item => item.rental_id === rentalId);
+      if (!rental) return;
+
+      detailsImage.src = buildImageUrl(rental.product_image);
+      detailsTitle.textContent = rental.product_name || 'Rental Details';
+      detailsProductId.textContent = `Product ID: ${rental.product_id || 'N/A'}`;
+      detailsStatus.className = `status-badge ${rental.status}`;
+      detailsStatus.textContent = rental.status;
+      detailsRentalDate.textContent = formatDate(rental.rental_date);
+      detailsDueDate.textContent = formatDate(rental.due_date);
+
+      const daysLeft = getDaysRemaining(rental.due_date);
+      detailsDaysRemaining.textContent = rental.status === 'returned'
+        ? `Returned on ${formatDate(rental.due_date)}`
+        : (rental.status === 'overdue' ? `Overdue by ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'}` : `${daysLeft} day${daysLeft === 1 ? '' : 's'} remaining`);
+
+      detailsFee.textContent = formatCurrency(rental.rental_fee);
+      detailsModal.classList.add('show');
+    }
+
+    function closeDetailsModal() {
+      detailsModal.classList.remove('show');
+    }
+
+    document.querySelectorAll('.period-button').forEach(button => {
+      button.addEventListener('click', () => setFilter(button.dataset.filter));
     });
 
-    document.addEventListener('click', (e) => {
-      if (!dropdownMenu.contains(e.target) && !menuIcon.contains(e.target)) {
-        dropdownMenu.style.display = 'none';
+    document.getElementById('detailsModal')?.addEventListener('click', (event) => {
+      if (event.target === detailsModal) {
+        closeDetailsModal();
       }
     });
-  </script>
 
+    document.getElementById('detailsModalClose')?.addEventListener('click', closeDetailsModal);
+
+    initializeAdminCashierPage(async () => {
+      await loadRentals();
+    });
+  </script>
+    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler.js"></script>
 </body>
 </html>
