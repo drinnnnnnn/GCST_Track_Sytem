@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $year_section   = trim(filter_input(INPUT_POST, 'year_section', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? '');
     $contact_number = trim(filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? '');
     $address        = trim(filter_input(INPUT_POST, 'address', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? '');
-    $status         = 'Active';
+    $status         = 'Pending';
 
     if ($student_id === '' || $last_name === '' || $first_name === '' || $email === '' || $password_raw === '' || $sex === '' || $course === '' || $year_section === '') {
         header('Location: http://localhost/GCST_Track_System/pages/superadmin/sign_up.html?status=invalid&show=register');

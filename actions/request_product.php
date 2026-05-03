@@ -1,50 +1,94 @@
 ﻿<?php
 require_once __DIR__ . '/security.php';
+require_once __DIR__ . '/../config/db_connect.php';
+
 secureSessionStart();
 requireAuth(['student']);
 header('Content-Type: application/json');
-require_once __DIR__ . '/../config/db_connect.php';
 
-$data = json_decode(file_get_contents('php://input'), true);
+$payload = json_decode(file_get_contents('php://input'), true);
+if (!is_array($payload)) {
+    $payload = $_POST;
+}
 $student_id = $_SESSION['student_id'] ?? null;
 
-if (!$student_id || !isset($data['product_id'])) {
-    echo json_encode(["success" => false, "message" => "Invalid input"]);
-    exit;
+if (!$student_id || !is_array($payload)) {
+    jsonResponse(['success' => false, 'message' => 'Invalid request data.'], 400);
 }
 
-$product_id = filter_var($data['product_id'], FILTER_VALIDATE_INT);
-if ($product_id === false || $product_id <= 0) {
-    echo json_encode(["success" => false, "message" => "Invalid product ID"]);
-    exit;
+$items = [];
+if (isset($payload['items']) && is_array($payload['items'])) {
+    $items = $payload['items'];
+} elseif (isset($payload['product_id'])) {
+    $items[] = ['product_id' => $payload['product_id']];
 }
 
-$product_name = null;
-$lookup_stmt = $conn->prepare("SELECT product_name FROM products WHERE product_id = ?");
-$lookup_stmt->bind_param("i", $product_id);
-$lookup_stmt->execute();
-$lookup_stmt->bind_result($product_name);
-if (!$lookup_stmt->fetch() || !$product_name) {
-    $lookup_stmt->close();
-    echo json_encode(["success" => false, "message" => "Product not found"]);
-    exit;
+if (count($items) === 0) {
+    jsonResponse(['success' => false, 'message' => 'No products were selected.'], 400);
 }
-$lookup_stmt->close();
 
-$stmt = $conn->prepare("INSERT INTO requests (student_id, product_id, status) VALUES (?, ?, 'Pending')");
-$stmt->bind_param("si", $student_id, $product_id);
-
-if ($stmt->execute()) {
-    // Automatically generate a notification for the student
-    $notif_stmt = $conn->prepare("INSERT INTO notifications (student_id, product_name, status) VALUES (?, ?, 'Request Pending Approval')");
-    $notif_stmt->bind_param("ss", $student_id, $product_name);
-    $notif_stmt->execute();
-    $notif_stmt->close();
-
-    echo json_encode(["success" => true, "message" => "Request sent successfully"]);
-} else {
-    echo json_encode(["success" => false, "message" => "Failed to send request"]);
+$allowedTypes = ['rent', 'buy'];
+$requestType = 'request';
+if (isset($payload['type']) && is_string($payload['type'])) {
+    $normalizedType = strtolower(trim($payload['type']));
+    if (in_array($normalizedType, $allowedTypes, true)) {
+        $requestType = $normalizedType;
+    }
 }
-$stmt->close();
-$conn->close();
+
+$insertStmt = $conn->prepare("INSERT INTO requests (student_id, product_id, status) VALUES (?, ?, 'pending')");
+$notifStmt = $conn->prepare('INSERT INTO notifications (student_id, product_name, status, is_read, notified_at) VALUES (?, ?, ?, 0, NOW())');
+
+$insertedCount = 0;
+foreach ($items as $item) {
+    $product_id = filter_var($item['product_id'] ?? 0, FILTER_VALIDATE_INT);
+    if ($product_id === false || $product_id <= 0) {
+        continue;
+    }
+
+    $itemType = $requestType;
+    if (isset($item['type']) && is_string($item['type'])) {
+        $typeCandidate = strtolower(trim($item['type']));
+        if (in_array($typeCandidate, $allowedTypes, true)) {
+            $itemType = $typeCandidate;
+        }
+    }
+
+    $productName = null;
+    $lookupStmt = $conn->prepare('SELECT product_name FROM products WHERE product_id = ? LIMIT 1');
+    $lookupStmt->bind_param('i', $product_id);
+    $lookupStmt->execute();
+    $lookupStmt->bind_result($productName);
+    if (!$lookupStmt->fetch() || !$productName) {
+        $lookupStmt->close();
+        continue;
+    }
+    $lookupStmt->close();
+
+    $insertStmt->bind_param('si', $student_id, $product_id);
+    if ($insertStmt->execute()) {
+        $notifStatus = $itemType === 'buy' ? 'Buy Request Pending Approval' : ($itemType === 'rent' ? 'Rent Request Pending Approval' : 'Request Pending Approval');
+        $notifStmt->bind_param('iss', $student_id, $productName, $notifStatus);
+        $notifStmt->execute();
+        $insertedCount++;
+    }
+}
+
+$insertStmt->close();
+$notifStmt->close();
+
+if ($insertedCount === 0) {
+    jsonResponse(['success' => false, 'message' => 'Unable to submit any requests.']);
+}
+
+updatePendingRequestCount($conn);
+logAudit('student', $student_id, 'submit_request', 'Submitted ' . $insertedCount . ' product request(s).');
+jsonResponse(['success' => true, 'message' => 'Request submitted successfully.', 'items_submitted' => $insertedCount]);
+
+function updatePendingRequestCount($conn) {
+    $result = $conn->query("SELECT COUNT(*) AS cnt FROM requests WHERE status = 'pending'");
+    $count = $result ? intval($result->fetch_assoc()['cnt'] ?? 0) : 0;
+    $conn->query("INSERT INTO count_items (pending_requests) SELECT $count WHERE NOT EXISTS (SELECT 1 FROM count_items)");
+    $conn->query("UPDATE count_items SET pending_requests = $count");
+}
 ?>

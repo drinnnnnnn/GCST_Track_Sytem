@@ -329,9 +329,6 @@
       <a class="menu-item" href="user_queue_tickets.html">
         <i class="fas fa-ticket-alt"></i> Queue Tickets
       </a>
-      <a class="menu-item" href="user_tuition_fees.html">
-        <i class="fas fa-receipt"></i> Tuition Fees
-      </a>
       <a class="menu-item" href="user_profile.html">
         <i class="fas fa-user-circle"></i> Profile
       </a>
@@ -441,15 +438,15 @@
         <form onsubmit="changePassword(event)" style="max-width: 500px;">
           <div class="form-group">
             <label>Current Password</label>
-            <input type="password" placeholder="Enter current password">
+            <input id="current-password" type="password" placeholder="Enter current password">
           </div>
           <div class="form-group">
             <label>New Password</label>
-            <input type="password" placeholder="Enter new password">
+            <input id="new-password" type="password" placeholder="Enter new password">
           </div>
           <div class="form-group">
             <label>Confirm Password</label>
-            <input type="password" placeholder="Confirm new password">
+            <input id="confirm-password" type="password" placeholder="Confirm new password">
           </div>
           <button type="submit" class="save-button">
             <i class="fas fa-lock"></i> Update Password
@@ -559,43 +556,130 @@
       alert('Change photo functionality to be implemented');
     }
 
-    function saveChanges(event) {
+    async function saveChanges(event) {
       event.preventDefault();
-      alert('Save personal info changes functionality to be implemented');
+      const payload = {
+        first_name: document.getElementById('first-name').value.trim(),
+        last_name: document.getElementById('last-name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        contact_number: document.getElementById('phone').value.trim()
+      };
+
+      try {
+        const result = await fetchWithError('http://localhost/GCST_Track_System/actions/update_user_profile.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (result.success) {
+          alert('Profile updated successfully.');
+        } else {
+          throw new Error(result.message || 'Unable to update profile.');
+        }
+      } catch (error) {
+        alert(error.message || 'Unable to update profile.');
+      }
     }
 
-    function changePassword(event) {
+    async function changePassword(event) {
       event.preventDefault();
-      alert('Change password functionality to be implemented');
+
+      const currentPassword = document.getElementById('current-password').value.trim();
+      const newPassword = document.getElementById('new-password').value.trim();
+      const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Please fill all password fields.');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        alert('New password and confirmation do not match.');
+        return;
+      }
+      if (newPassword.length < 8) {
+        alert('New password must be at least 8 characters long.');
+        return;
+      }
+
+      try {
+        const result = await fetchWithError('http://localhost/GCST_Track_System/actions/change_password.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ current_password: currentPassword, new_password: newPassword, confirm_password: confirmPassword })
+        });
+
+        if (result.success) {
+          document.getElementById('current-password').value = '';
+          document.getElementById('new-password').value = '';
+          document.getElementById('confirm-password').value = '';
+          alert('Password changed successfully.');
+        } else {
+          throw new Error(result.message || 'Unable to change password.');
+        }
+      } catch (error) {
+        alert(error.message || 'Unable to change password.');
+      }
     }
 
-    function saveNotifications() {
-      alert('Save notification preferences functionality to be implemented');
+    async function saveNotifications() {
+      const payload = {
+        email_notifications: document.getElementById('email-notif').checked,
+        rental_reminders: document.getElementById('rental-notif').checked,
+        payment_reminders: document.getElementById('payment-notif').checked,
+        queue_notifications: document.getElementById('queue-notif').checked,
+        system_updates: document.getElementById('system-notif').checked,
+      };
+
+      try {
+        const result = await fetchWithError('http://localhost/GCST_Track_System/actions/save_notification_preferences.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!result.success) {
+          throw new Error(result.message || 'Unable to save notification preferences.');
+        }
+
+        alert('Notification preferences saved successfully.');
+      } catch (error) {
+        alert(error.message || 'Unable to save notification preferences.');
+      }
     }
 
     initializeAdminCashierPage(async (userData) => {
       try {
-        const userFullData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_full.php');
-        
+        const response = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_full.php');
+        const user = response.user || {};
+
         // Update profile card
-        document.getElementById('profile-name').textContent = userFullData.full_name || 'User';
-        document.getElementById('profile-id').textContent = 'ID: ' + (userFullData.id || '---');
-        document.getElementById('profile-grade').textContent = 'Grade: ' + (userFullData.grade_level || '---');
-        
+        document.getElementById('profile-name').textContent = user.full_name || 'User';
+        document.getElementById('profile-id').textContent = 'ID: ' + (user.student_id || '---');
+        document.getElementById('profile-grade').textContent = user.course ? `${user.course} • ${user.year_section || 'No section'}` : (user.year_section || '---');
+
         // Fill form fields
-        document.getElementById('first-name').value = userFullData.first_name || '';
-        document.getElementById('last-name').value = userFullData.last_name || '';
-        document.getElementById('email').value = userFullData.email || '';
-        document.getElementById('phone').value = userFullData.phone || '';
-        document.getElementById('grade-level').value = userFullData.grade_level || '';
-        document.getElementById('student-id').value = userFullData.student_id || '';
-        
+        document.getElementById('first-name').value = user.first_name || '';
+        document.getElementById('last-name').value = user.last_name || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.contact_number || '';
+        document.getElementById('grade-level').value = user.year_section || user.course || '';
+        document.getElementById('student-id').value = user.student_id || '';
+
         // Account info
-        document.getElementById('account-created').textContent = userFullData.created_at ? new Date(userFullData.created_at).toLocaleDateString() : 'N/A';
-        document.getElementById('last-login').textContent = userFullData.last_login ? new Date(userFullData.last_login).toLocaleDateString() : 'N/A';
-        
+        document.getElementById('account-created').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
+        document.getElementById('last-login').textContent = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'N/A';
+        document.getElementById('account-status').textContent = user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1) : 'Active';
+
+        const prefs = user.notification_preferences || {};
+        document.getElementById('email-notif').checked = prefs.email_notifications ?? true;
+        document.getElementById('rental-notif').checked = prefs.rental_reminders ?? true;
+        document.getElementById('payment-notif').checked = prefs.payment_reminders ?? true;
+        document.getElementById('queue-notif').checked = prefs.queue_notifications ?? true;
+        document.getElementById('system-notif').checked = prefs.system_updates ?? true;
+
         // Payment history
-        const historyHtml = (userFullData.transaction_history || []).map(transaction => `
+        const historyHtml = (user.transaction_history || []).map(transaction => `
           <tr>
             <td>${transaction.date}</td>
             <td>${transaction.description}</td>
@@ -603,11 +687,10 @@
             <td>${transaction.type}</td>
           </tr>
         `).join('');
-        
+
         document.getElementById('history-table').innerHTML = historyHtml || `
           <tr><td colspan="4" style="text-align: center;">No transaction history available</td></tr>
         `;
-        
       } catch (error) {
         console.error('Error fetching user data:', error);
       }

@@ -174,6 +174,20 @@
       background: var(--primary-dark);
       transform: translateY(-1px);
     }
+
+    .availability-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .availability-toggle input {
+      width: auto;
+      accent-color: var(--primary);
+    }
     
     .filter-section {
       background: var(--surface);
@@ -432,9 +446,6 @@
       <a class="menu-item" href="user_queue_tickets.html">
         <i class="fas fa-ticket-alt"></i> Queue Tickets
       </a>
-      <a class="menu-item" href="user_tuition_fees.html">
-        <i class="fas fa-receipt"></i> Tuition Fees
-      </a>
       <a class="menu-item" href="user_profile.html">
         <i class="fas fa-user-circle"></i> Profile
       </a>
@@ -457,8 +468,11 @@
     <!-- Search Bar -->
     <div class="search-bar-wrapper">
       <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search for products..." />
+        <input type="text" id="search-input" placeholder="Search for products..." autocomplete="off" />
         <button onclick="performSearch()"><i class="fas fa-search"></i> Search</button>
+        <label class="availability-toggle">
+          <input type="checkbox" id="stock-toggle" /> In-stock only
+        </label>
       </div>
     </div>
 
@@ -553,30 +567,18 @@
       currentCategory = category;
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
       button?.classList.add('active');
-      renderProducts();
+      loadProducts();
     }
 
-    function performSearch() {
-      currentSearch = document.getElementById('search-input').value.toLowerCase();
-      renderProducts();
+    async function performSearch() {
+      currentSearch = document.getElementById('search-input').value.trim();
+      await loadProducts();
     }
 
     function renderProducts() {
       const container = document.getElementById('products-container');
-      let filtered = allProducts;
 
-      if (currentCategory !== 'all') {
-        filtered = filtered.filter(p => normalizeCategory(p.product_category) === currentCategory);
-      }
-
-      if (currentSearch) {
-        filtered = filtered.filter(p => {
-          const text = `${p.product_name} ${p.product_description || ''} ${p.product_category || ''}`.toLowerCase();
-          return text.includes(currentSearch);
-        });
-      }
-
-      if (filtered.length === 0) {
+      if (!Array.isArray(allProducts) || allProducts.length === 0) {
         container.innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1;">
             <i class="fas fa-search"></i>
@@ -587,10 +589,11 @@
         return;
       }
 
-      container.innerHTML = filtered.map(product => {
+      container.innerHTML = allProducts.map(product => {
         const imageUrl = product.product_image || 'http://localhost/GCST_Track_System/assets/book_img/placeholder.jpg';
-        const inStock = product.stock > 0;
-        const stockClass = product.stock > 10 ? 'stock-available' : product.stock > 0 ? 'stock-low' : 'stock-unavailable';
+        const inStock = Number(product.stock) > 0;
+        const stockClass = Number(product.stock) > 10 ? 'stock-available' : Number(product.stock) > 0 ? 'stock-low' : 'stock-unavailable';
+        const productStatus = String(product.product_status || 'available').trim().toLowerCase();
 
         return `
           <div class="product-card">
@@ -604,12 +607,12 @@
                 ${product.rent_price > 0 ? `<div><span class="price-label">Rent:</span> ₱${parseFloat(product.rent_price).toFixed(2)}</div>` : ''}
               </div>
               <div class="product-stock">
-                Available: <span class="${stockClass}">${inStock ? product.stock + ' pcs' : 'Out of stock'}</span>
+                ${productStatus !== 'available' ? `<span class="stock-unavailable">${productStatus.replace(/_/g, ' ')}</span>` : `Available: <span class="${stockClass}">${inStock ? `${product.stock} pcs` : 'Out of stock'}</span>`}
               </div>
             </div>
             <div class="product-actions">
-              ${product.buy_price > 0 ? `<button class="btn-action btn-buy" type="button" ${!inStock ? 'disabled' : ''} onclick="addToCart(${product.product_id}, 'buy')">Buy</button>` : ''}
-              ${product.rent_price > 0 ? `<button class="btn-action btn-rent" type="button" ${!inStock ? 'disabled' : ''} onclick="addToCart(${product.product_id}, 'rent')">Rent</button>` : ''}
+              ${product.buy_price > 0 ? `<button class="btn-action btn-buy" type="button" ${!inStock || productStatus !== 'available' ? 'disabled' : ''} onclick="addToCart('${product.product_id}', 'buy')">Buy</button>` : ''}
+              ${product.rent_price > 0 ? `<button class="btn-action btn-rent" type="button" ${!inStock || productStatus !== 'available' ? 'disabled' : ''} onclick="addToCart('${product.product_id}', 'rent')">Rent</button>` : ''}
             </div>
           </div>
         `;
@@ -617,24 +620,26 @@
     }
 
     function addToCart(productId, type) {
-      const product = allProducts.find(item => item.product_id === productId);
-      if (!product || product.stock <= 0) {
+      const normalizedProductId = Number(productId);
+      const product = allProducts.find(item => Number(item.product_id) === normalizedProductId);
+      const productStatus = String(product?.product_status || 'available').trim().toLowerCase();
+      if (!product || Number(product.stock) <= 0 || productStatus !== 'available') {
         alert('Product is unavailable.');
         return;
       }
 
-      const existing = cart.find(item => item.product_id === productId && item.type === type);
+      const existing = cart.find(item => Number(item.product_id) === normalizedProductId && item.type === type);
       const unitPrice = type === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
       if (!existing) {
         cart.push({
-          product_id: productId,
+          product_id: normalizedProductId,
           product_name: product.product_name,
           type,
           quantity: 1,
           unitPrice,
-          stock: product.stock
+          stock: Number(product.stock)
         });
-      } else if (existing.quantity < product.stock) {
+      } else if (existing.quantity < Number(product.stock)) {
         existing.quantity += 1;
       } else {
         alert('Maximum stock reached for this item.');
@@ -646,7 +651,15 @@
     function changeCartQuantity(productId, type, delta) {
       const item = cart.find(entry => entry.product_id === productId && entry.type === type);
       if (!item) return;
-      item.quantity = Math.max(1, item.quantity + delta);
+      const nextQuantity = item.quantity + delta;
+      if (nextQuantity < 1) {
+        return;
+      }
+      if (nextQuantity > item.stock) {
+        alert('Maximum available stock reached for this item.');
+        return;
+      }
+      item.quantity = nextQuantity;
       renderCart();
     }
 
@@ -696,9 +709,60 @@
 
     function renderCart() {
       updateCartDisplay();
+      saveCartToServer();
     }
 
-    function checkoutCart() {
+    async function loadProducts() {
+      const query = new URLSearchParams();
+      if (currentCategory !== 'all') query.set('category', currentCategory);
+      if (currentSearch.trim()) query.set('search', currentSearch.trim());
+      if (document.getElementById('stock-toggle').checked) query.set('available_only', '1');
+
+      const url = 'http://localhost/GCST_Track_System/actions/get_products.php' + (query.toString() ? `?${query.toString()}` : '');
+      const productsData = await fetchWithError(url);
+      allProducts = Array.isArray(productsData) ? productsData : productsData.products || [];
+      renderProducts();
+    }
+
+    async function loadCart() {
+      try {
+        const response = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_cart.php');
+        const serverCart = Array.isArray(response.cart) ? response.cart : [];
+
+        cart = serverCart.map(item => {
+          const normalizedProductId = Number(item.product_id);
+          const product = allProducts.find(p => Number(p.product_id) === normalizedProductId);
+          const unitPrice = parseFloat(item.unit_price) || (product ? (item.type === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price)) : 0);
+          return {
+            product_id: normalizedProductId,
+            product_name: item.product_name || (product ? product.product_name : 'Unknown item'),
+            type: item.type || 'buy',
+            quantity: Math.max(1, parseInt(item.quantity, 10) || 1),
+            unitPrice,
+            stock: product ? Number(product.stock) : (parseInt(item.stock, 10) || 0)
+          };
+        });
+      } catch (error) {
+        console.warn('Error loading saved cart:', error);
+        cart = [];
+      }
+
+      updateCartDisplay();
+    }
+
+    async function saveCartToServer() {
+      try {
+        await fetchWithError('http://localhost/GCST_Track_System/actions/save_user_cart.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: cart })
+        });
+      } catch (error) {
+        console.warn('Unable to save cart to server:', error);
+      }
+    }
+
+    async function checkoutCart() {
       if (cart.length === 0) {
         alert('Please add items to the cart before checking out.');
         return;
@@ -723,60 +787,57 @@
       checkoutButton.textContent = 'Processing...';
       checkoutButton.disabled = true;
 
-      fetchWithError('http://localhost/GCST_Track_System/actions/save_cashier_transaction.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(result => {
+      try {
+        const result = await fetchWithError('http://localhost/GCST_Track_System/actions/save_cashier_transaction.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
         if (!result.success) {
           throw new Error(result.message || 'Checkout failed');
         }
 
-        const reference = result.transaction_number || 'ORDER-' + Date.now();
-        const qrImage = document.getElementById('checkout-qr');
-        const orderReference = document.getElementById('order-reference');
-        const checkoutResult = document.getElementById('checkout-result');
-
-        qrImage.src = `https://chart.googleapis.com/chart?cht=qr&chs=250x250&chl=${encodeURIComponent(reference)}&chld=L|1`;
-        orderReference.textContent = reference;
-        checkoutResult.classList.remove('hidden');
         cart = [];
-        renderCart();
+        updateCartDisplay();
+        await saveCartToServer();
+
+        const reference = result.transaction_number || `ORDER-${Date.now()}`;
+        document.getElementById('checkout-qr').src = `https://chart.googleapis.com/chart?cht=qr&chs=250x250&chl=${encodeURIComponent(reference)}&chld=L|1`;
+        document.getElementById('order-reference').textContent = reference;
+        document.getElementById('checkout-result').classList.remove('hidden');
         alert('Checkout successful! Show the QR code to the cashier for scanning.');
-      })
-      .catch(error => {
+      } catch (error) {
         alert(error.message || 'Checkout failed. Please try again.');
-      })
-      .finally(() => {
+      } finally {
         checkoutButton.textContent = 'Checkout';
         checkoutButton.disabled = cart.length === 0;
-      });
+      }
     }
 
+    document.getElementById('search-input').addEventListener('input', () => {
+      currentSearch = document.getElementById('search-input').value;
+      loadProducts();
+    });
+
     document.getElementById('search-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') performSearch();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch();
+      }
+    });
+
+    document.getElementById('stock-toggle').addEventListener('change', () => {
+      loadProducts();
     });
 
     document.getElementById('checkout-button').addEventListener('click', checkoutCart);
 
     initializeAdminCashierPage(async () => {
-      try {
-        const productsData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_products.php');
-        allProducts = Array.isArray(productsData) ? productsData : productsData.products || [];
-        renderProducts();
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        document.getElementById('products-container').innerHTML = `
-          <div class="empty-state" style="grid-column: 1/-1;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error loading products</h3>
-            <p>Unable to load products. Please try again later.</p>
-          </div>
-        `;
-      }
+      await loadProducts();
+      await loadCart();
     });
   </script>
-    <script src="http://localhost/GCST_Track_System/assets/js/logout-handler.js"></script>
+  <script src="http://localhost/GCST_Track_System/assets/js/logout-handler.js"></script>
 </body>
 </html>

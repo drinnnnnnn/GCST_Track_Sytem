@@ -27,7 +27,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_result($first_name, $middle_name, $last_name, $hashed_password, $status);
         $stmt->fetch();
 
-        if ($status === 'Suspended') {
+        $normalizedStatus = strtolower(trim($status));
+        if ($normalizedStatus === 'pending') {
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?status=pending");
+            exit();
+        }
+
+        if ($normalizedStatus === 'rejected') {
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?status=rejected");
+            exit();
+        }
+
+        if ($normalizedStatus === 'suspended') {
             header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?status=suspended");
             exit();
         }
@@ -37,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $_SESSION['user_name'] = $full_name;
             $_SESSION['student_id'] = $student_id;
+            $_SESSION['role'] = 'student';
             header("Location: http://localhost/GCST_Track_System/pages/user/InUser_home.html");
             exit();
         } else {

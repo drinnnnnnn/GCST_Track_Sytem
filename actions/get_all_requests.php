@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'librarian') {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'] ?? '', ['admin','admincashier','superadmin','librarian'], true)) {
     http_response_code(403);
     echo json_encode(["error" => "Unauthorized"]);
     exit();
@@ -14,11 +14,11 @@ if ($conn->connect_error) {
 }
 
 $sql = "SELECT r.request_id, r.student_id, u.name, b.book_name, r.status
-        FROM request r
-        JOIN users u ON r.student_id = u.student_id
-        JOIN books b ON r.book_id = b.book_id
-        WHERE r.status IN ('pending', 'ready to pick up')
-        ORDER BY r.request_date DESC";
+    FROM request r
+    JOIN users u ON r.student_id = u.student_id
+    JOIN books b ON r.book_id = b.book_id
+    WHERE r.status IN ('pending', 'approved', 'processing')
+    ORDER BY r.request_date DESC";
 $result = $conn->query($sql);
 $rows = [];
 while ($row = $result->fetch_assoc()) $rows[] = $row;

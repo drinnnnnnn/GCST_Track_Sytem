@@ -106,6 +106,26 @@ $mysqli->query(
 );
 
 $mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `notification_preferences` (
+        `student_id` VARCHAR(50) NOT NULL,
+        `preferences` JSON NOT NULL,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`student_id`),
+        FOREIGN KEY (`student_id`) REFERENCES `users`(`student_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
+    "CREATE TABLE IF NOT EXISTS `user_carts` (
+        `student_id` VARCHAR(50) NOT NULL,
+        `cart_items` JSON NOT NULL,
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`student_id`),
+        FOREIGN KEY (`student_id`) REFERENCES `users`(`student_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+
+$mysqli->query(
     "CREATE TABLE IF NOT EXISTS `tuition_fees` (
         `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `user_id` INT(11) NOT NULL,

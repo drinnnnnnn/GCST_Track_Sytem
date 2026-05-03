@@ -82,9 +82,19 @@ function handleSendEmail($conn, $table, $data) {
     if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
         $status = 'failed';
     } else {
+        $boundary = md5(time());
         $headers = "From: no-reply@granby.edu.ph\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: multipart/related; boundary=\"{$boundary}\"\r\n";
+
+        $body = "--{$boundary}\r\n";
+        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $body .= $message . "\r\n\r\n";
+        $body .= "--{$boundary}--";
+
         if (function_exists('mail')) {
-            if (!@mail($recipient, $subject, $message, $headers)) {
+            if (!@mail($recipient, $subject, $body, $headers)) {
                 $status = 'failed';
             }
         }
