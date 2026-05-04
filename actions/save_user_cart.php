@@ -30,9 +30,12 @@ foreach ($items as $item) {
     $productId = intval($item['product_id'] ?? 0);
     $type = strtolower(trim((string)($item['type'] ?? '')));
     $quantity = intval($item['quantity'] ?? 0);
-    $unitPrice = floatval($item['unit_price'] ?? 0);
+    $unitPrice = floatval($item['unitPrice'] ?? $item['unit_price'] ?? 0);
     $productName = trim((string)($item['product_name'] ?? ''));
     $stock = intval($item['stock'] ?? 0);
+    $selected = filter_var($item['selected'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $duration = intval($item['duration'] ?? 1);
+    $durationUnit = trim((string)($item['duration_unit'] ?? $item['durationUnit'] ?? 'days'));
 
     if ($productId <= 0 || $quantity <= 0 || !in_array($type, ['buy', 'rent'], true) || $unitPrice <= 0) {
         continue;
@@ -45,6 +48,9 @@ foreach ($items as $item) {
         'quantity' => $quantity,
         'unit_price' => round($unitPrice, 2),
         'stock' => $stock,
+        'selected' => $selected,
+        'duration' => $duration,
+        'durationUnit' => $durationUnit
     ];
 }
 

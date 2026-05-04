@@ -42,7 +42,7 @@ class QueueModel {
     }
 
     public function getById($queueId) {
-        $stmt = $this->conn->prepare('SELECT id, queue_number, user_id, status, created_at, served_at FROM queue WHERE id = ? LIMIT 1');
+        $stmt = $this->conn->prepare('SELECT id, queue_number, user_id, status, created_at, served_at, student_name, purpose FROM queue WHERE id = ? LIMIT 1');
         $stmt->bind_param('i', $queueId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -61,7 +61,7 @@ class QueueModel {
     }
 
     public function getNextQueueNumber() {
-        $sql = 'SELECT MAX(CAST(SUBSTRING(queue_number, 2) AS UNSIGNED)) AS max_num FROM queue';
+        $sql = 'SELECT MAX(CAST(SUBSTRING(queue_number, 2) AS UNSIGNED)) AS max_num FROM queue WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)';
         $result = $this->conn->query($sql);
         $row = $result->fetch_assoc();
         $nextNum = ($row['max_num'] ?? 0) + 1;
@@ -69,7 +69,7 @@ class QueueModel {
     }
 
     public function queueNumberExists($queueNumber) {
-        $stmt = $this->conn->prepare('SELECT COUNT(*) AS count FROM queue WHERE queue_number = ?');
+        $stmt = $this->conn->prepare('SELECT COUNT(*) AS count FROM queue WHERE queue_number = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)');
         $stmt->bind_param('s', $queueNumber);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -78,7 +78,7 @@ class QueueModel {
         return (int) ($row['count'] ?? 0) > 0;
     }
 
-    public function create($queueNumber = null, $userId = null) {
+    public function create($queueNumber = null, $userId = null, $studentName = '', $purpose = '') {
         if ($queueNumber === null) {
             $queueNumber = $this->getNextQueueNumber();
         }
@@ -90,11 +90,11 @@ class QueueModel {
         }
 
         if ($userId === null) {
-            $stmt = $this->conn->prepare('INSERT INTO queue (queue_number, status) VALUES (?, "waiting")');
-            $stmt->bind_param('s', $queueNumber);
+            $stmt = $this->conn->prepare('INSERT INTO queue (queue_number, student_name, purpose, status) VALUES (?, ?, ?, "waiting")');
+            $stmt->bind_param('sss', $queueNumber, $studentName, $purpose);
         } else {
-            $stmt = $this->conn->prepare('INSERT INTO queue (queue_number, user_id, status) VALUES (?, ?, "waiting")');
-            $stmt->bind_param('si', $queueNumber, $userId);
+            $stmt = $this->conn->prepare('INSERT INTO queue (queue_number, user_id, student_name, purpose, status) VALUES (?, ?, ?, ?, "waiting")');
+            $stmt->bind_param('siss', $queueNumber, $userId, $studentName, $purpose);
         }
 
         $success = $stmt->execute();

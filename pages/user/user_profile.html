@@ -115,6 +115,8 @@
     .tab-btn.active {
       color: var(--primary);
       border-bottom-color: var(--primary);
+      background: var(--primary-soft);
+      border-radius: var(--radius) var(--radius) 0 0;
     }
     
     .tab-content {
@@ -265,6 +267,19 @@
     input:checked + .toggle-slider {
       background-color: var(--success);
     }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: center;
+      min-width: 80px;
+    }
+    .status-badge.pending { background: #fef3c7; color: #92400e; }
+    .status-badge.complete { background: #d1fae5; color: #065f46; }
+    .status-badge.failed { background: #fee2e2; color: #991b1b; }
     
     input:checked + .toggle-slider:before {
       transform: translateX(22px);
@@ -350,17 +365,11 @@
 
     <!-- Profile Card -->
     <div class="profile-card">
-      <img src="http://localhost/GCST_Track_System/assets/images/icons/granbylogo.png" alt="Profile" class="profile-photo" id="profile-photo">
       <h2 class="profile-name" id="profile-name">Loading...</h2>
       <div class="profile-info">
         <span id="profile-id">ID: ---</span> • <span id="profile-grade">Grade: ---</span>
       </div>
       <div class="profile-status" id="profile-status">Active</div>
-      <div class="profile-actions">
-        <button class="btn-action btn-secondary" onclick="changePhoto()">
-          <i class="fas fa-camera"></i> Change Photo
-        </button>
-      </div>
     </div>
 
     <!-- Tabs -->
@@ -527,11 +536,12 @@
               <th>Description</th>
               <th>Amount</th>
               <th>Type</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody id="history-table">
             <tr>
-              <td colspan="4" style="text-align: center; padding: 40px;">
+              <td colspan="5" style="text-align: center; padding: 40px;">
                 <div class="spinner" style="margin: 0 auto;"></div>
               </td>
             </tr>
@@ -558,6 +568,10 @@
 
     async function saveChanges(event) {
       event.preventDefault();
+      if (!confirm('Are you sure you want to save new information?')) {
+        return;
+      }
+
       const payload = {
         first_name: document.getElementById('first-name').value.trim(),
         last_name: document.getElementById('last-name').value.trim(),
@@ -584,6 +598,10 @@
 
     async function changePassword(event) {
       event.preventDefault();
+
+      if (!confirm('Are you sure you want to save new information?')) {
+        return;
+      }
 
       const currentPassword = document.getElementById('current-password').value.trim();
       const newPassword = document.getElementById('new-password').value.trim();
@@ -623,6 +641,10 @@
     }
 
     async function saveNotifications() {
+      if (!confirm('Are you sure you want to save new information?')) {
+        return;
+      }
+
       const payload = {
         email_notifications: document.getElementById('email-notif').checked,
         rental_reminders: document.getElementById('rental-notif').checked,
@@ -679,17 +701,25 @@
         document.getElementById('system-notif').checked = prefs.system_updates ?? true;
 
         // Payment history
-        const historyHtml = (user.transaction_history || []).map(transaction => `
-          <tr>
-            <td>${transaction.date}</td>
-            <td>${transaction.description}</td>
-            <td>₱${transaction.amount}</td>
-            <td>${transaction.type}</td>
-          </tr>
-        `).join('');
+        const historyHtml = (user.transaction_history || []).map(transaction => {
+          const status = (transaction.status || 'pending').toLowerCase();
+          let statusClass = 'pending';
+          if (status === 'complete' || status === 'paid') statusClass = 'complete';
+          if (status === 'failed' || status === 'cancelled') statusClass = 'failed';
+          
+          return `
+            <tr>
+              <td>${transaction.date}</td>
+              <td>${transaction.description}</td>
+              <td>₱${transaction.amount}</td>
+              <td>${transaction.type}</td>
+              <td><span class="status-badge ${statusClass}">${status === 'paid' ? 'Complete' : (status.charAt(0).toUpperCase() + status.slice(1))}</span></td>
+            </tr>
+          `;
+        }).join('');
 
         document.getElementById('history-table').innerHTML = historyHtml || `
-          <tr><td colspan="4" style="text-align: center;">No transaction history available</td></tr>
+          <tr><td colspan="5" style="text-align: center;">No transaction history available</td></tr>
         `;
       } catch (error) {
         console.error('Error fetching user data:', error);

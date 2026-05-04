@@ -53,8 +53,20 @@
       background: var(--surface);
       border-radius: var(--radius-lg);
       padding: 24px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      box-shadow: var(--shadow-lg);
+      border: 2px solid var(--border-soft);
+      position: relative;
+    }
+    
+    .ticket-detail-card::after {
+      content: '';
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      top: 50%;
+      height: 2px;
+      border-top: 2px dashed var(--border);
+      transform: translateY(-50%);
     }
 
     .ticket-card-header {
@@ -120,6 +132,21 @@
       color: #0c4a6e;
     }
 
+    .ticket-status.serving {
+      background: #dcfce7;
+      color: #166534;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ticket-status.serving::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: pulse-light 2s infinite;
+    }
+
     .ticket-status.expired {
       background: #fee2e2;
       color: #991b1b;
@@ -137,6 +164,12 @@
     .ticket-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .ticket-card.is-serving {
+      border: 2px solid var(--success);
+      background: #f0fdf4;
+      transform: scale(1.02);
     }
 
     .ticket-card-header > div {
@@ -222,6 +255,11 @@
       color: var(--muted);
       margin: 6px 0 0;
       font-size: 0.95rem;
+    }
+
+    @keyframes pulse-light {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
 
     @media (max-width: 1024px) {
@@ -314,8 +352,26 @@
     </section>
 
     <section class="action-panel">
+      <div style="width: 100%; display: grid; gap: 12px; margin-bottom: 8px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="student-name-input" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); font-size: 0.9rem;">Full Name:</label>
+          <input type="text" id="student-name-input" placeholder="Loading name..." style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-soft); color: var(--text);" readonly>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="ticket-purpose" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); font-size: 0.9rem;">Purpose of Visit:</label>
+          <select id="ticket-purpose" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer;">
+            <option value="">-- Select Purpose --</option>
+            <option value="Payment">Payment / Cashier</option>
+            <option value="Rental">New Rental</option>
+            <option value="Return">Returning Items</option>
+            <option value="Inquiry">General Inquiry</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
       <button id="generate-ticket-btn" class="generate-ticket-btn"><i class="fas fa-plus"></i> Generate New Ticket</button>
       <button id="refresh-status-btn" class="generate-ticket-btn" style="background: #1f2937; color: white;"><i class="fas fa-sync"></i> Refresh Queue Status</button>
+      <p id="last-updated-text" style="width: 100%; text-align: right; font-size: 0.8rem; color: var(--muted); margin-top: -10px;">Last updated: --:--</p>
     </section>
 
     <div id="confirmation-msg" class="confirmation-message"><i class="fas fa-check-circle"></i> <strong id="confirmation-text">Ticket generated successfully!</strong></div>
@@ -331,6 +387,8 @@
         </div>
         <div class="ticket-preview">
           <p class="ticket-num" id="latest-ticket-number">-</p>
+          <p class="ticket-meta" id="latest-ticket-name" style="font-weight: 600; color: var(--text); font-size: 1.1rem; margin-top: 10px;"></p>
+          <p class="ticket-meta" id="latest-ticket-purpose" style="font-weight: 700; color: var(--primary); margin-top: 4px; font-size: 1rem;"></p>
           <p class="ticket-meta" id="latest-ticket-created">Generated: -</p>
           <p class="ticket-meta" id="latest-ticket-wait">Waiting time: -</p>
         </div>
@@ -424,7 +482,7 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1; text-align:center;">
-            <i class="fas fa-inbox"></i>
+            <i class="fas fa-ticket-alt" style="font-size: 3rem; opacity: 0.2; margin-bottom: 1rem;"></i>
             <h3>No tickets found</h3>
             <p>You don't have any ${mapStatus(currentFilter).toLowerCase()} queue tickets yet.</p>
           </div>
@@ -432,10 +490,12 @@
         return;
       }
       container.innerHTML = filtered.map(ticket => `
-        <div class="ticket-card">
+        <div class="ticket-card ${statusClass(ticket.status) === 'serving' ? 'is-serving' : ''}">
           <div class="ticket-card-header">
             <div>
               <div class="ticket-number">${ticket.queue_number}</div>
+              <p class="ticket-meta" style="color: var(--text); font-weight: 600;">Name: ${ticket.student_name || 'N/A'}</p>
+              <p class="ticket-meta" style="color: var(--primary); font-weight: 600;">Purpose: ${ticket.purpose || 'General'}</p>
               <p class="ticket-meta">${mapStatus(ticket.status)}</p>
             </div>
             <span class="ticket-status ${statusClass(ticket.status)}">${mapStatus(ticket.status)}</span>
@@ -502,17 +562,23 @@
       const numberEl = document.getElementById('latest-ticket-number');
       const createdEl = document.getElementById('latest-ticket-created');
       const waitEl = document.getElementById('latest-ticket-wait');
+      const nameEl = document.getElementById('latest-ticket-name');
+      const purposeEl = document.getElementById('latest-ticket-purpose');
       const statusEl = document.getElementById('latest-ticket-status');
       const actionsEl = document.getElementById('latest-ticket-actions');
       if (!ticket) {
         if (numberEl) numberEl.textContent = '-';
         if (createdEl) createdEl.textContent = 'Generated: -';
         if (waitEl) waitEl.textContent = 'Waiting time: -';
+        if (nameEl) nameEl.textContent = '';
+        if (purposeEl) purposeEl.textContent = '';
         if (statusEl) statusEl.textContent = 'Waiting';
         if (actionsEl) actionsEl.style.display = 'none';
         return;
       }
       if (numberEl) numberEl.textContent = ticket.queue_number;
+      if (nameEl) nameEl.textContent = `Name: ${ticket.student_name || 'N/A'}`;
+      if (purposeEl) purposeEl.textContent = `Purpose: ${ticket.purpose || 'General'}`;
       if (createdEl) createdEl.textContent = `Generated: ${formatDateTime(ticket.created_at)}`;
       if (waitEl) waitEl.textContent = `Waiting time: ${getWaitingDuration(ticket.created_at)}`;
       if (statusEl) {
@@ -528,12 +594,25 @@
 
     async function generateNewTicket() {
       const button = document.getElementById('generate-ticket-btn');
-      if (button) button.disabled = true;
+      if (!button) return;
+
+      const studentName = document.getElementById('student-name-input').value.trim();
+      const purpose = document.getElementById('ticket-purpose').value;
+
+      if (!studentName || !purpose) {
+        alert('Please fill in your name and select a purpose.');
+        return;
+      }
+
+      const originalHtml = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating...';
+
       try {
         const response = await fetchWithError('http://localhost/GCST_Track_System/actions/generate_queue.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ queue_number: null })
+          body: JSON.stringify({ queue_number: null, student_name: studentName, purpose: purpose })
         });
         if (!response.success) {
           showConfirmation(response.error || 'Failed to generate ticket', true);
@@ -545,7 +624,8 @@
         console.error('Error generating ticket:', error);
         showConfirmation('Unable to generate ticket. Please try again.', true);
       } finally {
-        if (button) button.disabled = false;
+        button.disabled = false;
+        button.innerHTML = originalHtml;
       }
     }
 
@@ -610,7 +690,15 @@
       refreshQueueStatus();
     });
 
-    initializeAdminCashierPage(async () => {
+    document.getElementById('generate-ticket-btn')?.addEventListener('click', () => {
+      generateNewTicket();
+    });
+
+    initializeAdminCashierPage(async (userData) => {
+      const nameInput = document.getElementById('student-name-input');
+      if (nameInput && userData) {
+        nameInput.value = userData.full_name || userData.name || '';
+      }
       updateLiveClock();
       setInterval(updateLiveClock, 1000);
       await refreshQueueStatus();

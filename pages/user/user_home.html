@@ -847,6 +847,11 @@
       const stockCount = Number(product.stock_count || 0);
       const buyPrice = formatPrice(product.buy_price);
       const rentPrice = formatPrice(product.rent_price);
+      const category = (product.product_category || 'General').toLowerCase();
+      
+      const buyText = (category !== 'books' && buyPrice) ? `Buy ₱${buyPrice}` : '';
+      const rentText = rentPrice ? `${buyText ? ' · ' : ''}Rent ₱${rentPrice}` : '';
+
       const card = document.createElement('article');
       card.className = 'product-card';
       card.style.transitionDelay = `${index * 80}ms`;
@@ -855,7 +860,7 @@
         <div class="product-card-body">
           <span class="product-category-pill">${product.product_category || 'General'}</span>
           <h3 class="product-name">${product.product_name}</h3>
-          <p class="product-details">${buyPrice ? `Buy ₱${buyPrice}` : ''}${rentPrice ? `${buyPrice ? ' ·' : ''} Rent ₱${rentPrice}` : ''}</p>
+          <p class="product-details">${buyText}${rentText}</p>
           <div class="product-card-footer">
             <span class="product-stock ${stockCount > 10 ? 'stock-available' : stockCount > 0 ? 'stock-low' : 'stock-unavailable'}">${stockCount > 0 ? `${stockCount} in stock` : 'Out of stock'}</span>
             <div class="product-actions">
@@ -948,9 +953,14 @@
       document.getElementById('modal-image').alt = product.product_name || 'Product image';
       document.getElementById('modal-category').textContent = product.product_category || 'General';
       document.getElementById('modal-stock').textContent = Number(product.stock_count || 0) > 0 ? `${product.stock_count} in stock` : 'Out of stock';
+      
+      const category = (product.product_category || 'General').toLowerCase();
       const buyPrice = formatPrice(product.buy_price);
       const rentPrice = formatPrice(product.rent_price);
-      document.getElementById('modal-price').textContent = buyPrice && rentPrice ? `Buy ₱${buyPrice} · Rent ₱${rentPrice}` : buyPrice ? `Buy ₱${buyPrice}` : rentPrice ? `Rent ₱${rentPrice}` : 'Not available';
+      
+      const buyDisplay = (category !== 'books' && buyPrice) ? `Buy ₱${buyPrice}` : '';
+      const rentDisplay = rentPrice ? `${buyDisplay ? ' · ' : ''}Rent ₱${rentPrice}` : '';
+      document.getElementById('modal-price').textContent = (buyDisplay || rentDisplay) ? `${buyDisplay}${rentDisplay}` : 'Not available';
       document.getElementById('modal-description').textContent = product.product_description || 'No description available.';
 
       const modal = document.getElementById('product-details-modal');

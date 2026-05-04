@@ -62,6 +62,7 @@ $createTableSql = "CREATE TABLE IF NOT EXISTS `cashier_transactions` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `transaction_number` VARCHAR(50) NOT NULL,
     `receipt_number` VARCHAR(100) DEFAULT NULL,
+    `user_id` INT(11) DEFAULT NULL,
     `cashier_id` INT(11) NOT NULL,
     `transaction_type` ENUM('buy','rent','mixed') NOT NULL,
     `items` TEXT NOT NULL,
@@ -74,7 +75,9 @@ $createTableSql = "CREATE TABLE IF NOT EXISTS `cashier_transactions` (
     `payment_status` ENUM('paid','pending') NOT NULL DEFAULT 'pending',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_transaction_number` (`transaction_number`),
     UNIQUE KEY `uniq_receipt_number` (`receipt_number`),
+    KEY `idx_cashier_transactions_user_id` (`user_id`),
     KEY `idx_cashier_transactions_cashier_id` (`cashier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 $conn->query($createTableSql);
@@ -85,6 +88,11 @@ if ($typeColumnInfo && $typeColumnInfo->num_rows > 0) {
     if (strpos($typeDef, "'mixed'") === false) {
         $conn->query("ALTER TABLE `cashier_transactions` MODIFY COLUMN `transaction_type` ENUM('buy','rent','mixed') NOT NULL");
     }
+}
+
+$userCheck = $conn->query("SHOW COLUMNS FROM `cashier_transactions` LIKE 'user_id'");
+if (!$userCheck || $userCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE `cashier_transactions` ADD COLUMN `user_id` INT(11) DEFAULT NULL AFTER `receipt_number` , ADD INDEX (`user_id`) ");
 }
 
 $stockColumn = 'stock_count';
@@ -128,13 +136,18 @@ try {
             throw new Exception('Invalid selected price for ' . $product['product_name']);
         }
 
-        $itemTotal = round($unitPrice * $quantity, 2);
+        $duration = ($type === 'rent') ? intval($item['duration'] ?? 1) : 1;
+        $durationUnit = $item['duration_unit'] ?? ($type === 'rent' ? 'days' : null);
+        $itemTotal = round($unitPrice * $duration * $quantity, 2);
+
         $cartItems[] = [
             'product_id' => $productId,
             'product_name' => $product['product_name'],
             'type' => $type,
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
+            'duration' => $duration,
+            'duration_unit' => $durationUnit,
             'total' => $itemTotal,
         ];
 
@@ -160,8 +173,8 @@ try {
         $existingReceipt->close();
     }
 
-    $insertStmt = $conn->prepare("INSERT INTO cashier_transactions (transaction_number, receipt_number, cashier_id, transaction_type, items, subtotal, discount_percent, discount_amount, total_amount, payment_received, change_amount, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $insertStmt->bind_param('ssissdddddds', $transactionNumber, $receiptNumber, $cashierId, $transactionType, $itemsJson, $subtotal, $discountPercent, $discountAmount, $totalAmount, $paymentReceived, $changeAmount, $paymentStatus);
+    $insertStmt = $conn->prepare("INSERT INTO cashier_transactions (transaction_number, receipt_number, user_id, cashier_id, transaction_type, items, subtotal, discount_percent, discount_amount, total_amount, payment_received, change_amount, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insertStmt->bind_param('ssiissdddddds', $transactionNumber, $receiptNumber, $userId, $cashierId, $transactionType, $itemsJson, $subtotal, $discountPercent, $discountAmount, $totalAmount, $paymentReceived, $changeAmount, $paymentStatus);
     if (!$insertStmt->execute()) {
         throw new Exception('Could not save transaction: ' . $insertStmt->error);
     }
@@ -195,11 +208,13 @@ try {
                 $userEmail = $userData['email'];
                 $studentFullName = trim(($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? ''));
                 $qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=' . rawurlencode($transactionNumber) . '&chld=L|1';
-                $inlineQr = "<div style=\"text-align:center;margin:20px 0;\">" .
+                $inlineQr = "<div style=\"text-align:center;margin:30px 0;padding:20px;border:2px dashed #2563eb;border-radius:16px;background:#f8fafc;\">" .
+                    "<div style=\"font-size:18px;font-weight:bold;color:#2563eb;margin-bottom:15px;letter-spacing:1px;\">PRESENT TO CASHIER</div>" .
                     "<img src=\"{$qrUrl}\" alt=\"Order QR Code\" style=\"max-width:100%;height:auto;border:1px solid #ddd;border-radius:12px;\" />" .
                     "</div>";
                 $emailBody = "<p>Hi " . htmlspecialchars($studentFullName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . ",</p>" .
-                    "<p>Your order has been completed successfully. Please present the QR code below to the cashier for quick scanning.</p>" .
+                    "<p>Your order has been placed. Please present the QR code below to the cashier for quick scanning.</p>" .
+                    "<p style='color:#dc2626;'><strong>Note:</strong> This QR code will expire and become invalid after 2 days (48 hours).</p>" .
                     "<p><strong>Order reference:</strong> " . htmlspecialchars($transactionNumber, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</p>" .
                     $inlineQr .
                     "<p>Order total: ₱" . number_format($totalAmount, 2, '.', ',') . "</p>" .

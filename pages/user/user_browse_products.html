@@ -12,15 +12,18 @@
       background: var(--surface);
       border-radius: var(--radius-lg);
       padding: 18px;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.2s ease;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     
     .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-soft);
     }
     
     .product-image {
@@ -29,6 +32,11 @@
       border-radius: var(--radius);
       object-fit: cover;
       margin-bottom: 14px;
+      transition: transform 0.5s ease;
+    }
+    
+    .product-card:hover .product-image {
+      transform: scale(1.05);
     }
     
     .product-info {
@@ -146,6 +154,7 @@
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      align-items: center;
     }
     
     .search-bar-wrapper input {
@@ -179,14 +188,61 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font-weight: 600;
-      color: var(--text);
-      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 8px 16px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: all 0.2s ease;
+      user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .availability-toggle:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: white;
     }
 
     .availability-toggle input {
-      width: auto;
-      accent-color: var(--primary);
+      display: none;
+    }
+
+    .toggle-switch-ui {
+      width: 34px;
+      height: 18px;
+      background: #cbd5e1;
+      border-radius: 10px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-switch-ui::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .availability-toggle input:checked + .toggle-switch-ui {
+      background: var(--primary);
+    }
+
+    .availability-toggle input:checked + .toggle-switch-ui::after {
+      left: 19px;
+    }
+
+    .availability-toggle input:checked ~ span {
+      color: var(--primary);
     }
     
     .filter-section {
@@ -288,14 +344,33 @@
       overflow-y: auto;
     }
 
+    .select-all-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px 8px;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
     .cart-item {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: auto 1fr auto;
       gap: 12px;
       background: var(--surface-soft);
       border-radius: var(--radius);
       padding: 14px;
       align-items: center;
+    }
+
+    .cart-item input[type="checkbox"],
+    .select-all-wrapper input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary);
     }
 
     .cart-item-meta {
@@ -323,6 +398,32 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .btn-delete-selected {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-delete-selected:hover:not(:disabled) {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .btn-delete-selected:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
 
     .btn-remove {
@@ -359,6 +460,40 @@
       display: grid;
       gap: 14px;
       text-align: center;
+    }
+
+    .qr-box {
+      position: relative;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f8fafc;
+      border: 3px dashed var(--primary-soft);
+      border-radius: 24px;
+      display: inline-block;
+    }
+
+    .qr-scan-animation {
+      position: absolute;
+      inset: 20px;
+      border: 2px solid transparent;
+      pointer-events: none;
+    }
+
+    .qr-scan-animation::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      box-shadow: 0 0 15px var(--primary);
+      animation: qr-scan-line 2s linear infinite;
+    }
+
+    @keyframes qr-scan-line {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(220px); }
     }
 
     .checkout-result img {
@@ -471,7 +606,9 @@
         <input type="text" id="search-input" placeholder="Search for products..." autocomplete="off" />
         <button onclick="performSearch()"><i class="fas fa-search"></i> Search</button>
         <label class="availability-toggle">
-          <input type="checkbox" id="stock-toggle" /> In-stock only
+          <input type="checkbox" id="stock-toggle" />
+          <div class="toggle-switch-ui"></div>
+          <span>In-stock only</span>
         </label>
       </div>
     </div>
@@ -513,6 +650,14 @@
           <span id="cart-count" class="cart-badge">0</span>
         </div>
 
+        <div id="select-all-container" class="select-all-wrapper hidden">
+          <input type="checkbox" id="select-all-cart" onchange="toggleSelectAll(this.checked)">
+          <label for="select-all-cart">Select All Items</label>
+          <button type="button" class="btn-delete-selected" id="btn-delete-selected" onclick="deleteSelectedItems()">
+            <i class="fas fa-trash-alt"></i> Delete Selected
+          </button>
+        </div>
+
         <div id="cart-items" class="cart-items"></div>
         <div id="cart-empty" class="empty-state cart-empty-state">
           <i class="fas fa-shopping-cart"></i>
@@ -535,11 +680,14 @@
 
         <div id="checkout-result" class="checkout-result hidden">
           <div class="checkout-message">
+            <div style="font-size: 2rem; color: var(--primary); margin-bottom: 8px;"><i class="fas fa-barcode"></i></div>
             <h3>Order ready for cashier</h3>
-            <p>Show this QR code at checkout.</p>
+            <p>Show this QR code at checkout. <br><small style="color: #ef4444; font-weight: 700;">Valid for 48 hours only.</small></p>
           </div>
           <div class="qr-box">
+            <div class="qr-scan-animation"></div>
             <img id="checkout-qr" src="" alt="Order QR Code" />
+            <div style="margin-top: 12px; font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">Scan at Counter</div>
           </div>
           <div class="order-reference">
             <strong>Order Reference:</strong>
@@ -594,6 +742,7 @@
         const inStock = Number(product.stock) > 0;
         const stockClass = Number(product.stock) > 10 ? 'stock-available' : Number(product.stock) > 0 ? 'stock-low' : 'stock-unavailable';
         const productStatus = String(product.product_status || 'available').trim().toLowerCase();
+        const category = normalizeCategory(product.product_category);
 
         return `
           <div class="product-card">
@@ -603,7 +752,7 @@
               <span class="product-category">${product.product_category || 'Uncategorized'}</span>
               <p class="product-description">${product.product_description || 'No description available.'}</p>
               <div class="product-price">
-                ${product.buy_price > 0 ? `<div><span class="price-label">Buy:</span> ₱${parseFloat(product.buy_price).toFixed(2)}</div>` : ''}
+                ${product.buy_price > 0 && category !== 'books' ? `<div><span class="price-label">Buy:</span> ₱${parseFloat(product.buy_price).toFixed(2)}</div>` : ''}
                 ${product.rent_price > 0 ? `<div><span class="price-label">Rent:</span> ₱${parseFloat(product.rent_price).toFixed(2)}</div>` : ''}
               </div>
               <div class="product-stock">
@@ -611,7 +760,7 @@
               </div>
             </div>
             <div class="product-actions">
-              ${product.buy_price > 0 ? `<button class="btn-action btn-buy" type="button" ${!inStock || productStatus !== 'available' ? 'disabled' : ''} onclick="addToCart('${product.product_id}', 'buy')">Buy</button>` : ''}
+              ${product.buy_price > 0 && category !== 'books' ? `<button class="btn-action btn-buy" type="button" ${!inStock || productStatus !== 'available' ? 'disabled' : ''} onclick="addToCart('${product.product_id}', 'buy')">Buy</button>` : ''}
               ${product.rent_price > 0 ? `<button class="btn-action btn-rent" type="button" ${!inStock || productStatus !== 'available' ? 'disabled' : ''} onclick="addToCart('${product.product_id}', 'rent')">Rent</button>` : ''}
             </div>
           </div>
@@ -628,6 +777,11 @@
         return;
       }
 
+      if (type === 'buy' && normalizeCategory(product.product_category) === 'books') {
+        alert('Books are available for rent only.');
+        return;
+      }
+
       const existing = cart.find(item => Number(item.product_id) === normalizedProductId && item.type === type);
       const unitPrice = type === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price);
       if (!existing) {
@@ -637,7 +791,10 @@
           type,
           quantity: 1,
           unitPrice,
-          stock: Number(product.stock)
+          stock: Number(product.stock),
+          selected: false,
+          duration: 1,
+          durationUnit: 'days'
         });
       } else if (existing.quantity < Number(product.stock)) {
         existing.quantity += 1;
@@ -646,6 +803,43 @@
       }
 
       renderCart();
+    }
+
+    function toggleSelectAll(checked) {
+      cart.forEach(item => item.selected = checked);
+      renderCart();
+    }
+
+    function toggleSelectItem(productId, type, checked) {
+      const item = cart.find(entry => entry.product_id === productId && entry.type === type);
+      if (item) item.selected = checked;
+      renderCart();
+    }
+
+    function updateRentalDuration(productId, value) {
+      const item = cart.find(entry => Number(entry.product_id) === Number(productId) && entry.type === 'rent');
+      if (item) {
+        item.duration = Math.max(1, parseInt(value) || 1);
+        renderCart();
+      }
+    }
+
+    function updateRentalUnit(productId, value) {
+      const item = cart.find(entry => Number(entry.product_id) === Number(productId) && entry.type === 'rent');
+      if (item) {
+        item.durationUnit = value;
+        renderCart();
+      }
+    }
+
+    function deleteSelectedItems() {
+      const selectedItems = cart.filter(item => item.selected);
+      if (selectedItems.length === 0) return;
+      
+      if (confirm(`Are you sure you want to remove ${selectedItems.length} selected item(s) from your cart?`)) {
+        cart = cart.filter(item => !item.selected);
+        renderCart();
+      }
     }
 
     function changeCartQuantity(productId, type, delta) {
@@ -675,27 +869,57 @@
       const cartCount = document.getElementById('cart-count');
       const cartItemsCount = document.getElementById('cart-items-count');
       const cartSubtotal = document.getElementById('cart-subtotal');
+      const selectAllContainer = document.getElementById('select-all-container');
+      const selectAllCheckbox = document.getElementById('select-all-cart');
+      const deleteSelectedBtn = document.getElementById('btn-delete-selected');
 
-      const totalAmount = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const selectedItems = cart.filter(item => item.selected);
+      const totalAmount = selectedItems.reduce((sum, item) => {
+        const multiplier = item.type === 'rent' ? (item.duration || 1) : 1;
+        return sum + (item.unitPrice * multiplier * item.quantity);
+      }, 0);
+      const totalItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const selectedItemsQuantity = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-      cartCount.textContent = totalItems;
-      cartItemsCount.textContent = totalItems;
+      cartCount.textContent = totalItemsCount;
+      cartItemsCount.textContent = selectedItemsQuantity;
       cartSubtotal.textContent = formatCurrency(totalAmount);
-      checkoutButton.disabled = cart.length === 0;
+      checkoutButton.disabled = selectedItems.length === 0;
+      if (deleteSelectedBtn) deleteSelectedBtn.disabled = selectedItems.length === 0;
 
       if (cart.length === 0) {
         cartItemsContainer.innerHTML = '';
         cartEmpty.classList.remove('hidden');
+        selectAllContainer.classList.add('hidden');
         return;
       }
 
       cartEmpty.classList.add('hidden');
+      selectAllContainer.classList.remove('hidden');
+
+      if (selectAllCheckbox) {
+        const allSelected = cart.every(item => item.selected);
+        const someSelected = cart.some(item => item.selected);
+        selectAllCheckbox.checked = allSelected;
+        selectAllCheckbox.indeterminate = someSelected && !allSelected;
+      }
+
       cartItemsContainer.innerHTML = cart.map(item => `
         <div class="cart-item">
+          <input type="checkbox" ${item.selected ? 'checked' : ''} onchange="toggleSelectItem(${item.product_id}, '${item.type}', this.checked)">
           <div>
             <strong>${item.product_name}</strong>
-            <div class="cart-item-meta">${item.type.toUpperCase()} • ₱${item.unitPrice.toFixed(2)}</div>
+            <div class="cart-item-meta">${item.type.toUpperCase()} • ₱${item.unitPrice.toFixed(2)} ${item.type === 'rent' ? `× ${item.duration} ${item.durationUnit}` : ''}</div>
+            ${item.type === 'rent' ? `
+              <div class="rental-duration-selector" style="margin-top: 6px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+                <span>Borrow for:</span>
+                <input type="number" min="1" value="${item.duration || 1}" style="width: 45px; padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px;" onchange="updateRentalDuration(${item.product_id}, this.value)">
+                <select style="padding: 2px; border: 1px solid var(--border); border-radius: 4px;" onchange="updateRentalUnit(${item.product_id}, this.value)">
+                  <option value="days" ${item.durationUnit === 'days' ? 'selected' : ''}>Days</option>
+                  <option value="hours" ${item.durationUnit === 'hours' ? 'selected' : ''}>Hours</option>
+                </select>
+              </div>
+            ` : ''}
           </div>
           <div class="cart-item-controls">
             <button type="button" onclick="changeCartQuantity(${item.product_id}, '${item.type}', -1)">−</button>
@@ -732,14 +956,17 @@
         cart = serverCart.map(item => {
           const normalizedProductId = Number(item.product_id);
           const product = allProducts.find(p => Number(p.product_id) === normalizedProductId);
-          const unitPrice = parseFloat(item.unit_price) || (product ? (item.type === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price)) : 0);
+          const unitPrice = parseFloat(item.unitPrice || item.unit_price) || (product ? (item.type === 'rent' ? parseFloat(product.rent_price) : parseFloat(product.buy_price)) : 0);
           return {
             product_id: normalizedProductId,
             product_name: item.product_name || (product ? product.product_name : 'Unknown item'),
             type: item.type || 'buy',
             quantity: Math.max(1, parseInt(item.quantity, 10) || 1),
             unitPrice,
-            stock: product ? Number(product.stock) : (parseInt(item.stock, 10) || 0)
+            stock: product ? Number(product.stock) : (parseInt(item.stock, 10) || 0),
+            selected: item.selected === true || item.selected === 'true' || false,
+            duration: item.duration || 1,
+            durationUnit: item.durationUnit || item.duration_unit || 'days'
           };
         });
       } catch (error) {
@@ -763,24 +990,34 @@
     }
 
     async function checkoutCart() {
-      if (cart.length === 0) {
-        alert('Please add items to the cart before checking out.');
+      const selectedItems = cart.filter(item => item.selected);
+      if (selectedItems.length === 0) {
+        alert('Please select items to checkout.');
         return;
       }
 
-      const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      if (!confirm('Are you sure you want to proceed with the checkout?')) {
+        return;
+      }
+
+      const subtotal = selectedItems.reduce((sum, item) => {
+        const multiplier = item.type === 'rent' ? (item.duration || 1) : 1;
+        return sum + (item.unitPrice * multiplier * item.quantity);
+      }, 0);
       const payload = {
-        items: cart.map(item => ({
+        items: selectedItems.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
           type: item.type,
-          unit_price: item.unitPrice
+          unit_price: item.unitPrice,
+          duration: item.duration || 1,
+          duration_unit: item.durationUnit || 'days'
         })),
         subtotal,
         total_amount: subtotal,
-        payment_received: subtotal,
+        payment_received: 0,
         change_amount: 0,
-        payment_status: 'paid'
+        payment_status: 'pending'
       };
 
       const checkoutButton = document.getElementById('checkout-button');
@@ -798,7 +1035,8 @@
           throw new Error(result.message || 'Checkout failed');
         }
 
-        cart = [];
+        // Remove checked-out items from cart
+        cart = cart.filter(item => !item.selected);
         updateCartDisplay();
         await saveCartToServer();
 

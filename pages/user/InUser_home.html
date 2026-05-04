@@ -146,6 +146,35 @@
       gap: 18px;
     }
 
+    .table-container {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    .pending-orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .pending-orders-table th, .pending-orders-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.9rem;
+    }
+
+    .pending-orders-table th {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
     @media (max-width: 768px) {
       .rental-card {
         flex-direction: column;
@@ -256,6 +285,48 @@
       </div>
     </div>
 
+    <!-- Queue Summary Section -->
+    <section class="balance-section">
+      <h2>Queue Status Overview</h2>
+      <div class="balance-cards">
+        <div class="balance-card">
+          <h3>Now Serving</h3>
+          <p class="amount" id="nowServing">-</p>
+        </div>
+        <div class="balance-card">
+          <h3>Waiting Count</h3>
+          <p class="amount" id="waitingCount">0</p>
+        </div>
+        <div class="balance-card">
+          <h3>My Latest Ticket</h3>
+          <p class="amount" id="myLatestTicket">-</p>
+        </div>
+        <div class="balance-card">
+          <h3>Ticket Status</h3>
+          <p class="amount" id="myTicketStatus">N/A</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pending Orders Section -->
+    <section class="activity-section">
+      <h2>My Pending Orders</h2>
+      <div class="table-container">
+        <table class="pending-orders-table">
+          <thead>
+            <tr>
+              <th>Order Date</th>
+              <th>Product(s)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="pending-orders-container">
+            <tr><td colspan="3" style="text-align: center;">Loading orders...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Summary Section -->
     <section class="balance-section">
       <h2>Rental Summary</h2>
@@ -359,14 +430,101 @@
             </div>
           </div>
           <div class="rental-actions">
-            ${rental.status === 'active' ? `<button class="btn-renew" onclick="renewRental('${rental.id}')">Renew</button>` : ''}
+            ${rental.status === 'active' ? `<button class="btn-renew" onclick="renewRental('${rental.id}')">Request Renewal</button>` : ''}
           </div>
         </div>
       `).join('');
     }
 
-    function renewRental(id) {
-      alert('Renew functionality to be implemented - Rental ID: ' + id);
+    async function loadQueueData() {
+      try {
+        // Fetch general queue status (Now Serving and Waiting Count)
+        const queueStatus = await fetchWithError('http://localhost/GCST_Track_System/actions/get_queue_status.php');
+        document.getElementById('nowServing').textContent = queueStatus.now_serving || '-';
+        document.getElementById('waitingCount').textContent = queueStatus.counts?.waiting ?? 0;
+
+        // Fetch user's specific tickets to show their latest status
+        const userTickets = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_tickets.php');
+        const tickets = userTickets.tickets || [];
+        const latestTicketEl = document.getElementById('myLatestTicket');
+        const statusEl = document.getElementById('myTicketStatus');
+
+        if (tickets.length > 0) {
+          const latest = tickets[0];
+          latestTicketEl.textContent = latest.queue_number;
+          statusEl.textContent = latest.display_status || (latest.status.charAt(0).toUpperCase() + latest.status.slice(1));
+          
+          statusEl.style.color = latest.status === 'serving' ? '#166534' : 
+                                latest.status === 'waiting' ? 'var(--primary)' : 'inherit';
+        } else {
+          latestTicketEl.textContent = 'None';
+          statusEl.textContent = 'N/A';
+        }
+      } catch (error) {
+        console.error('Error fetching queue data:', error);
+      }
+    }
+
+    async function loadPendingOrders() {
+      const container = document.getElementById('pending-orders-container');
+      try {
+        const response = await fetchWithError('http://localhost/GCST_Track_System/actions/get_student_pending_orders.php');
+        const orders = response.orders || [];
+
+        if (orders.length === 0) {
+          container.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--muted); padding: 30px;">No pending orders found.</td></tr>';
+          return;
+        }
+
+        container.innerHTML = orders.map(order => {
+          const date = new Date(order.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+          const items = JSON.parse(order.items || '[]');
+          const productList = items.map(i => `${i.product_name} (${i.quantity})`).join(', ');
+          
+          const isExpired = order.is_expired == 1;
+          const statusHtml = isExpired 
+            ? '<span class="status-badge overdue">Expired</span>' 
+            : '<span class="status-badge active">Pending</span>';
+
+          return `
+            <tr>
+              <td style="font-weight: 600;">${date}</td>
+              <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${productList}">
+                ${productList}
+              </td>
+              <td>${statusHtml}</td>
+            </tr>
+          `;
+        }).join('');
+      } catch (error) {
+        console.error('Error fetching pending orders:', error);
+        container.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--danger);">Unable to load orders.</td></tr>';
+      }
+    }
+
+    async function renewRental(id) {
+      if (!confirm('Are you sure you want to request a renewal for this item?')) return;
+
+      const duration = prompt('How many additional days/hours do you want to borrow this?', '1');
+      if (!duration) return;
+
+      const unit = prompt('Please enter "days" or "hours":', 'days');
+      if (!unit) return;
+
+      try {
+        const result = await fetchWithError('http://localhost/GCST_Track_System/actions/renew_rental.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            rental_id: id,
+            duration: parseInt(duration),
+            unit: unit.toLowerCase()
+          })
+        });
+        alert('Renewal request submitted for Rental ID: ' + id + '. This action requires admin approval.');
+      } catch (e) {
+        console.error('Renewal failed:', e);
+      }
     }
 
     document.querySelectorAll('.period-button').forEach(btn => {
@@ -380,8 +538,13 @@
 
     initializeAdminCashierPage(async (userData) => {
       try {
+        await loadQueueData();
+        setInterval(loadQueueData, 30000); // Auto-refresh queue data every 30 seconds
+        
+        await loadPendingOrders();
+
         // Fetch user rentals
-        const rentalsData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_rentals.html');
+        const rentalsData = await fetchWithError('http://localhost/GCST_Track_System/actions/get_user_rentals.php');
         allRentals = rentalsData.rentals || [];
         
         // Update summary stats

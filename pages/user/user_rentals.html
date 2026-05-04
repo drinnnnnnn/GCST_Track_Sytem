@@ -130,7 +130,7 @@
       border: 1px solid var(--border-soft);
       border-radius: 24px;
       padding: 22px;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow);
       display: grid;
       grid-template-rows: auto 1fr auto;
       gap: 18px;
@@ -139,7 +139,8 @@
 
     .rental-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 25px 65px rgba(15, 23, 42, 0.12);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-soft);
     }
 
     .rental-card .rental-header {
@@ -672,8 +673,7 @@
               <button class="btn-action btn-view" type="button" onclick="viewDetails(${rental.rental_id})">
                 <i class="fas fa-info-circle"></i> View Details
               </button>
-              ${!isReturned ? `<button class="btn-action btn-renew" type="button" onclick="renewRental(${rental.rental_id})"><i class="fas fa-redo"></i> Renew</button>` : ''}
-              ${!isReturned ? `<button class="btn-action btn-return" type="button" onclick="markReturned(${rental.rental_id})"><i class="fas fa-check"></i> Return</button>` : ''}
+              ${!isReturned ? `<button class="btn-action btn-renew" type="button" onclick="renewRental(${rental.rental_id})"><i class="fas fa-redo"></i> Request Renewal</button>` : ''}
             </div>
           </div>
         `;
@@ -706,7 +706,7 @@
       showLoading(rentalsContainer);
 
       try {
-        const rentalsData = await fetchWithError(`${apiBase}/get_user_rentals.html`);
+        const rentalsData = await fetchWithError(`${apiBase}/get_user_rentals.php`);
         allRentals = rentalsData.rentals || [];
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -724,17 +724,30 @@
     }
 
     async function renewRental(rentalId) {
+      if (!confirm('Are you sure you want to request a renewal for this item?')) return;
+
+      const duration = prompt('How many additional days/hours do you want to borrow this?', '1');
+      if (!duration) return;
+
+      const unit = prompt('Please enter "days" or "hours":', 'days');
+      if (!unit) return;
+
       try {
         const result = await fetchWithError(`${apiBase}/renew_rental.php`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `rental_id=${encodeURIComponent(rentalId)}`
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            rental_id: rentalId,
+            duration: parseInt(duration),
+            unit: unit.toLowerCase()
+          })
         });
 
         if (!result.success) {
           throw new Error(result.error || 'Renew failed');
         }
 
+        alert('Your renewal request has been submitted and is pending admin approval.');
         await loadRentals();
       } catch (error) {
         alert(`Unable to renew rental: ${error.message}`);
