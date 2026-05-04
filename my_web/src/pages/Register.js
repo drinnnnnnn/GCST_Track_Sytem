@@ -25,6 +25,12 @@ export default function Register() {
     event.preventDefault();
     setStatus({ loading: true, message: '', type: '' });
 
+    const studentIdPattern = /^GC-\d{6}$/;
+    if (!studentIdPattern.test(form.student_id)) {
+      setStatus({ loading: false, message: 'Invalid Student ID. Format must be GC-XXXXXX (e.g., GC-123456).', type: 'error' });
+      return;
+    }
+
     if (form.password !== form.confirm_password) {
       setStatus({ loading: false, message: 'Passwords do not match.', type: 'error' });
       return;

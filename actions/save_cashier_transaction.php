@@ -12,7 +12,14 @@ if ($conn->connect_error) {
 }
 
 $adminId = $_SESSION['admin_id'] ?? null;
-$studentId = $_SESSION['student_id'] ?? null;
+
+$payload = json_decode(file_get_contents('php://input'), true);
+if (!$payload || !isset($payload['items']) || !is_array($payload['items']) || count($payload['items']) === 0) {
+    jsonResponse(['success' => false, 'message' => 'No items in cart.'], 400);
+}
+
+// Allow student ID to come from the payload (selected by cashier) or session
+$studentId = $payload['student_id'] ?? $_SESSION['student_id'] ?? null;
 
 if (!$adminId && !$studentId) {
     echo json_encode(['success' => false, 'message' => 'Authentication required.']);
@@ -20,22 +27,20 @@ if (!$adminId && !$studentId) {
 }
 
 $userId = null;
+$studentFullName = null;
 if ($studentId) {
-    $lookupStmt = $conn->prepare('SELECT id FROM users WHERE student_id = ? LIMIT 1');
+    $lookupStmt = $conn->prepare('SELECT id, first_name, last_name FROM users WHERE student_id = ? LIMIT 1');
     $lookupStmt->bind_param('s', $studentId);
     $lookupStmt->execute();
-    $lookupStmt->bind_result($userId);
-    if (!$lookupStmt->fetch() || !$userId) {
+    $lookupStmt->bind_result($userId, $fName, $lName);
+    if ($lookupStmt->fetch() && $userId) {
+        $studentFullName = trim($fName . ' ' . $lName);
+    } else {
         $lookupStmt->close();
         echo json_encode(['success' => false, 'message' => 'Unable to resolve authenticated user.']);
         exit;
     }
     $lookupStmt->close();
-}
-
-$payload = json_decode(file_get_contents('php://input'), true);
-if (!$payload || !isset($payload['items']) || !is_array($payload['items']) || count($payload['items']) === 0) {
-    jsonResponse(['success' => false, 'message' => 'No items in cart.'], 400);
 }
 
 $subtotal = isset($payload['subtotal']) ? floatval($payload['subtotal']) : 0.0;
@@ -63,6 +68,7 @@ $createTableSql = "CREATE TABLE IF NOT EXISTS `cashier_transactions` (
     `transaction_number` VARCHAR(50) NOT NULL,
     `receipt_number` VARCHAR(100) DEFAULT NULL,
     `user_id` INT(11) DEFAULT NULL,
+    `student_name` VARCHAR(255) DEFAULT NULL,
     `cashier_id` INT(11) NOT NULL,
     `transaction_type` ENUM('buy','rent','mixed') NOT NULL,
     `items` TEXT NOT NULL,
@@ -82,6 +88,23 @@ $createTableSql = "CREATE TABLE IF NOT EXISTS `cashier_transactions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 $conn->query($createTableSql);
 
+// Create the active_rentals table if it does not exist.
+$createRentalsTableSql = "CREATE TABLE IF NOT EXISTS `active_rentals` (
+    `rental_id` INT(11) NOT NULL AUTO_INCREMENT,
+    `transaction_number` VARCHAR(50) NOT NULL,
+    `student_id` VARCHAR(50) NOT NULL,
+    `product_id` INT(11) NOT NULL,
+    `quantity` INT(11) NOT NULL DEFAULT 1,
+    `rental_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `return_date` DATETIME NOT NULL,
+    `rejection_reason` TEXT DEFAULT NULL,
+    `status` ENUM('active','returned','overdue','pending_renewal') NOT NULL DEFAULT 'active',
+    PRIMARY KEY (`rental_id`),
+    KEY `idx_active_rentals_student` (`student_id`),
+    KEY `idx_active_rentals_transaction` (`transaction_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+$conn->query($createRentalsTableSql);
+
 $typeColumnInfo = $conn->query("SHOW COLUMNS FROM `cashier_transactions` LIKE 'transaction_type'");
 if ($typeColumnInfo && $typeColumnInfo->num_rows > 0) {
     $typeDef = $typeColumnInfo->fetch_assoc()['Type'];
@@ -93,6 +116,11 @@ if ($typeColumnInfo && $typeColumnInfo->num_rows > 0) {
 $userCheck = $conn->query("SHOW COLUMNS FROM `cashier_transactions` LIKE 'user_id'");
 if (!$userCheck || $userCheck->num_rows === 0) {
     $conn->query("ALTER TABLE `cashier_transactions` ADD COLUMN `user_id` INT(11) DEFAULT NULL AFTER `receipt_number` , ADD INDEX (`user_id`) ");
+}
+
+$nameCheck = $conn->query("SHOW COLUMNS FROM `cashier_transactions` LIKE 'student_name'");
+if (!$nameCheck || $nameCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE `cashier_transactions` ADD COLUMN `student_name` VARCHAR(255) DEFAULT NULL AFTER `user_id` ");
 }
 
 $stockColumn = 'stock_count';
@@ -111,13 +139,17 @@ try {
         $quantity = intval($item['quantity'] ?? 0);
         $type = strtolower(trim($item['type'] ?? $item['item_type'] ?? 'buy'));
 
+        if ($type === 'rent' && !$studentId) {
+            throw new Exception('Student ID is required for rental items.');
+        }
+
         if ($productId <= 0 || $quantity <= 0 || !in_array($type, $allowedTypes, true)) {
             throw new Exception('Invalid cart item data.');
         }
 
         $itemTypes[] = $type;
 
-        $stmt = $conn->prepare("SELECT product_id, product_name, COALESCE(stock_count, stock, 0) AS available_stock, COALESCE(buy_price, price, 0.00) AS buy_price, COALESCE(rent_price, 0.00) AS rent_price FROM products WHERE product_id = ? LIMIT 1");
+        $stmt = $conn->prepare("SELECT product_id, product_name, product_category, COALESCE(stock_count, stock, 0) AS available_stock, COALESCE(buy_price, price, 0.00) AS buy_price, COALESCE(rent_price, 0.00) AS rent_price FROM products WHERE product_id = ? LIMIT 1");
         $stmt->bind_param('i', $productId);
         $stmt->execute();
         $product = $stmt->get_result()->fetch_assoc();
@@ -125,6 +157,14 @@ try {
 
         if (!$product) {
             throw new Exception('Product not found.');
+        }
+
+        if ($type === 'buy' && strtolower($product['product_category'] ?? '') === 'books') {
+            throw new Exception('Books can only be rented. Invalid item: ' . $product['product_name']);
+        }
+
+        if ($type === 'rent' && strtolower($product['product_category'] ?? '') !== 'books') {
+            throw new Exception('Rental is only allowed for Books. Invalid item: ' . $product['product_name']);
         }
 
         if ($product['available_stock'] < $quantity) {
@@ -138,6 +178,13 @@ try {
 
         $duration = ($type === 'rent') ? intval($item['duration'] ?? 1) : 1;
         $durationUnit = $item['duration_unit'] ?? ($type === 'rent' ? 'days' : null);
+
+        $returnDate = null;
+        if ($type === 'rent') {
+            $unit = in_array($durationUnit, ['hours', 'days', 'weeks', 'months']) ? $durationUnit : 'days';
+            $returnDate = date('Y-m-d H:i:s', strtotime("+$duration $unit"));
+        }
+
         $itemTotal = round($unitPrice * $duration * $quantity, 2);
 
         $cartItems[] = [
@@ -148,6 +195,7 @@ try {
             'unit_price' => $unitPrice,
             'duration' => $duration,
             'duration_unit' => $durationUnit,
+            'return_date' => $returnDate,
             'total' => $itemTotal,
         ];
 
@@ -173,8 +221,8 @@ try {
         $existingReceipt->close();
     }
 
-    $insertStmt = $conn->prepare("INSERT INTO cashier_transactions (transaction_number, receipt_number, user_id, cashier_id, transaction_type, items, subtotal, discount_percent, discount_amount, total_amount, payment_received, change_amount, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $insertStmt->bind_param('ssiissdddddds', $transactionNumber, $receiptNumber, $userId, $cashierId, $transactionType, $itemsJson, $subtotal, $discountPercent, $discountAmount, $totalAmount, $paymentReceived, $changeAmount, $paymentStatus);
+    $insertStmt = $conn->prepare("INSERT INTO cashier_transactions (transaction_number, receipt_number, user_id, student_name, cashier_id, transaction_type, items, subtotal, discount_percent, discount_amount, total_amount, payment_received, change_amount, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insertStmt->bind_param('ssiss ss ddd ddd s', $transactionNumber, $receiptNumber, $userId, $studentFullName, $cashierId, $transactionType, $itemsJson, $subtotal, $discountPercent, $discountAmount, $totalAmount, $paymentReceived, $changeAmount, $paymentStatus);
     if (!$insertStmt->execute()) {
         throw new Exception('Could not save transaction: ' . $insertStmt->error);
     }
@@ -182,13 +230,23 @@ try {
 
     if ($userId) {
         $itemInsert = $conn->prepare('INSERT INTO transactions (user_id, product_id, type, quantity, total_amount) VALUES (?, ?, ?, ?, ?)');
+        $rentalInsert = $conn->prepare('INSERT INTO active_rentals (transaction_number, student_id, product_id, quantity, return_date, status) VALUES (?, ?, ?, ?, ?, "active")');
+
         foreach ($cartItems as $item) {
             $itemInsert->bind_param('iisid', $userId, $item['product_id'], $item['type'], $item['quantity'], $item['total']);
             if (!$itemInsert->execute()) {
                 throw new Exception('Failed to record item transaction: ' . $itemInsert->error);
             }
+
+            if ($item['type'] === 'rent') {
+                $rentalInsert->bind_param('ssiis', $transactionNumber, $studentId, $item['product_id'], $item['quantity'], $item['return_date']);
+                if (!$rentalInsert->execute()) {
+                    throw new Exception('Failed to record active rental: ' . $rentalInsert->error);
+                }
+            }
         }
         $itemInsert->close();
+        $rentalInsert->close();
     }
 
     $conn->commit();

@@ -8,10 +8,18 @@
   <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
   <style>
     .cashier-layout {
-      display: grid;
-      grid-template-columns: 1.8fr 1.2fr 1fr;
+      display: grid; 
+      grid-template-columns: 1fr 420px;
       gap: 24px;
       margin-top: 20px;
+      align-items: start;
+    }
+    .cashier-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 20px;
     }
     .panel {
       background: #ffffff;
@@ -111,6 +119,12 @@
       margin: 0;
       color: #4b5563;
       font-size: 0.92rem;
+    }
+    .badge-rent-only {
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+      font-size: 0.7rem;
     }
     .product-meta {
       display: flex;
@@ -257,7 +271,7 @@
     .hidden {
       display: none !important;
     }
-    @media screen and (max-width: 1180px) {
+    @media screen and (max-width: 1280px) {
       .cashier-layout {
         grid-template-columns: 1fr;
       }
@@ -324,32 +338,33 @@
         <div class="filter-group" id="category-filters"></div>
         <div id="product-grid" class="products-grid"></div>
       </div>
-      <div class="panel">
-        <div class="panel-header">
-          <h2>Cart</h2>
-          <button id="clear-cart" class="btn btn-secondary">Clear Cart</button>
+      <div class="cashier-sidebar">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Cart</h2>
+            <button id="clear-cart" class="btn btn-secondary btn-sm">Clear</button>
+          </div>
+          <div id="cart-content">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="cart-body"></tbody>
+            </table>
+          </div>
+          <div id="cart-empty" class="empty-state">Cart is empty.</div>
         </div>
-        <div id="cart-content">
-          <table class="cart-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>Total</th>
-                <th>Remove</th>
-              </tr>
-            </thead>
-            <tbody id="cart-body"></tbody>
-          </table>
-        </div>
-        <div id="cart-empty" class="empty-state">Add products to build a cart.</div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">
-          <h2>Checkout</h2>
-          <span class="badge badge-success" id="payment-status-label">Ready</span>
-        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Checkout</h2>
+            <span class="badge badge-success" id="payment-status-label">Ready</span>
+          </div>
         <div class="summary-card">
           <div class="summary-row">
             <label>Transaction Type
@@ -358,6 +373,18 @@
                 <option value="rent">Rent</option>
               </select>
             </label>
+          </div>
+          <div class="summary-row" style="grid-template-columns: 1fr; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="checkout-student-id">Student ID / Search Name</label>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickRegisterModal()" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 8px; border: 1px solid #d1d5db;">+ Quick Register</button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input id="checkout-student-id" type="text" list="student-datalist" placeholder="Select or type ID" style="flex: 1;" />
+              <datalist id="student-datalist"></datalist>
+              <button type="button" class="btn btn-secondary" onclick="checkStudentId()" style="white-space: nowrap; padding: 0 16px; border-radius: 16px;">Check</button>
+            </div>
+            <div id="student-check-msg" style="font-size: 0.8rem; min-height: 1.2em;"></div>
           </div>
           <div class="summary-row">
             <label>Discount (%)
@@ -409,8 +436,155 @@
           <div class="receipt-line"><span>Paid</span><strong id="receipt-paid"></strong></div>
           <div class="receipt-line"><span>Change</span><strong id="receipt-change"></strong></div>
         </div>
+        </div>
       </div>
     </section>
+    <section class="management-section" style="margin-top: 24px; padding: 0 20px;">
+      <div class="panel">
+        <div class="panel-header" style="flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <h2>Active Rentals</h2>
+            <span id="active-rental-count" class="badge badge-primary">0 active</span>
+            <button class="btn btn-secondary" onclick="exportActiveRentalsToCSV()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-file-csv"></i> Export CSV</button>
+            <button class="btn btn-secondary" onclick="loadActiveRentals()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> Refresh Status</button>
+          </div>
+          <div class="search-group" style="margin-bottom: 0; min-width: 240px;">
+            <input id="active-rental-search" class="search-input" type="text" placeholder="Search by student or product..." style="padding: 8px 12px; font-size: 0.85rem;" />
+          </div>
+        </div>
+        <div id="active-rentals-content">
+           <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th onclick="sortActiveRentalsByDate()" style="cursor: pointer;">Due Date <i class="fas fa-sort" id="sort-icon-date"></i></th>
+                  <th>Status/Note</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="active-rentals-body"></tbody>
+           </table>
+        </div>
+        <div id="active-rentals-empty" class="empty-state">No active rentals found.</div>
+      </div>
+    </section>
+    <section class="management-section" style="margin-top: 24px; padding: 0 20px;">
+      <div class="panel">
+        <div class="panel-header" style="flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <h2>Pending Rental Renewals</h2>
+            <span id="renewal-count" class="badge badge-warning">0 pending</span>
+          </div>
+          <div class="search-group" style="margin-bottom: 0; min-width: 240px;">
+            <input id="renewal-search" class="search-input" type="text" placeholder="Search renewals..." style="padding: 8px 12px; font-size: 0.85rem;" />
+          </div>
+        </div>
+        <div id="renewals-content">
+           <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th onclick="sortPendingRenewalsByDate()" style="cursor: pointer;">Requested Date <i class="fas fa-sort" id="sort-icon-renewal-date"></i></th>
+                  <th>New Due Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="renewals-body"></tbody>
+           </table>
+        </div>
+        <div id="renewals-empty" class="empty-state">No pending renewals to review.</div>
+      </div>
+    </section>
+    <section class="management-section" style="margin-top: 24px; padding: 0 20px;">
+      <div class="panel">
+        <div class="panel-header" style="flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <h2>Recent Transactions</h2>
+            <button class="btn btn-secondary" onclick="loadRecentTransactions()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div class="search-group" style="margin-bottom: 0; min-width: 240px;">
+            <input id="txn-history-search" class="search-input" type="text" placeholder="Search Order #..." style="padding: 8px 12px; font-size: 0.85rem;" />
+          </div>
+        </div>
+        <div id="txn-history-content">
+           <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Order #</th>
+                  <th>Student</th>
+                  <th>Type</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="txn-history-body"></tbody>
+           </table>
+        </div>
+        <div id="txn-history-empty" class="empty-state">No recent transactions found.</div>
+      </div>
+    </section>
+    <div id="reject-reason-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+      <div class="panel" style="width: 100%; max-width: 450px;">
+        <div class="panel-header">
+          <h2>Reject Renewal Request</h2>
+        </div>
+        <div class="summary-card">
+          <div class="summary-row">
+            <label>Reason for rejection:
+              <textarea id="rejection-reason" class="search-input" style="height: 120px; width: 100%; margin-top: 10px; padding: 12px;" placeholder="Enter reason here..."></textarea>
+            </label>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-danger" style="flex: 1;" onclick="confirmRejection()">Reject Request</button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick="closeRejectModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="quick-register-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+      <div class="panel" style="width: 100%; max-width: 450px;">
+        <div class="panel-header">
+          <h2>Quick Student Registration</h2>
+          <button type="button" class="modal-close" onclick="closeQuickRegisterModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <form id="quick-register-form">
+          <div class="summary-card">
+            <div class="summary-row" style="grid-template-columns: 1fr;">
+              <label for="quick-reg-student-id">Student ID</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" name="student_id" id="quick-reg-student-id" required placeholder="GC-123456" pattern="GC-\d{6}" title="Format: GC-XXXXXX (e.g., GC-123456)" style="flex: 1;" />
+                <button type="button" class="btn btn-secondary" onclick="generateStudentId()" style="padding: 0 12px; font-size: 0.8rem; border-radius: 12px; white-space: nowrap;">Generate</button>
+              </div>
+            </div>
+            <div class="summary-row" style="grid-template-columns: 1fr;">
+              <label>First Name
+                <input type="text" name="first_name" required />
+              </label>
+            </div>
+            <div class="summary-row" style="grid-template-columns: 1fr;">
+              <label>Last Name
+                <input type="text" name="last_name" required />
+              </label>
+            </div>
+            <div class="summary-row" style="grid-template-columns: 1fr;">
+              <label>Email
+                <input type="email" name="email" required />
+              </label>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">Register Student</button>
+              <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeQuickRegisterModal()">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </main>
   <script src="http://localhost/GCST_Track_System/assets/js/admincashier.js"></script>
   <script>
@@ -420,13 +594,18 @@
 
     let products = [];
     let cart = [];
+    let activeRentals = [];
+    let pendingRenewals = [];
+    let recentTransactions = [];
     const state = {
       category: 'All',
       query: '',
       transactionType: 'buy',
       discountPercent: 0,
       cashReceived: 0,
-      paymentStatus: 'paid'
+      paymentStatus: 'paid', // Default to paid
+      // studentId: '' // This is already handled by the input field
+      studentId: ''
     };
     function formatCurrency(value) {
       return '₱' + parseFloat(value || 0).toFixed(2);
@@ -449,6 +628,7 @@
       const count = document.getElementById('product-count');
       grid.innerHTML = '';
       const results = products.filter(product => {
+        // Category filtering logic
         if (state.category !== 'All' && (product.product_category || 'Uncategorized') !== state.category) return false;
         const searchText = `${product.product_name} ${product.product_category || 'Uncategorized'} ${product.barcode ?? ''}`.toLowerCase();
         return searchText.includes(state.query.toLowerCase());
@@ -463,24 +643,36 @@
           const imageSrc = resolveImagePath(product.product_image);
           const statusLabel = stock <= 0 ? 'Out of Stock' : stock < 5 ? 'Low Stock' : 'In Stock';
           const statusClass = stock <= 0 ? 'out-stock' : stock < 5 ? 'low-stock' : 'in-stock';
+          const isBook = (product.product_category || '').toLowerCase() === 'books';
+          
+          let priceHtml = isBook 
+            ? `<span><strong>Rent:</strong> ${formatCurrency(rentPrice)}</span>`
+            : `<span><strong>Buy:</strong> ${formatCurrency(price)}</span>`;
+
+          let badgeHtml = isBook 
+            ? `<span class="badge badge-rent-only">Rent Only</span>`
+            : ``;
+
           const card = document.createElement('article');
           card.className = 'product-card';
           card.innerHTML = `
             <img src="${imageSrc}" alt="${product.product_name}" />
             <div class="product-body">
-              <h3>${product.product_name}</h3>
+              <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                <h3>${product.product_name}</h3>
+                ${badgeHtml}
+              </div>
               <p>${product.product_category || 'Uncategorized'}</p>
               <div class="product-meta">
                 <span class="status-pill ${statusClass}">${statusLabel}</span>
                 <span class="stock-pill">${stock} left</span>
               </div>
               <div class="product-meta">
-                <span><strong>Buy:</strong> ${formatCurrency(price)}</span>
-                <span><strong>Rent:</strong> ${formatCurrency(rentPrice)}</span>
+                ${priceHtml}
               </div>
             </div>
             <div class="product-actions">
-              <button class="btn btn-primary" type="button" ${stock <= 0 ? 'disabled' : ''} onclick="addProductToCart(${product.product_id})">Add to cart</button>
+              <button class="btn btn-primary" type="button" ${stock <= 0 ? 'disabled' : ''} onclick="addProductToCart('${product.product_id}')">Add to cart</button>
             </div>
           `;
           grid.appendChild(card);
@@ -498,6 +690,10 @@
         button.className = 'filter-btn' + (category === state.category ? ' active' : '');
         button.textContent = category;
         button.onclick = () => {
+          if (state.transactionType === 'rent' && category !== 'Books') {
+            alert('During a rental session, only the "Books" category is allowed.');
+            return;
+          }
           state.category = category;
           buildCategoryFilters();
           renderProducts();
@@ -525,15 +721,14 @@
         tr.innerHTML = `
           <td>${item.product_name}</td>
           <td>
-            <div class="qty-input">
-              <button type="button" onclick="changeCartQuantity(${item.product_id}, -1)">-</button>
-              <span>${item.quantity}</span>
-              <button type="button" onclick="changeCartQuantity(${item.product_id}, 1)">+</button>
+            <div class="qty-input" style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" onclick="changeCartQuantity('${item.product_id}', -1)">-</button>
+              <span style="min-width: 20px; text-align: center;">${item.quantity}</span>
+              <button type="button" onclick="changeCartQuantity('${item.product_id}', 1)">+</button>
             </div>
           </td>
-          <td>${formatCurrency(item.unitPrice)}</td>
           <td>${formatCurrency(rowTotal)}</td>
-          <td><button class="btn btn-danger" type="button" onclick="removeCartItem(${item.product_id})">Remove</button></td>
+          <td><button class="btn btn-danger btn-sm" type="button" onclick="removeCartItem('${item.product_id}')"><i class="fas fa-times"></i></button></td>
         `;
         cartBody.appendChild(tr);
       });
@@ -548,15 +743,21 @@
     }
     function syncCartProductPrices() {
       cart = cart.map(item => {
-        const product = products.find(p => p.product_id === item.product_id);
+        const product = products.find(p => p.product_id == item.product_id);
         const unitPrice = state.transactionType === 'rent' ? getProductRentPrice(product) : getProductPrice(product);
         return { ...item, unitPrice };
       });
       updateCartSummary();
     }
     function addProductToCart(productId) {
-      const product = products.find(p => p.product_id === productId);
+      const product = products.find(p => p.product_id == productId);
       if (!product) return;
+
+      if (state.transactionType === 'rent' && (product.product_category || '').toLowerCase() !== 'books') {
+        alert('Rental is only allowed for items in the "Books" category.');
+        return;
+      }
+
       const stock = getProductStock(product);
       const existing = cart.find(item => item.product_id === productId);
       if (existing) {
@@ -576,9 +777,9 @@
       updateCartSummary();
     }
     function changeCartQuantity(productId, delta) {
-      const item = cart.find(entry => entry.product_id === productId);
+      const item = cart.find(entry => entry.product_id == productId);
       if (!item) return;
-      const product = products.find(p => p.product_id === productId);
+      const product = products.find(p => p.product_id == productId);
       const stock = getProductStock(product);
       const nextQty = item.quantity + delta;
       if (nextQty <= 0) {
@@ -593,7 +794,7 @@
       updateCartSummary();
     }
     function removeCartItem(productId) {
-      cart = cart.filter(item => item.product_id !== productId);
+      cart = cart.filter(item => item.product_id != productId);
       updateCartSummary();
     }
     function clearCart() {
@@ -604,6 +805,8 @@
       document.getElementById('discount-percent').value = '0';
       document.getElementById('cash-received').value = '0.00';
       document.getElementById('payment-status').value = 'paid';
+      document.getElementById('checkout-student-id').value = '';
+      document.getElementById('student-check-msg').textContent = '';
       const label = document.getElementById('payment-status-label');
       label.textContent = 'Paid';
       label.className = 'badge badge-success';
@@ -613,7 +816,7 @@
     function loadProducts() {
       const grid = document.getElementById('product-grid');
       grid.innerHTML = '<div class="empty-state"><p>Loading products...</p></div>';
-      fetch(`${API_ROOT}/get_admincashier_products.html`)
+      fetch(`${API_ROOT}/get_admincashier_products.php`)
         .then(response => response.json())
         .then(data => {
           products = Array.isArray(data) ? data : [];
@@ -625,10 +828,40 @@
         });
     }
     function updateTransactionSettings() {
-      state.transactionType = document.getElementById('transaction-type').value;
+      const previousType = state.transactionType;
+      const newType = document.getElementById('transaction-type').value;
+
+      // Prevent switching to Rent if cart has non-book items
+      if (newType === 'rent' && cart.length > 0) {
+        const hasNonBooks = cart.some(item => {
+          const product = products.find(p => p.product_id == item.product_id);
+          return (product.product_category || '').toLowerCase() !== 'books';
+        });
+        if (hasNonBooks) {
+          alert('Rental is only available for Books. Please remove non-book items from the cart before switching to Rent.');
+          document.getElementById('transaction-type').value = 'buy';
+          state.transactionType = 'buy';
+          return;
+        }
+      }
+
+      state.transactionType = newType;
+
+      // Automatically filter to Books when Rent is selected
+      if (state.transactionType === 'rent' && previousType !== 'rent') {
+        state.category = 'Books';
+        buildCategoryFilters();
+        renderProducts();
+      } else if (state.transactionType === 'buy' && previousType === 'rent') {
+        state.category = 'All';
+        buildCategoryFilters();
+        renderProducts();
+      }
+
       state.discountPercent = parseFloat(document.getElementById('discount-percent').value) || 0;
       state.cashReceived = parseFloat(document.getElementById('cash-received').value) || 0;
       state.paymentStatus = document.getElementById('payment-status').value;
+      state.studentId = document.getElementById('checkout-student-id').value.trim();
       const label = document.getElementById('payment-status-label');
       label.textContent = state.paymentStatus === 'paid' ? 'Paid' : 'Pending';
       label.className = `badge ${state.paymentStatus === 'paid' ? 'badge-success' : 'badge-warning'}`;
@@ -661,6 +894,11 @@
         return;
       }
       updateTransactionSettings();
+      if (state.transactionType === 'rent' && !state.studentId) {
+        alert('A Student ID is required for rental transactions.');
+        document.getElementById('checkout-student-id').focus();
+        return;
+      }
       const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
       const discountAmount = subtotal * (state.discountPercent / 100);
       const totalAmount = Math.max(0, subtotal - discountAmount);
@@ -671,8 +909,9 @@
         return;
       }
       const payload = {
+        student_id: state.studentId,
         transaction_type: state.transactionType,
-        items: cart.map(item => ({ product_id: item.product_id, quantity: item.quantity })),
+        items: cart.map(item => ({ product_id: item.product_id, quantity: item.quantity, type: state.transactionType })),
         subtotal,
         discount_percent: state.discountPercent,
         discount_amount: discountAmount,
@@ -699,6 +938,7 @@
           showReceipt(result.receipt);
           clearCart();
           loadProducts();
+          loadRecentTransactions();
         })
         .catch(() => {
           completeButton.disabled = false;
@@ -738,6 +978,293 @@
       printWindow.focus();
       printWindow.print();
     }
+    function loadPendingRenewals() {
+      fetch(`${API_ROOT}/get_pending_renewals.php`)
+        .then(res => res.json())
+        .then(data => {
+          pendingRenewals = Array.isArray(data) ? data : [];
+          renderPendingRenewals(pendingRenewals);
+        });
+    }
+    function renderPendingRenewals(data) {
+          const body = document.getElementById('renewals-body');
+          const empty = document.getElementById('renewals-empty');
+          const content = document.getElementById('renewals-content');
+          const count = document.getElementById('renewal-count');
+          
+          body.innerHTML = '';
+          if (!data || data.length === 0) {
+            content.style.display = 'none';
+            empty.classList.remove('hidden');
+            count.textContent = '0 pending';
+            return;
+          }
+          
+          content.style.display = 'block';
+          empty.classList.add('hidden');
+          count.textContent = `${data.length} pending`;
+          
+          data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${item.first_name} ${item.last_name} (${item.student_id})</td>
+              <td>${item.product_name}</td>
+              <td>${item.quantity}</td>
+              <td>${new Date(item.rental_date).toLocaleString()}</td>
+              <td>${new Date(item.return_date).toLocaleString()}</td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-primary" onclick="handleRenewal(${item.rental_id}, 'approve')">Approve</button>
+                  <button class="btn btn-danger" onclick="handleRenewal(${item.rental_id}, 'reject')">Reject</button>
+                </div>
+              </td>
+            `;
+            body.appendChild(tr);
+          });
+    }
+
+    let activeRentalSortAsc = true;
+    function sortActiveRentalsByDate() {
+      activeRentalSortAsc = !activeRentalSortAsc;
+      activeRentals.sort((a, b) => {
+        const dateA = new Date(a.return_date);
+        const dateB = new Date(b.return_date);
+        return activeRentalSortAsc ? dateA - dateB : dateB - dateA;
+      });
+      const icon = document.getElementById('sort-icon-date');
+      if (icon) {
+        icon.className = activeRentalSortAsc ? 'fas fa-sort-up' : 'fas fa-sort-down';
+      }
+      const query = document.getElementById('active-rental-search').value.toLowerCase();
+      const filtered = activeRentals.filter(item => {
+        const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
+        return studentName.includes(query) || 
+               item.student_id.toLowerCase().includes(query) || 
+               item.product_name.toLowerCase().includes(query);
+      });
+      renderActiveRentals(filtered);
+    }
+
+    let pendingRenewalSortAsc = true;
+    function sortPendingRenewalsByDate() {
+      pendingRenewalSortAsc = !pendingRenewalSortAsc;
+      pendingRenewals.sort((a, b) => {
+        const dateA = new Date(a.rental_date);
+        const dateB = new Date(b.rental_date);
+        return pendingRenewalSortAsc ? dateA - dateB : dateB - dateA;
+      });
+      const icon = document.getElementById('sort-icon-renewal-date');
+      if (icon) {
+        icon.className = pendingRenewalSortAsc ? 'fas fa-sort-up' : 'fas fa-sort-down';
+      }
+      const query = document.getElementById('renewal-search').value.toLowerCase();
+      const filtered = pendingRenewals.filter(item => {
+        const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
+        return studentName.includes(query) || 
+               item.student_id.toLowerCase().includes(query) || 
+               item.product_name.toLowerCase().includes(query);
+      });
+      renderPendingRenewals(filtered);
+    }
+
+    function loadRecentTransactions() {
+      fetch(`${API_ROOT}/get_recent_transactions.php`)
+        .then(res => res.json())
+        .then(data => {
+          recentTransactions = Array.isArray(data) ? data : [];
+          renderRecentTransactions(recentTransactions);
+        });
+    }
+
+    function renderRecentTransactions(data) {
+      const body = document.getElementById('txn-history-body');
+      const empty = document.getElementById('txn-history-empty');
+      const content = document.getElementById('txn-history-content');
+      body.innerHTML = '';
+      if (!data || data.length === 0) {
+        content.style.display = 'none';
+        empty.classList.remove('hidden');
+        return;
+      }
+      content.style.display = 'block';
+      empty.classList.add('hidden');
+      data.forEach(txn => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(txn.created_at).toLocaleString()}</td>
+          <td>${txn.transaction_number}</td>
+          <td>${txn.student_name || 'Walk-in'}</td>
+          <td style="text-transform: capitalize;">${txn.transaction_type}</td>
+          <td>${formatCurrency(txn.total_amount)}</td>
+          <td><span class="badge ${txn.payment_status === 'paid' ? 'badge-success' : 'badge-warning'}">${txn.payment_status}</span></td>
+          <td><button class="btn btn-secondary" onclick="reprintReceipt('${txn.transaction_number}')">View</button></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function reprintReceipt(txnNumber) {
+      const txn = recentTransactions.find(t => t.transaction_number === txnNumber);
+      if (txn) showReceipt(txn);
+    }
+
+    let rejectionRentalId = null;
+    function handleRenewal(rentalId, action) {
+      if (action === 'reject') {
+        rejectionRentalId = rentalId;
+        document.getElementById('reject-reason-modal').classList.remove('hidden');
+        return;
+      }
+      executeRenewalAction(rentalId, 'approve', '');
+    }
+
+    function closeRejectModal() {
+      document.getElementById('reject-reason-modal').classList.add('hidden');
+      document.getElementById('rejection-reason').value = '';
+      rejectionRentalId = null;
+    }
+
+    function generateStudentId() {
+      fetch(`${API_ROOT}/get_next_student_id.php`)
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            const input = document.getElementById('quick-reg-student-id');
+            if (input) {
+              input.value = result.next_student_id;
+            }
+          } else {
+            alert(result.message || 'Failed to generate Student ID.');
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching next student ID:', err);
+          alert('An error occurred while generating Student ID.');
+        });
+    }
+
+    function confirmRejection() {
+      const reason = document.getElementById('rejection-reason').value.trim();
+      if (!reason) {
+        alert('Please provide a reason for rejection.');
+        return;
+      }
+      executeRenewalAction(rejectionRentalId, 'reject', reason);
+      closeRejectModal();
+    }
+
+    function executeRenewalAction(rentalId, action, reason) {
+      fetch(`${API_ROOT}/approve_renewal.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rental_id: rentalId, action, reason })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          alert(`Renewal ${action === 'approve' ? 'approved' : 'rejected'} successfully.`);
+          loadPendingRenewals();
+        } else {
+          alert(result.error || 'Failed to process renewal.');
+        }
+      });
+    }
+
+    function exportActiveRentalsToCSV() {
+      if (!activeRentals || activeRentals.length === 0) {
+        alert('No active rentals to export.');
+        return;
+      }
+      const headers = ['Student ID', 'Student Name', 'Product', 'Quantity', 'Due Date', 'Status', 'Rejection Note'];
+      const rows = activeRentals.map(item => [
+        item.student_id,
+        `${item.first_name} ${item.last_name}`,
+        item.product_name,
+        item.quantity,
+        new Date(item.return_date).toLocaleString(),
+        item.status.toUpperCase(),
+        item.rejection_reason || ''
+      ]);
+      const csvContent = headers.join(",") + "\n" + rows.map(r => r.map(f => `"${String(f).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `active_rentals_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function loadActiveRentals() {
+      fetch(`${API_ROOT}/get_active_rentals.php`)
+        .then(res => res.json())
+        .then(data => {
+          activeRentals = Array.isArray(data) ? data : [];
+          renderActiveRentals(activeRentals);
+        });
+    }
+    function renderActiveRentals(data) {
+          const body = document.getElementById('active-rentals-body');
+          const empty = document.getElementById('active-rentals-empty');
+          const content = document.getElementById('active-rentals-content');
+          const count = document.getElementById('active-rental-count');
+          
+          body.innerHTML = '';
+          if (!data || data.length === 0) {
+            content.style.display = 'none';
+            empty.classList.remove('hidden');
+            count.textContent = '0 active';
+            return;
+          }
+          
+          content.style.display = 'block';
+          empty.classList.add('hidden');
+          count.textContent = `${data.length} active`;
+          
+          data.forEach(item => {
+            const tr = document.createElement('tr');
+            if (item.status === 'overdue') {
+              tr.style.backgroundColor = '#fff5f5';
+              tr.style.boxShadow = 'inset 4px 0 0 #ef4444';
+            }
+
+            const statusClass = item.status === 'overdue' ? 'background: #fee2e2; color: #b91c1c;' : 'background: #e0e7ff; color: #4338ca;';
+            const statusLabel = item.status === 'overdue' ? 'Overdue' : 'Active';
+            const reasonHtml = item.rejection_reason ? `<div style="font-size: 0.8rem; color: #ef4444; margin-top: 4px;"><strong>Rejection Note:</strong> ${item.rejection_reason}</div>` : '';
+
+            tr.innerHTML = `
+              <td>${item.first_name} ${item.last_name} (${item.student_id})</td>
+              <td>${item.product_name}</td>
+              <td>${item.quantity}</td>
+              <td>${new Date(item.return_date).toLocaleString()}</td>
+              <td><span class="badge" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; ${statusClass}">${statusLabel}</span>${reasonHtml}</td>
+              <td>
+                <button class="btn btn-primary" onclick="processReturn(${item.rental_id})">Return Item</button>
+              </td>
+            `;
+            body.appendChild(tr);
+          });
+    }
+    function processReturn(rentalId) {
+      if (!confirm('Are you sure you want to mark this item as returned? Stock will be updated.')) return;
+      
+      fetch(`${API_ROOT}/return_item.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rental_id: rentalId })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          alert(result.message);
+          loadActiveRentals();
+          loadProducts();
+        } else {
+          alert(result.message || 'Failed to process return.');
+        }
+      });
+    }
     initializeAdminCashierPage(async (userData) => {
       const name = userData.name || 'Admin Cashier';
       const greetingElement = document.getElementById('greeting-message');
@@ -748,10 +1275,42 @@
       updateTransactionSettings();
       updateDateTime();
       setInterval(updateDateTime, 60000);
+      loadPendingRenewals();
+      loadActiveRentals();
+      loadRecentTransactions();
+      loadStudentList();
     });
     document.getElementById('product-search').addEventListener('input', () => {
       state.query = document.getElementById('product-search').value.trim();
       renderProducts();
+    });
+    document.getElementById('active-rental-search').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = activeRentals.filter(item => {
+        const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
+        return studentName.includes(query) || 
+               item.student_id.toLowerCase().includes(query) || 
+               item.product_name.toLowerCase().includes(query);
+      });
+      renderActiveRentals(filtered);
+    });
+    document.getElementById('renewal-search').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = pendingRenewals.filter(item => {
+        const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
+        return studentName.includes(query) || 
+               item.student_id.toLowerCase().includes(query) || 
+               item.product_name.toLowerCase().includes(query);
+      });
+      renderPendingRenewals(filtered);
+    });
+    document.getElementById('txn-history-search').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = recentTransactions.filter(item => 
+        item.transaction_number.toLowerCase().includes(query) ||
+        (item.student_name && item.student_name.toLowerCase().includes(query))
+      );
+      renderRecentTransactions(filtered);
     });
     document.getElementById('clear-search').addEventListener('click', () => {
       document.getElementById('product-search').value = '';
@@ -770,9 +1329,63 @@
     document.getElementById('payment-status').addEventListener('change', () => {
       updateTransactionSettings();
     });
+    document.getElementById('checkout-student-id').addEventListener('input', () => {
+      updateTransactionSettings();
+    });
     document.getElementById('clear-cart').addEventListener('click', clearCart);
     document.getElementById('complete-sale').addEventListener('click', completeTransaction);
     document.getElementById('print-receipt').addEventListener('click', printReceipt);
+
+    function checkStudentId() {
+      const studentId = document.getElementById('checkout-student-id').value.trim();
+      const msg = document.getElementById('student-check-msg');
+      if (!studentId) {
+        msg.textContent = 'Please enter a Student ID.';
+        msg.style.color = '#ef4444';
+        return;
+      }
+      msg.textContent = 'Verifying...';
+      msg.style.color = '#6b7280';
+
+      fetch(`${API_ROOT}/check_student_id.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: studentId })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          msg.textContent = `Verified: ${result.name}`;
+          msg.style.color = '#10b981';
+        } else {
+          msg.textContent = result.message || 'Student not found.';
+          msg.style.color = '#ef4444';
+        }
+      })
+      .catch(() => {
+        msg.textContent = 'Error checking Student ID.';
+        msg.style.color = '#ef4444';
+      });
+    }
+
+    function loadStudentList() {
+      fetch(`${API_ROOT}/get_students.php`)
+        .then(res => res.json())
+        .then(data => {
+          const datalist = document.getElementById('student-datalist');
+          if (!datalist) return;
+          datalist.innerHTML = '';
+          if (Array.isArray(data)) {
+            data.forEach(student => {
+              const option = document.createElement('option');
+              option.value = student.id;
+              option.textContent = student.name;
+              datalist.appendChild(option);
+            });
+          }
+        })
+        .catch(err => console.error('Error loading student list:', err));
+    }
   </script>
     <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
 </body>

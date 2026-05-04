@@ -142,6 +142,12 @@ function UserSignup() {
 
   function handleSubmit(event) {
     event.preventDefault();
+    const studentIdPattern = /^GC-\d{6}$/;
+    if (!studentIdPattern.test(form.student_id)) {
+      setStatus({ loading: false, message: 'Invalid Student ID format. Expected GC-XXXXXX.', error: true });
+      return;
+    }
+
     if (form.password !== form.confirm_password) {
       setStatus({ loading: false, message: 'Passwords do not match.', error: true });
       return;
