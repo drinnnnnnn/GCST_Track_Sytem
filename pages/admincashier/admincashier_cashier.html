@@ -6,13 +6,14 @@
   <title>GCST Admin Cashier - Point of Sale</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="http://localhost/GCST_Track_System/assets/css/admincashier.css" />
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     .cashier-layout {
       display: grid; 
       grid-template-columns: 1fr 420px;
       gap: 24px;
       margin-top: 20px;
-      align-items: start;
+      align-items: stretch;
     }
     .cashier-sidebar {
       display: flex;
@@ -27,6 +28,16 @@
       box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
       padding: 24px;
       border: 1px solid rgba(229, 231, 235, 0.9);
+    }
+    .cashier-layout .panel {
+      height: 850px;
+      display: flex;
+      flex-direction: column;
+    }
+    .management-section .panel {
+      height: 600px;
+      display: flex;
+      flex-direction: column;
     }
     .panel-header {
       display: flex;
@@ -87,6 +98,24 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 18px;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      scroll-behavior: smooth;
+    }
+    .products-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .products-grid::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    .products-grid::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .products-grid::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
     .product-card {
       background: #f7f8fc;
@@ -160,23 +189,114 @@
     .product-actions .btn {
       flex: 1;
     }
-    .cart-table {
-      width: 100%;
-      border-collapse: collapse;
+    #cart-content {
+      flex: 1;
+      overflow-y: auto;
       margin-bottom: 16px;
-      min-width: 100%;
     }
-    .cart-table th,
-    .cart-table td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 0.92rem;
-      vertical-align: middle;
-      text-align: left;
+    #active-rentals-content,
+    #renewals-content,
+    #txn-history-content {
+      flex: 1;
+      overflow-y: auto;
     }
-    .cart-table th {
+    .cart-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s ease;
+    }
+    .cart-item:hover {
+      border-color: #4f46e5;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+    }
+    .cart-item.deselected {
+      opacity: 0.6;
+      filter: grayscale(0.5);
+    }
+    .cart-item-info h4 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #111827;
+      font-weight: 600;
+    }
+    .cart-item-info p {
+      margin: 2px 0 0;
+      font-size: 0.8rem;
       color: #6b7280;
+    }
+    .qty-control {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .qty-control button {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #4f46e5;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+    .qty-control button:hover {
+      background: #eef2ff;
+    }
+    .qty-control span {
+      width: 30px;
+      text-align: center;
+      font-size: 0.85rem;
       font-weight: 700;
+      color: #111827;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 16px;
+    }
+    .data-table th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      border-bottom: 2px solid #edf2f7;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 16px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.92rem;
+      color: #1e293b;
+    }
+    .data-table tbody tr:hover {
+      background-color: #fcfcfd;
     }
     .summary-card {
       display: grid;
@@ -271,6 +391,21 @@
     .hidden {
       display: none !important;
     }
+    .txn-history-table th {
+      background-color: #f8fafc;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    #reader {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #reader__scan_region video {
+      object-fit: cover !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
     @media screen and (max-width: 1280px) {
       .cashier-layout {
         grid-template-columns: 1fr;
@@ -333,6 +468,8 @@
         </div>
         <div class="search-group">
           <input id="product-search" class="search-input" type="text" placeholder="Search by name, category or barcode" />
+          <button id="qr-scan-btn" class="btn btn-secondary" title="Scan Order QR Code"><i class="fas fa-qrcode"></i> Scan Order</button>
+          <button id="product-scan-btn" class="btn btn-secondary" title="Scan Product Barcode"><i class="fas fa-barcode"></i> Scan Product</button>
           <button id="clear-search" class="btn btn-secondary">Clear</button>
         </div>
         <div class="filter-group" id="category-filters"></div>
@@ -340,102 +477,34 @@
       </div>
       <div class="cashier-sidebar">
         <div class="panel">
-          <div class="panel-header">
+          <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
             <h2>Cart</h2>
-            <button id="clear-cart" class="btn btn-secondary btn-sm">Clear</button>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
+              <button id="select-all-btn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 10px;" onclick="toggleSelectAllCart(true)"><i class="fas fa-check-double"></i> All</button>
+              <button id="deselect-all-btn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 10px;" onclick="toggleSelectAllCart(false)"><i class="fas fa-times"></i> None</button>
+              <button id="delete-selected-cart" class="btn btn-danger hidden" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 10px;" onclick="deleteSelectedCartItems()"><i class="fas fa-minus-circle"></i> Selected</button>
+              <button id="clear-cart" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 10px;"><i class="fas fa-trash-alt"></i> Clear</button>
+            </div>
           </div>
           <div id="cart-content">
-            <table class="cart-table">
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Qty</th>
-                  <th>Total</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="cart-body"></tbody>
-            </table>
+            <div class="summary-row" style="margin-bottom: 12px; padding: 0 4px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="select-all-cart" onchange="toggleSelectAllCart(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #4f46e5;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Select All Cart Items</span>
+              </div>
+            </div>
+            <div id="cart-list" class="cart-list"></div>
           </div>
           <div id="cart-empty" class="empty-state">Cart is empty.</div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Checkout</h2>
-            <span class="badge badge-success" id="payment-status-label">Ready</span>
-          </div>
-        <div class="summary-card">
-          <div class="summary-row">
-            <label>Transaction Type
-              <select id="transaction-type">
-                <option value="buy">Buy</option>
-                <option value="rent">Rent</option>
-              </select>
-            </label>
-          </div>
-          <div class="summary-row" style="grid-template-columns: 1fr; gap: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <label for="checkout-student-id">Student ID / Search Name</label>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickRegisterModal()" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 8px; border: 1px solid #d1d5db;">+ Quick Register</button>
+          <div id="cart-footer" class="hidden" style="margin-top: 20px; border-top: 2px solid #eef2ff; padding-top: 20px;">
+            <div class="summary-row" style="margin-bottom: 15px; background: #f8fafc; padding: 16px; border-radius: 16px;">
+              <label style="font-weight: 600; font-size: 0.9rem; color: #64748b;">Grand Total</label>
+              <strong id="cart-total-display" style="font-size: 1.6rem; color: #4f46e5;">₱0.00</strong>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <input id="checkout-student-id" type="text" list="student-datalist" placeholder="Select or type ID" style="flex: 1;" />
-              <datalist id="student-datalist"></datalist>
-              <button type="button" class="btn btn-secondary" onclick="checkStudentId()" style="white-space: nowrap; padding: 0 16px; border-radius: 16px;">Check</button>
-            </div>
-            <div id="student-check-msg" style="font-size: 0.8rem; min-height: 1.2em;"></div>
+            <button id="open-checkout-btn" class="btn btn-primary" style="width: 100%; padding: 18px; border-radius: 18px; font-size: 1rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);" onclick="openCheckoutModal()">
+              <i class="fas fa-shopping-bag" style="margin-right: 8px;"></i> Proceed to Checkout
+            </button>
           </div>
-          <div class="summary-row">
-            <label>Discount (%)
-              <input id="discount-percent" type="number" min="0" max="100" step="1" value="0" />
-            </label>
-          </div>
-          <div class="summary-row">
-            <label>Subtotal</label>
-            <strong id="subtotal-amount">₱0.00</strong>
-          </div>
-          <div class="summary-row">
-            <label>Discount Amount</label>
-            <strong id="discount-amount">₱0.00</strong>
-          </div>
-          <div class="summary-row total-line">
-            <label>Total</label>
-            <strong id="total-amount">₱0.00</strong>
-          </div>
-          <div class="summary-row">
-            <label>Cash Received
-              <input id="cash-received" type="number" min="0" step="0.01" value="0.00" />
-            </label>
-          </div>
-          <div class="summary-row">
-            <label>Change</label>
-            <strong id="change-amount">₱0.00</strong>
-          </div>
-          <div class="summary-row">
-            <label>Payment Status
-              <select id="payment-status">
-                <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
-              </select>
-            </label>
-          </div>
-          <button id="complete-sale" class="btn btn-primary">Complete Transaction</button>
-          <button id="print-receipt" class="btn btn-secondary">Print Receipt</button>
-        </div>
-        <div id="receipt-card" class="receipt-panel hidden">
-          <h3>Receipt Summary</h3>
-          <div class="receipt-line"><span>Transaction #</span><strong id="receipt-number"></strong></div>
-          <div class="receipt-line"><span>Type</span><strong id="receipt-type"></strong></div>
-          <div class="receipt-line"><span>Status</span><strong id="receipt-status"></strong></div>
-          <div class="receipt-line"><span>Date</span><strong id="receipt-date"></strong></div>
-          <div class="receipt-items" id="receipt-items"></div>
-          <div class="receipt-line"><span>Subtotal</span><strong id="receipt-subtotal"></strong></div>
-          <div class="receipt-line"><span>Discount</span><strong id="receipt-discount"></strong></div>
-          <div class="receipt-line"><span>Total</span><strong id="receipt-total"></strong></div>
-          <div class="receipt-line"><span>Paid</span><strong id="receipt-paid"></strong></div>
-          <div class="receipt-line"><span>Change</span><strong id="receipt-change"></strong></div>
-        </div>
         </div>
       </div>
     </section>
@@ -445,6 +514,7 @@
           <div style="display: flex; align-items: center; gap: 15px;">
             <h2>Active Rentals</h2>
             <span id="active-rental-count" class="badge badge-primary">0 active</span>
+            <button id="bulk-return-btn" class="btn btn-danger hidden" onclick="processBulkReturn()" style="padding: 6px 12px; font-size: 0.8rem;">Bulk Return</button>
             <button class="btn btn-secondary" onclick="exportActiveRentalsToCSV()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-file-csv"></i> Export CSV</button>
             <button class="btn btn-secondary" onclick="loadActiveRentals()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> Refresh Status</button>
           </div>
@@ -453,79 +523,104 @@
           </div>
         </div>
         <div id="active-rentals-content">
-           <table class="cart-table">
+          <table class="data-table">
               <thead>
                 <tr>
+                  <th style="width: 40px;"><input type="checkbox" id="select-all-rentals" onchange="toggleSelectAllRentals(this.checked)"></th>
                   <th>Student</th>
                   <th>Product</th>
                   <th>Qty</th>
-                  <th onclick="sortActiveRentalsByDate()" style="cursor: pointer;">Due Date <i class="fas fa-sort" id="sort-icon-date"></i></th>
+                  <th onclick="sortActiveRentalsByDate()" style="cursor: pointer;">Due Date <i class="fas fa-sort" id="sort-icon-date" style="margin-left: 5px; opacity: 0.5;"></i></th>
                   <th>Status/Note</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="active-rentals-body"></tbody>
-           </table>
+          </table>
         </div>
         <div id="active-rentals-empty" class="empty-state">No active rentals found.</div>
       </div>
     </section>
     <section class="management-section" style="margin-top: 24px; padding: 0 20px;">
       <div class="panel">
-        <div class="panel-header" style="flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 20px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
             <h2>Pending Rental Renewals</h2>
             <span id="renewal-count" class="badge badge-warning">0 pending</span>
+            <button class="btn btn-secondary" onclick="loadPendingRenewals()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="btn btn-secondary" onclick="openVoidedReportModal()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-file-invoice"></i> Voided Report</button>
           </div>
-          <div class="search-group" style="margin-bottom: 0; min-width: 240px;">
-            <input id="renewal-search" class="search-input" type="text" placeholder="Search renewals..." style="padding: 8px 12px; font-size: 0.85rem;" />
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; flex: 1; justify-content: flex-end;">
+            <div style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 4px 14px; border-radius: 14px; border: 1px solid #d1d5db;">
+              <i class="far fa-calendar-check" style="color: #64748b; font-size: 0.85rem;"></i>
+              <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">Today →</span>
+              <input id="renewal-date-to" class="search-input" type="date" style="padding: 8px 0; font-size: 0.85rem; width: auto; border: none; background: transparent; cursor: pointer;" title="Filter renewals up to this date" />
+            </div>
+            <div style="position: relative; max-width: 260px; flex: 1;">
+              <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem;"></i>
+              <input id="renewal-search" class="search-input" type="text" placeholder="Search renewals..." style="padding: 10px 16px 10px 38px; font-size: 0.85rem; width: 100%;" />
+            </div>
           </div>
         </div>
         <div id="renewals-content">
-           <table class="cart-table">
+          <table class="data-table">
               <thead>
                 <tr>
                   <th>Student</th>
                   <th>Product</th>
                   <th>Qty</th>
-                  <th onclick="sortPendingRenewalsByDate()" style="cursor: pointer;">Requested Date <i class="fas fa-sort" id="sort-icon-renewal-date"></i></th>
+                  <th onclick="sortPendingRenewalsByDate()" style="cursor: pointer;">Requested Date <i class="fas fa-sort" id="sort-icon-renewal-date" style="margin-left: 5px; opacity: 0.5;"></i></th>
                   <th>New Due Date</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="renewals-body"></tbody>
-           </table>
+          </table>
         </div>
         <div id="renewals-empty" class="empty-state">No pending renewals to review.</div>
       </div>
     </section>
     <section class="management-section" style="margin-top: 24px; padding: 0 20px;">
       <div class="panel">
-        <div class="panel-header" style="flex-wrap: wrap;">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 20px;">
           <div style="display: flex; align-items: center; gap: 15px;">
             <h2>Recent Transactions</h2>
             <button class="btn btn-secondary" onclick="loadRecentTransactions()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="btn btn-secondary" onclick="openVoidedReportModal()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-file-invoice"></i> Voided Report</button>
           </div>
-          <div class="search-group" style="margin-bottom: 0; min-width: 240px;">
-            <input id="txn-history-search" class="search-input" type="text" placeholder="Search Order #..." style="padding: 8px 12px; font-size: 0.85rem;" />
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; flex: 1; justify-content: flex-end;">
+            <div style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 4px 14px; border-radius: 14px; border: 1px solid #d1d5db;">
+              <i class="far fa-calendar-alt" style="color: #64748b; font-size: 0.85rem;"></i>
+              <input id="txn-date-from" class="search-input" type="date" style="padding: 8px 0; font-size: 0.85rem; width: auto; border: none; background: transparent; cursor: pointer;" title="From Date" />
+              <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">→</span>
+              <input id="txn-date-to" class="search-input" type="date" style="padding: 8px 0; font-size: 0.85rem; width: auto; border: none; background: transparent; cursor: pointer;" title="To Date" />
+            </div>
+            <div style="position: relative; max-width: 300px; flex: 1;">
+              <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem;"></i>
+              <input id="txn-history-search" class="search-input" type="text" placeholder="Search Order # or Student ID..." style="padding: 10px 16px 10px 38px; font-size: 0.85rem; width: 100%;" />
+            </div>
           </div>
         </div>
         <div id="txn-history-content">
-           <table class="cart-table">
+          <table class="data-table txn-history-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Order #</th>
-                  <th>Student</th>
-                  <th>Type</th>
-                  <th>Total</th>
-                  <th>Status</th>
+                  <th><i class="far fa-calendar-alt"></i> Date</th>
+                  <th><i class="fas fa-hashtag"></i> Order #</th>
+                  <th><i class="fas fa-user-graduate"></i> Student ID</th>
+                  <th><i class="fas fa-tag"></i> Type</th>
+                  <th><i class="fas fa-coins"></i> Total</th>
+                  <th><i class="fas fa-user-tie"></i> Cashier</th>
+                  <th><i class="fas fa-info-circle"></i> Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="txn-history-body"></tbody>
-           </table>
+              <tbody id="txn-history-body">
+                <tr><td colspan="8" class="empty-state">Loading recent transactions...</td></tr>
+              </tbody>
+          </table>
         </div>
+        <div id="txn-pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 15px; padding-bottom: 10px;"></div>
         <div id="txn-history-empty" class="empty-state">No recent transactions found.</div>
       </div>
     </section>
@@ -585,12 +680,186 @@
         </form>
       </div>
     </div>
+    <div id="qr-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+      <div class="panel" style="width: 100%; max-width: 500px; text-align: center;">
+        <div class="panel-header">
+          <h2 id="qr-modal-title">Scan Order QR Code</h2>
+          <button type="button" onclick="closeQRScanner()" style="border:none; background:none; font-size:1.5rem; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <div id="reader" style="width: 100%; background: #000; margin-bottom: 20px;"></div>
+        <button class="btn btn-secondary" onclick="closeQRScanner()">Cancel</button>
+      </div>
+    </div>
+
+    <div id="view-txn-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+      <div class="panel" style="width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto;">
+        <div class="panel-header">
+          <h2>Transaction Details</h2>
+          <button type="button" onclick="closeViewTxnModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <div id="view-txn-content" class="receipt-panel">
+          <!-- Content populated via JS -->
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button class="btn btn-primary" onclick="printViewTxnReceipt()" style="flex: 1;"><i class="fas fa-print"></i> Print Receipt</button>
+          <button class="btn btn-secondary" onclick="closeViewTxnModal()" style="flex: 1;">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="voided-report-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+      <div class="panel" style="width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto;">
+        <div class="panel-header">
+          <div>
+            <h2>Expired / Voided Orders Report</h2>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 5px 0 0;">Pending orders automatically cancelled after 48 hours.</p>
+          </div>
+          <button type="button" onclick="closeVoidedReportModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <div id="voided-report-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date Created</th>
+                <th>Order #</th>
+                <th>Student</th>
+                <th>Total</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody id="voided-report-body"></tbody>
+          </table>
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+          <button class="btn btn-secondary" onclick="closeVoidedReportModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="checkout-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+      <div class="panel" style="width: 100%; max-width: 580px; max-height: 95vh; overflow-y: auto; border-radius: 28px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        <div class="panel-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 24px;">
+          <h2 style="font-size: 1.5rem; font-weight: 700;">Checkout</h2>
+          <button type="button" onclick="closeCheckoutModal()" style="border:none; background:#f1f5f9; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor:pointer; color:#64748b; transition: all 0.2s;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="checkout-form" style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Transaction Info Section -->
+          <div style="background: #f8fafc; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
+             <div class="summary-row" style="grid-template-columns: 1fr;">
+                <label style="font-weight: 600; margin-bottom: 8px; color: #475569;">Transaction Type</label>
+                <select id="transaction-type" class="search-input" style="background: white;">
+                    <option value="buy">Purchase (Buy)</option>
+                    <option value="rent">Rental (Rent)</option>
+                </select>
+             </div>
+          </div>
+
+          <!-- Customer Info Section -->
+          <div style="background: #f8fafc; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <label style="font-weight: 600; color: #475569;">Student Information</label>
+                <button type="button" class="btn btn-secondary" onclick="openQuickRegisterModal()" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 10px;">
+                    <i class="fas fa-user-plus"></i> New Student
+                </button>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                <input id="checkout-student-id" type="text" list="student-datalist" class="search-input" placeholder="Enter Student ID (e.g. GC-123456)" style="background: white; flex: 1;" />
+                <datalist id="student-datalist"></datalist>
+                <button type="button" class="btn btn-secondary" onclick="checkStudentId()" style="padding: 0 20px; border-radius: 16px;">
+                    Verify
+                </button>
+            </div>
+            <div id="student-check-msg" style="font-size: 0.85rem; font-weight: 500; min-height: 1.2em; padding-left: 4px;"></div>
+          </div>
+
+          <!-- Financial Summary Section -->
+          <div style="background: #4f46e5; background: linear-gradient(135deg, #4f46e5, #6366f1); padding: 24px; border-radius: 24px; color: white; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; opacity: 0.9;">
+                <span>Subtotal</span>
+                <span id="subtotal-amount" style="font-weight: 600;">₱0.00</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span>Discount</span>
+                    <input id="discount-percent" type="number" min="0" max="100" value="0" style="width: 60px; padding: 4px 8px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2); color: white; text-align: center;" />
+                    <span>%</span>
+                </div>
+                <span id="discount-amount" style="font-weight: 600;">-₱0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <span style="font-size: 1.1rem; font-weight: 600;">Total Payable</span>
+                <strong id="total-amount" style="font-size: 2rem;">₱0.00</strong>
+            </div>
+          </div>
+
+          <!-- Payment Section -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.9rem;">Cash Received</label>
+                <div style="position: relative;">
+                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-weight: 600;">₱</span>
+                    <input id="cash-received" type="number" min="0" step="0.01" value="0.00" class="search-input" style="padding-left: 30px; background: #fff;" />
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.9rem;">Payment Status</label>
+                <select id="payment-status" class="search-input" style="background: #fff;">
+                    <option value="paid">Mark as Paid</option>
+                    <option value="pending">Keep as Pending</option>
+                </select>
+            </div>
+          </div>
+
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: #166534;">Change Amount</span>
+            <strong id="change-amount" style="font-size: 1.25rem; color: #15803d;">₱0.00</strong>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px; padding: 0 4px;">
+            <input type="checkbox" id="auto-print-receipt" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #4f46e5;">
+            <label for="auto-print-receipt" style="cursor: pointer; font-size: 0.9rem; color: #64748b; font-weight: 500;">Automatically print receipt upon completion</label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 8px;">
+            <button id="complete-sale" class="btn btn-primary" style="padding: 16px; border-radius: 16px; font-size: 1rem; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);">
+                <i class="fas fa-check-circle" style="margin-right: 8px;"></i> Complete Transaction
+            </button>
+            <button id="print-receipt" class="btn btn-secondary" style="padding: 16px; border-radius: 16px;">
+                <i class="fas fa-print"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="receipt-card" class="receipt-panel hidden" style="margin-top: 32px; border-top: 2px dashed #e2e8f0; padding-top: 32px;">
+          <h3 style="font-weight: 700; margin-bottom: 20px; text-align: center;">Transaction Successful</h3>
+          <div class="receipt-line"><span>Transaction #</span><strong id="receipt-number"></strong></div>
+          <div class="receipt-line"><span>Type</span><strong id="receipt-type"></strong></div>
+          <div class="receipt-line"><span>Status</span><strong id="receipt-status"></strong></div>
+          <div class="receipt-line"><span>Date</span><strong id="receipt-date"></strong></div>
+          <div id="receipt-items" class="receipt-items"></div>
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+              <div class="receipt-line"><span>Subtotal</span><strong id="receipt-subtotal"></strong></div>
+              <div class="receipt-line"><span>Discount</span><strong id="receipt-discount"></strong></div>
+              <div class="receipt-line" style="font-size: 1.1rem; color: #4f46e5;"><span>Total</span><strong id="receipt-total"></strong></div>
+              <div class="receipt-line"><span>Paid</span><strong id="receipt-paid"></strong></div>
+              <div class="receipt-line"><span>Change</span><strong id="receipt-change"></strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
   <script src="http://localhost/GCST_Track_System/assets/js/admincashier.js"></script>
   <script>
     const API_ROOT = window.location.origin + '/GCST_Track_System/actions';
     const ASSET_ROOT = window.location.origin + '/GCST_Track_System/assets';
     const IMAGE_FALLBACK = `${ASSET_ROOT}/images/icons/granbylogo.png`;
+    // Audio object for scan feedback
+    const SCAN_SOUND = new Audio('https://raw.githubusercontent.com/rafaelbotazini/floating-whatsapp/master/beep.mp3');
+    const ERROR_SOUND = new Audio('https://www.soundjay.com/buttons/beep-05.mp3');
+    let html5QrCode = null;
 
     let products = [];
     let cart = [];
@@ -702,35 +971,57 @@
       });
     }
     function updateCartSummary() {
-      const cartBody = document.getElementById('cart-body');
+      const cartList = document.getElementById('cart-list');
       const cartContent = document.getElementById('cart-content');
       const cartEmpty = document.getElementById('cart-empty');
-      cartBody.innerHTML = '';
+      const cartFooter = document.getElementById('cart-footer');
+      const deleteSelectedBtn = document.getElementById('delete-selected-cart');
+      const selectAllCheckbox = document.getElementById('select-all-cart');
+      
+      cartList.innerHTML = '';
       if (cart.length === 0) {
         cartContent.style.display = 'none';
         cartEmpty.classList.remove('hidden');
+        cartFooter.classList.add('hidden');
+        deleteSelectedBtn.classList.add('hidden');
       } else {
         cartContent.style.display = 'block';
         cartEmpty.classList.add('hidden');
+        cartFooter.classList.remove('hidden');
+        
+        const hasSelected = cart.some(item => item.selected);
+        deleteSelectedBtn.classList.toggle('hidden', !hasSelected);
+        if (selectAllCheckbox) {
+          selectAllCheckbox.checked = cart.every(item => item.selected);
+        }
       }
+      
       let subtotal = 0;
       cart.forEach(item => {
         const rowTotal = item.unitPrice * item.quantity;
-        subtotal += rowTotal;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.product_name}</td>
-          <td>
-            <div class="qty-input" style="display: flex; align-items: center; gap: 8px;">
-              <button type="button" onclick="changeCartQuantity('${item.product_id}', -1)">-</button>
-              <span style="min-width: 20px; text-align: center;">${item.quantity}</span>
-              <button type="button" onclick="changeCartQuantity('${item.product_id}', 1)">+</button>
+        if (item.selected) subtotal += rowTotal;
+        
+        const div = document.createElement('div');
+        div.className = 'cart-item' + (item.selected ? '' : ' deselected');
+        div.innerHTML = `
+          <input type="checkbox" ${item.selected ? 'checked' : ''} onchange="toggleCartItemSelection('${item.product_id}', this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #4f46e5;">
+          <div class="cart-item-info">
+            <h4>${item.product_name}</h4>
+            <p>${formatCurrency(item.unitPrice)} / unit</p>
+            <p style="font-weight: 700; color: #4f46e5; margin-top: 4px; font-size: 0.95rem;">${formatCurrency(rowTotal)}</p>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+            <div class="qty-control">
+              <button type="button" onclick="changeCartQuantity('${item.product_id}', -1)"><i class="fas fa-minus"></i></button>
+              <span>${item.quantity}</span>
+              <button type="button" onclick="changeCartQuantity('${item.product_id}', 1)"><i class="fas fa-plus"></i></button>
             </div>
-          </td>
-          <td>${formatCurrency(rowTotal)}</td>
-          <td><button class="btn btn-danger btn-sm" type="button" onclick="removeCartItem('${item.product_id}')"><i class="fas fa-times"></i></button></td>
+            <button class="btn btn-danger" type="button" onclick="removeCartItem('${item.product_id}')" style="padding: 4px 8px; font-size: 0.7rem; border-radius: 8px;">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
         `;
-        cartBody.appendChild(tr);
+        cartList.appendChild(div);
       });
       const discountAmount = Math.max(0, subtotal * (state.discountPercent / 100));
       const total = Math.max(0, subtotal - discountAmount);
@@ -739,8 +1030,29 @@
       document.getElementById('subtotal-amount').textContent = formatCurrency(subtotal);
       document.getElementById('discount-amount').textContent = formatCurrency(discountAmount);
       document.getElementById('total-amount').textContent = formatCurrency(total);
+      document.getElementById('cart-total-display').textContent = formatCurrency(total);
       document.getElementById('change-amount').textContent = formatCurrency(change >= 0 ? change : 0);
     }
+
+    function toggleSelectAllCart(isChecked) {
+      cart.forEach(item => item.selected = isChecked);
+      updateCartSummary();
+    }
+
+    function toggleCartItemSelection(productId, isChecked) {
+      const item = cart.find(i => i.product_id == productId);
+      if (item) {
+        item.selected = isChecked;
+        updateCartSummary();
+      }
+    }
+
+    function deleteSelectedCartItems() {
+      if (!confirm('Are you sure you want to remove selected items from the cart?')) return;
+      cart = cart.filter(item => !item.selected);
+      updateCartSummary();
+    }
+
     function syncCartProductPrices() {
       cart = cart.map(item => {
         const product = products.find(p => p.product_id == item.product_id);
@@ -772,7 +1084,7 @@
           return;
         }
         const unitPrice = state.transactionType === 'rent' ? getProductRentPrice(product) : getProductPrice(product);
-        cart.push({ product_id: productId, product_name: product.product_name, quantity: 1, unitPrice });
+        cart.push({ product_id: productId, product_name: product.product_name, quantity: 1, unitPrice, selected: true });
       }
       updateCartSummary();
     }
@@ -807,11 +1119,20 @@
       document.getElementById('payment-status').value = 'paid';
       document.getElementById('checkout-student-id').value = '';
       document.getElementById('student-check-msg').textContent = '';
+      const selectAll = document.getElementById('select-all-cart');
+      if (selectAll) selectAll.checked = false;
       const label = document.getElementById('payment-status-label');
       label.textContent = 'Paid';
       label.className = 'badge badge-success';
       document.getElementById('receipt-card').classList.add('hidden');
       updateCartSummary();
+    }
+    function openCheckoutModal() {
+      if (cart.length === 0) return;
+      document.getElementById('checkout-modal').classList.remove('hidden');
+    }
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
     }
     function loadProducts() {
       const grid = document.getElementById('product-grid');
@@ -832,8 +1153,9 @@
       const newType = document.getElementById('transaction-type').value;
 
       // Prevent switching to Rent if cart has non-book items
-      if (newType === 'rent' && cart.length > 0) {
-        const hasNonBooks = cart.some(item => {
+      const selectedItems = cart.filter(item => item.selected);
+      if (newType === 'rent' && selectedItems.length > 0) {
+        const hasNonBooks = selectedItems.some(item => {
           const product = products.find(p => p.product_id == item.product_id);
           return (product.product_category || '').toLowerCase() !== 'books';
         });
@@ -893,13 +1215,13 @@
         alert('Please add items to the cart before checking out.');
         return;
       }
-      updateTransactionSettings();
-      if (state.transactionType === 'rent' && !state.studentId) {
-        alert('A Student ID is required for rental transactions.');
-        document.getElementById('checkout-student-id').focus();
+      const selectedItems = cart.filter(item => item.selected);
+      if (selectedItems.length === 0) {
+        alert('Please select the items the student wants to purchase or rent.');
         return;
       }
-      const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      updateTransactionSettings();
+      const subtotal = selectedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
       const discountAmount = subtotal * (state.discountPercent / 100);
       const totalAmount = Math.max(0, subtotal - discountAmount);
       const paymentReceived = parseFloat(state.cashReceived) || 0;
@@ -911,7 +1233,7 @@
       const payload = {
         student_id: state.studentId,
         transaction_type: state.transactionType,
-        items: cart.map(item => ({ product_id: item.product_id, quantity: item.quantity, type: state.transactionType })),
+        items: selectedItems.map(item => ({ product_id: item.product_id, quantity: item.quantity, type: state.transactionType })),
         subtotal,
         discount_percent: state.discountPercent,
         discount_amount: discountAmount,
@@ -934,9 +1256,14 @@
             alert(result.message || 'Checkout failed.');
             return;
           }
-          alert('Transaction completed successfully.');
           showReceipt(result.receipt);
-          clearCart();
+          if (document.getElementById('auto-print-receipt').checked) {
+            printReceipt();
+          }
+          alert('Transaction completed successfully.');
+          // Only remove items that were actually purchased
+          cart = cart.filter(item => !item.selected);
+          updateCartSummary();
           loadProducts();
           loadRecentTransactions();
         })
@@ -983,7 +1310,7 @@
         .then(res => res.json())
         .then(data => {
           pendingRenewals = Array.isArray(data) ? data : [];
-          renderPendingRenewals(pendingRenewals);
+          filterRenewals();
         });
     }
     function renderPendingRenewals(data) {
@@ -1039,8 +1366,8 @@
       const filtered = activeRentals.filter(item => {
         const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
         return studentName.includes(query) || 
-               item.student_id.toLowerCase().includes(query) || 
-               item.product_name.toLowerCase().includes(query);
+              item.student_id.toLowerCase().includes(query) || 
+              item.product_name.toLowerCase().includes(query);
       });
       renderActiveRentals(filtered);
     }
@@ -1061,19 +1388,43 @@
       const filtered = pendingRenewals.filter(item => {
         const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
         return studentName.includes(query) || 
-               item.student_id.toLowerCase().includes(query) || 
-               item.product_name.toLowerCase().includes(query);
+              item.student_id.toLowerCase().includes(query) || 
+              item.product_name.toLowerCase().includes(query);
       });
       renderPendingRenewals(filtered);
     }
 
-    function loadRecentTransactions() {
-      fetch(`${API_ROOT}/get_recent_transactions.php`)
+    let txnCurrentPage = 1;
+    function loadRecentTransactions(page = 1, search = '') {
+      const from = document.getElementById('txn-date-from')?.value || '';
+      const to = document.getElementById('txn-date-to')?.value || '';
+      txnCurrentPage = page;
+      fetch(`${API_ROOT}/get_recent_transactions.php?page=${page}&limit=10&search=${encodeURIComponent(search)}&from=${from}&to=${to}`)
         .then(res => res.json())
         .then(data => {
-          recentTransactions = Array.isArray(data) ? data : [];
+          recentTransactions = data.transactions || [];
           renderRecentTransactions(recentTransactions);
+          renderTxnPagination(data.total_pages, data.current_page, search);
+        })
+        .catch(err => {
+          console.error('Error loading recent transactions:', err);
+          document.getElementById('txn-history-body').innerHTML = '<tr><td colspan="8" class="empty-state">Error loading transactions. Please refresh.</td></tr>';
         });
+    }
+
+    function renderTxnPagination(totalPages, currentPage, search = '') {
+      const container = document.getElementById('txn-pagination');
+      if (!container) return;
+      container.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = i === currentPage ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+        btn.textContent = i;
+        btn.onclick = () => loadRecentTransactions(i, search);
+        container.appendChild(btn);
+      }
     }
 
     function renderRecentTransactions(data) {
@@ -1089,23 +1440,190 @@
       content.style.display = 'block';
       empty.classList.add('hidden');
       data.forEach(txn => {
+        const dateObj = new Date(txn.created_at);
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${new Date(txn.created_at).toLocaleString()}</td>
-          <td>${txn.transaction_number}</td>
-          <td>${txn.student_name || 'Walk-in'}</td>
-          <td style="text-transform: capitalize;">${txn.transaction_type}</td>
-          <td>${formatCurrency(txn.total_amount)}</td>
-          <td><span class="badge ${txn.payment_status === 'paid' ? 'badge-success' : 'badge-warning'}">${txn.payment_status}</span></td>
-          <td><button class="btn btn-secondary" onclick="reprintReceipt('${txn.transaction_number}')">View</button></td>
+          <td style="font-size: 0.85rem; color: #64748b;">
+            <strong>${dateObj.toLocaleDateString()}</strong><br>
+            ${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </td>
+          <td style="font-weight: 600; color: #4f46e5;">${txn.transaction_number}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-user-circle" style="color: #cbd5e1; font-size: 1.2rem;" title="${txn.student_name}"></i>
+              <span>${txn.student_id || ''}</span>
+            </div>
+          </td>
+          <td><span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; text-transform: uppercase; font-size: 0.7rem;">${txn.transaction_type}</span></td>
+          <td style="font-weight: 700; color: #1e293b;">${formatCurrency(txn.total_amount)}</td>
+          <td style="font-size: 0.85rem; color: #4b5563;">${txn.cashier_name || 'System'}</td>
+          <td><span class="badge ${txn.payment_status === 'paid' ? 'badge-success' : 'badge-warning'}" style="text-transform: uppercase; font-size: 0.75rem;">${txn.payment_status}</span></td>
+          <td><button class="btn btn-secondary btn-sm" onclick="reprintReceipt('${txn.transaction_number}')" title="View Details"><i class="fas fa-eye"></i> View</button></td>
         `;
         body.appendChild(tr);
       });
     }
 
-    function reprintReceipt(txnNumber) {
-      const txn = recentTransactions.find(t => t.transaction_number === txnNumber);
-      if (txn) showReceipt(txn);
+    function closeViewTxnModal() {
+      document.getElementById('view-txn-modal').classList.add('hidden');
+    }
+
+    function printViewTxnReceipt() {
+      const content = document.getElementById('view-txn-content');
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('Unable to open print window. Check your popup settings.');
+        return;
+      }
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Receipt - GCST</title>
+            <style>
+              body { font-family: 'Courier New', Courier, monospace; padding: 20px; color: #000; max-width: 300px; margin: 0 auto; }
+              .receipt-line { display: flex; justify-content: space-between; margin-bottom: 5px; }
+              .receipt-items { border-top: 1px dashed #000; border-bottom: 1px dashed #000; margin: 10px 0; padding: 10px 0; }
+              .receipt-item { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.9rem; }
+              .header { text-align: center; margin-bottom: 20px; }
+              .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; }
+            </style>
+          </head>
+          <body onload="window.print(); window.close();">
+            <div class="header">
+              <strong>GCST Tracking System</strong><br>
+              Official Receipt
+            </div>
+            ${content.innerHTML}
+            <div class="footer">
+              Thank you for your transaction!<br>
+              ${new Date().toLocaleString()}
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    async function reprintReceipt(txnNumber) {
+      let txn = recentTransactions.find(t => t.transaction_number == txnNumber);
+      
+      // If transaction is not found in the current list or details are missing, fetch from database
+      if (!txn || !txn.items || (typeof txn.items === 'string' && txn.items === '[]')) {
+        try {
+          const response = await fetch(`${API_ROOT}/get_transaction_details.php?transaction_number=${encodeURIComponent(txnNumber)}`);
+          const result = await response.json();
+          
+          if (result.success && result.transaction) {
+            txn = result.transaction;
+          } else {
+            alert(result.message || 'Full transaction details could not be found.');
+            return;
+          }
+        } catch (error) {
+          console.error('Error fetching transaction details:', error);
+          alert('Unable to fetch transaction details. Please check your connection.');
+          return;
+        }
+      }
+
+      if (txn) {
+        const content = document.getElementById('view-txn-content');
+        const dateObj = txn.created_at ? new Date(txn.created_at) : new Date();
+        
+        let itemsHtml = '';
+        let items = [];
+        try {
+          items = typeof txn.items === 'string' ? JSON.parse(txn.items) : (txn.items || []);
+        } catch (e) { console.error("Error parsing items:", e); }
+
+        if (Array.isArray(items)) {
+          const isVoided = txn.payment_status === 'voided';
+          items.forEach(item => {
+            itemsHtml += `
+              <div class="receipt-item">
+                <span>${item.product_name} x ${item.quantity}</span>
+                <strong style="${isVoided ? 'text-decoration: line-through; color: #94a3b8;' : ''}">${formatCurrency(item.total || (item.unit_price * item.quantity))}</strong>
+              </div>`;
+          });
+        }
+
+        content.innerHTML = `
+          <div class="receipt-line"><span>Transaction #</span><strong>${txn.transaction_number}</strong></div>
+          <div class="receipt-line"><span>Student ID</span><strong>${txn.student_id || 'N/A'}</strong></div>
+          <div class="receipt-line"><span>Type</span><strong style="text-transform: uppercase;">${txn.transaction_type}</strong></div>
+          <div class="receipt-line"><span>Status</span><strong style="text-transform: uppercase; color: ${txn.payment_status === 'voided' ? '#ef4444' : 'inherit'};">${txn.payment_status}</strong></div>
+          <div class="receipt-line"><span>Cashier</span><strong>${txn.cashier_name || 'System'}</strong></div>
+          <div class="receipt-line"><span>Date</span><strong>${dateObj.toLocaleString()}</strong></div>
+          <div class="receipt-items" style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+            ${itemsHtml}
+          </div>
+          <div style="margin-top: 15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+            <div class="receipt-line"><span>Subtotal</span><strong>${formatCurrency(txn.subtotal)}</strong></div>
+            <div class="receipt-line"><span>Discount (${txn.discount_percent}%)</span><strong>-${formatCurrency(txn.discount_amount)}</strong></div>
+            <div class="receipt-line" style="font-size: 1.2rem; margin-top: 5px; color: #4f46e5;"><span>Total</span><strong>${formatCurrency(txn.total_amount)}</strong></div>
+            <div class="receipt-line"><span>Paid</span><strong>${formatCurrency(txn.payment_received)}</strong></div>
+            <div class="receipt-line"><span>Change</span><strong>${formatCurrency(txn.change_amount)}</strong></div>
+          </div>
+        `;
+        document.getElementById('view-txn-modal').classList.remove('hidden');
+      }
+    }
+
+    function openVoidedReportModal() {
+      document.getElementById('voided-report-modal').classList.remove('hidden');
+      loadVoidedTransactions();
+    }
+
+    function closeVoidedReportModal() {
+      document.getElementById('voided-report-modal').classList.add('hidden');
+    }
+
+    async function loadVoidedTransactions() {
+      const body = document.getElementById('voided-report-body');
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Loading report...</td></tr>';
+      
+      try {
+        const response = await fetch(`${API_ROOT}/get_voided_transactions.php`);
+        const data = await response.json();
+        
+        body.innerHTML = '';
+        const voidedItems = (data && Array.isArray(data.voided)) ? data.voided : [];
+        
+        if (data.success && voidedItems.length > 0) {
+          voidedItems.forEach(txn => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td style="font-size: 0.85rem;">${new Date(txn.created_at).toLocaleString()}</td>
+              <td><strong style="color: #4f46e5;">${txn.transaction_number}</strong></td>
+              <td>${txn.student_name || 'N/A'} <br><small style="color:#64748b;">${txn.student_id || ''}</small></td>
+              <td style="font-weight: 600;">${formatCurrency(txn.total_amount)}</td>
+              <td><span class="badge" style="background:#fee2e2; color:#b91c1c; font-size: 0.7rem;">${(txn.transaction_type || 'unknown').toUpperCase()}</span></td>
+            `;
+            body.appendChild(tr);
+          });
+        } else {
+          body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No voided transactions found.</td></tr>';
+        }
+      } catch (error) {
+        console.error('Error fetching voided report:', error);
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#ef4444;">Failed to load report.</td></tr>';
+      }
+    }
+
+    async function autoVoidExpiredOrders() {
+      try {
+        const response = await fetch(`${API_ROOT}/auto_void_expired.php`, {
+          method: 'POST'
+        });
+        const result = await response.json();
+        if (result.success && result.voided_count > 0) {
+          console.log(`Auto-voided ${result.voided_count} expired pending orders.`);
+          loadRecentTransactions();
+          loadProducts();
+        }
+      } catch (error) {
+        console.error('Error during auto-void check:', error);
+      }
     }
 
     let rejectionRentalId = null;
@@ -1222,6 +1740,8 @@
           empty.classList.add('hidden');
           count.textContent = `${data.length} active`;
           
+          updateBulkReturnButtonVisibility();
+          
           data.forEach(item => {
             const tr = document.createElement('tr');
             if (item.status === 'overdue') {
@@ -1234,6 +1754,7 @@
             const reasonHtml = item.rejection_reason ? `<div style="font-size: 0.8rem; color: #ef4444; margin-top: 4px;"><strong>Rejection Note:</strong> ${item.rejection_reason}</div>` : '';
 
             tr.innerHTML = `
+              <td><input type="checkbox" class="rental-checkbox" value="${item.rental_id}" onchange="updateBulkReturnButtonVisibility()"></td>
               <td>${item.first_name} ${item.last_name} (${item.student_id})</td>
               <td>${item.product_name}</td>
               <td>${item.quantity}</td>
@@ -1289,8 +1810,8 @@
       const filtered = activeRentals.filter(item => {
         const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
         return studentName.includes(query) || 
-               item.student_id.toLowerCase().includes(query) || 
-               item.product_name.toLowerCase().includes(query);
+              item.student_id.toLowerCase().includes(query) || 
+              item.product_name.toLowerCase().includes(query);
       });
       renderActiveRentals(filtered);
     });
@@ -1299,18 +1820,17 @@
       const filtered = pendingRenewals.filter(item => {
         const studentName = `${item.first_name} ${item.last_name}`.toLowerCase();
         return studentName.includes(query) || 
-               item.student_id.toLowerCase().includes(query) || 
-               item.product_name.toLowerCase().includes(query);
+              item.student_id.toLowerCase().includes(query) || 
+              item.product_name.toLowerCase().includes(query);
       });
       renderPendingRenewals(filtered);
     });
+    let txnSearchTimeout = null;
     document.getElementById('txn-history-search').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      const filtered = recentTransactions.filter(item => 
-        item.transaction_number.toLowerCase().includes(query) ||
-        (item.student_name && item.student_name.toLowerCase().includes(query))
-      );
-      renderRecentTransactions(filtered);
+      clearTimeout(txnSearchTimeout);
+      txnSearchTimeout = setTimeout(() => {
+        loadRecentTransactions(1, e.target.value.trim());
+      }, 400);
     });
     document.getElementById('clear-search').addEventListener('click', () => {
       document.getElementById('product-search').value = '';
@@ -1335,6 +1855,106 @@
     document.getElementById('clear-cart').addEventListener('click', clearCart);
     document.getElementById('complete-sale').addEventListener('click', completeTransaction);
     document.getElementById('print-receipt').addEventListener('click', printReceipt);
+    
+    let scanMode = 'order'; // 'order' or 'product'
+    document.getElementById('qr-scan-btn').addEventListener('click', () => openQRScanner('order'));
+    document.getElementById('product-scan-btn').addEventListener('click', () => openQRScanner('product'));
+
+    function openQRScanner(mode = 'order') {
+      scanMode = mode;
+      document.getElementById('qr-modal-title').textContent = mode === 'order' ? 'Scan Order QR Code' : 'Scan Product Barcode';
+      document.getElementById('qr-modal').classList.remove('hidden');
+      html5QrCode = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+        .catch(err => {
+          console.error("Error starting QR scanner:", err);
+          alert("Unable to access camera. Please check permissions.");
+          document.getElementById('qr-modal').classList.add('hidden');
+        });
+    }
+
+    function closeQRScanner() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          document.getElementById('qr-modal').classList.add('hidden');
+          html5QrCode = null;
+        }).catch(() => {
+          document.getElementById('qr-modal').classList.add('hidden');
+          html5QrCode = null;
+        });
+      } else {
+        document.getElementById('qr-modal').classList.add('hidden');
+      }
+    }
+
+    function onScanSuccess(decodedText) {
+      // Play success sound immediately on detection
+      SCAN_SOUND.currentTime = 0;
+      SCAN_SOUND.play().catch(err => console.warn("Audio play blocked by browser:", err));
+      closeQRScanner();
+      if (scanMode === 'order') {
+        loadOrderByQR(decodedText);
+      } else {
+        handleProductBarcodeScan(decodedText);
+      }
+    }
+
+    function handleProductBarcodeScan(barcode) {
+      const product = products.find(p => p.barcode == barcode);
+      if (product) {
+        addProductToCart(product.product_id);
+        alert(`Added ${product.product_name} to cart.`);
+      } else {
+        ERROR_SOUND.currentTime = 0;
+        ERROR_SOUND.play().catch(err => console.warn("Audio play blocked by browser:", err));
+        alert(`No product found with barcode: ${barcode}`);
+      }
+    }
+
+    function loadOrderByQR(txnNumber) {
+      fetch(`${API_ROOT}/get_order_by_qr.php?transaction_number=${encodeURIComponent(txnNumber)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const order = data.order;
+            // Set transaction type first to ensure prices sync correctly
+            document.getElementById('transaction-type').value = order.transaction_type;
+            state.transactionType = order.transaction_type;
+
+            // Populate cart
+            cart = order.items.map(item => ({
+              product_id: item.product_id,
+              product_name: item.product_name,
+              quantity: item.quantity,
+              unitPrice: parseFloat(item.unit_price),
+              selected: true
+            }));
+
+            if (order.student_id) {
+              document.getElementById('checkout-student-id').value = order.student_id;
+              state.studentId = order.student_id;
+              checkStudentId(); 
+            }
+
+            document.getElementById('discount-percent').value = order.discount_percent;
+            state.discountPercent = parseFloat(order.discount_percent);
+
+            updateCartSummary();
+            alert(`Order ${txnNumber} loaded into cart.`);
+          } else {
+            ERROR_SOUND.currentTime = 0;
+            ERROR_SOUND.play().catch(err => console.warn("Audio play blocked by browser:", err));
+            alert(data.message || 'Failed to load order.');
+          }
+        })
+        .catch(err => {
+          console.error('Error loading order:', err);
+          ERROR_SOUND.currentTime = 0;
+          ERROR_SOUND.play().catch(err => console.warn("Audio play blocked by browser:", err));
+          alert('An error occurred while loading the order.');
+        });
+    }
 
     function checkStudentId() {
       const studentId = document.getElementById('checkout-student-id').value.trim();
@@ -1385,6 +2005,53 @@
           }
         })
         .catch(err => console.error('Error loading student list:', err));
+    }
+
+    function toggleSelectAllRentals(isChecked) {
+      document.querySelectorAll('.rental-checkbox').forEach(cb => cb.checked = isChecked);
+      updateBulkReturnButtonVisibility();
+    }
+
+    function updateBulkReturnButtonVisibility() {
+      const selectedCount = document.querySelectorAll('.rental-checkbox:checked').length;
+      const btn = document.getElementById('bulk-return-btn');
+      if (btn) btn.classList.toggle('hidden', selectedCount === 0);
+    }
+
+    function processBulkReturn() {
+      const selectedCheckboxes = document.querySelectorAll('.rental-checkbox:checked');
+      const rentalIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+      
+      if (rentalIds.length === 0) return;
+      if (!confirm(`Are you sure you want to mark ${rentalIds.length} items as returned? Stock will be updated.`)) return;
+
+      const bulkBtn = document.getElementById('bulk-return-btn');
+      bulkBtn.disabled = true;
+      bulkBtn.textContent = 'Processing...';
+
+      fetch(`${API_ROOT}/bulk_return_items.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rental_ids: rentalIds })
+      })
+      .then(res => res.json())
+      .then(result => {
+        bulkBtn.disabled = false;
+        bulkBtn.textContent = 'Bulk Return';
+        if (result.success) {
+          alert(result.message);
+          loadActiveRentals();
+          loadProducts();
+          document.getElementById('select-all-rentals').checked = false;
+        } else {
+          alert(result.message || 'Bulk return failed.');
+        }
+      })
+      .catch(() => {
+        bulkBtn.disabled = false;
+        bulkBtn.textContent = 'Bulk Return';
+        alert('An error occurred during bulk return.');
+      });
     }
   </script>
     <script src="http://localhost/GCST_Track_System/assets/js/logout-handler1.js"></script>
