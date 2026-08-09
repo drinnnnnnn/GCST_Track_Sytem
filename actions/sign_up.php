@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/security.php';
 require_once __DIR__ . '/../config/db_connect.php';
+require_once __DIR__ . '/email_helpers.php';
 
 secureSessionStart();
 
@@ -210,6 +211,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt->execute()) {
         updateMemberCount($conn);
+
+        $studentName = trim($first_name . ' ' . $last_name);
+        $approvalEmailSubject = 'Account Registration Pending Approval';
+        $approvalEmailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;'>"
+            . "<h2 style='margin-bottom: 12px; color: #1d4ed8;'>Account Registration Received</h2>"
+            . "<p>Hello <strong>$studentName</strong>,</p>"
+            . "<p>Thank you for creating your account with GRANBY COLLEGES OF SCIENCE AND TECHNOLOGY Track System.</p>"
+            . "<p>Your registration is now being reviewed by the administrator. Please wait for your account to be approved before you can log in.</p>"
+            . "<p>You will receive another email once your account has been approved.</p>"
+            . "<p style='margin-top: 16px;'>Regards,<br>GRANBY COLLEGES OF SCIENCE AND TECHNOLOGY Track System</p>"
+            . "</div>";
+
+        sendEmailWithLog($conn, $email, $approvalEmailSubject, $approvalEmailBody, 'Account Approval Pending');
+
         $stmt->close();
         $check_stmt->close();
         header('Location: ../pages/superadmin/sign_up.html?status=success&show=register');

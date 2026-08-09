@@ -147,10 +147,14 @@ try {
                 ct.items AS raw_items,
                 CONCAT(aa.first_name, ' ', aa.middle_name, ' ', aa.last_name) AS cashier_name,
                 COALESCE(NULLIF(us.course, ''), NULLIF(us.year_section, ''), 'N/A') AS user_course,
-                us.student_id AS student_id
+                us.student_id AS student_id,
+                tr.balance AS tuition_balance,
+                tr.total_payment AS tuition_total_payment,
+                tr.amount_paid AS tuition_amount_paid
             FROM cashier_transactions ct
             LEFT JOIN admincashier_acc aa ON ct.cashier_id = aa.id
             LEFT JOIN users us ON ct.user_id = us.id
+            LEFT JOIN tuition_receipts tr ON (tr.transaction_number = ct.transaction_number OR tr.receipt_number = ct.receipt_number)
             WHERE ct.transaction_number = ? OR ct.receipt_number = ? OR ct.id = ?
             LIMIT 1";
         $stmt = $conn->prepare($query);
@@ -325,16 +329,19 @@ try {
         $transaction['items'] = [[
             'product_name' => $transaction['receipt_category'] ?? 'Receipt Item',
             'quantity' => 1,
-            'unit_price' => $transaction['amount_paid'] ?? 0,
-            'total' => $transaction['amount_paid'] ?? 0,
+            'unit_price' => $transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0,
+            'total' => $transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0,
             'details' => 'Receipt record'
         ]];
-        $transaction['subtotal'] = floatval($transaction['amount_paid'] ?? 0);
+        $transaction['subtotal'] = floatval($transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0);
         $transaction['discount_percent'] = 0;
         $transaction['discount_amount'] = 0;
-        $transaction['total_amount'] = floatval($transaction['total_payment'] ?? $transaction['amount_paid'] ?? 0);
-        $transaction['payment_received'] = floatval($transaction['amount_paid'] ?? 0);
+        $transaction['total_amount'] = floatval($transaction['total_payment'] ?? $transaction['tuition_total_payment'] ?? $transaction['amount_paid'] ?? 0);
+        $transaction['payment_received'] = floatval($transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0);
         $transaction['change_amount'] = 0;
+        $transaction['balance'] = floatval($transaction['balance'] ?? $transaction['tuition_balance'] ?? 0);
+        $transaction['total_payment'] = floatval($transaction['total_payment'] ?? $transaction['tuition_total_payment'] ?? $transaction['total_amount'] ?? 0);
+        $transaction['amount_paid'] = floatval($transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? $transaction['payment_received'] ?? 0);
         $transaction['receipt_type'] = $transaction['receipt_category'] ?? 'Receipt';
         $transaction['transaction_type'] = $transaction['receipt_category'] ?? 'receipt';
     }

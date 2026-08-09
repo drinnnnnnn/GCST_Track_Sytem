@@ -4935,9 +4935,13 @@
         const provisional = document.getElementById('tuition-provisional-number').value.trim();
       const category = getActiveReceiptCategory();
       const amount = parseFloat(document.getElementById('tuition-amount').value);
-      const totalPayment = parseFloat(document.getElementById('tuition-total-payment').value);
+      const totalPaymentInput = document.getElementById('tuition-total-payment');
+      const totalPayment = parseFloat(totalPaymentInput?.value || '');
+      const originalTotalFees = parseFloat(totalPaymentInput?.dataset.originalTotalFees || '');
+      const receiptTotalPayment = !isNaN(totalPayment) && totalPayment > 0
+        ? totalPayment
+        : (!isNaN(originalTotalFees) ? originalTotalFees : amount);
       const orNumber = document.getElementById('tuition-or-number').value.trim();
-      const balance = parseFloat(document.getElementById('tuition-balance').value.replace(/,/g, '')) || 0;
       const remarks = document.getElementById('tuition-remarks').value.trim();
       const note = document.getElementById('tuition-note').value.trim();
       const paymentType = document.getElementById('tuition-payment-type').value;
@@ -5000,6 +5004,12 @@
         return;
       }
 
+      updateTuitionBalance();
+      const balanceInputValue = parseFloat(document.getElementById('tuition-balance').value.replace(/,/g, ''));
+      const receiptBalance = !isNaN(balanceInputValue)
+        ? balanceInputValue
+        : (!isNaN(receiptTotalPayment) && !isNaN(amount) ? Math.max(receiptTotalPayment - amount, 0) : 0);
+
       const tuitionSaveResult = await saveTuitionReceipt({
         receipt_number: provisional,
         receipt_category: category,
@@ -5013,9 +5023,9 @@
         check_number: checkNumber || null,
         payment_status: 'paid',
         payment_received: amount,
-        total_amount: (!isNaN(totalPayment) && totalPayment > 0) ? totalPayment : amount,
-        total_payment: !isNaN(totalPayment) ? totalPayment : null,
-        balance: !isNaN(balance) ? balance : 0,
+        total_amount: receiptTotalPayment,
+        total_payment: receiptTotalPayment,
+        balance: receiptBalance,
         or_number: orNumber || null,
         payment_type: paymentType,
         change_amount: 0,
@@ -5028,6 +5038,13 @@
         alert('Unable to save tuition receipt: ' + (tuitionSaveResult.message || 'Please try again.'));
         return;
       }
+
+      const displayTotalPayment = Number.isFinite(tuitionSaveResult.total_payment)
+        ? Number(tuitionSaveResult.total_payment)
+        : receiptTotalPayment;
+      const displayBalance = Number.isFinite(tuitionSaveResult.balance)
+        ? Number(tuitionSaveResult.balance)
+        : receiptBalance;
 
       // Use the receipt number returned from backend (may be auto-generated if duplicate detected)
       const finalReceiptNumber = tuitionSaveResult.receipt_number || provisional;
@@ -5052,10 +5069,10 @@
       setText('tuition-receipt-datetime', dateTime);
       setText('tuition-receipt-provisional', finalReceiptNumber);
       setText('tuition-receipt-amount', '₱' + amount.toFixed(2));
-      const receiptStatus = tuitionSaveResult.payment_status_text || (balance <= 0 ? 'Fully Paid' : 'Partial Payment');
+      const receiptStatus = tuitionSaveResult.payment_status_text || (displayBalance <= 0 ? 'Fully Paid' : 'Partial Payment');
       setText('tuition-receipt-status', receiptStatus);
-      setText('tuition-receipt-total-payment', receiptStatus === 'Fully Paid' ? '₱0.00' : (!isNaN(totalPayment) ? '₱' + totalPayment.toFixed(2) : '₱0.00'));
-      setText('tuition-receipt-balance', '₱' + balance.toFixed(2));
+      setText('tuition-receipt-total-payment', '₱' + displayTotalPayment.toFixed(2));
+      setText('tuition-receipt-balance', '₱' + displayBalance.toFixed(2));
       setText('tuition-receipt-or-number', orNumber || '—');
       if (receiptStatus === 'Fully Paid') {
         const totalPaymentInput = document.getElementById('tuition-total-payment');
@@ -5146,9 +5163,17 @@
       document.getElementById('tuition-student-semester').value = '';
       document.getElementById('tuition-provisional-number').value = '';
       document.getElementById('tuition-amount').value = '';
-      document.getElementById('tuition-total-payment').value = '';
+      const totalPaymentInput = document.getElementById('tuition-total-payment');
+      if (totalPaymentInput) {
+        totalPaymentInput.value = '';
+        totalPaymentInput.dataset.originalTotalFees = '';
+      }
       document.getElementById('tuition-or-number').value = '';
-      document.getElementById('tuition-balance').value = '';
+      const balanceInput = document.getElementById('tuition-balance');
+      if (balanceInput) {
+        balanceInput.value = '';
+        balanceInput.dataset.initialBalance = '';
+      }
       document.getElementById('tuition-remarks').value = '';
       document.getElementById('tuition-note').value = '';
       document.getElementById('tuition-receipt-mode').value = 'Payment Receipt';
@@ -5202,12 +5227,28 @@
     }
 
     function updateTuitionBalance() {
-      const totalPayment = parseFloat(document.getElementById('tuition-total-payment').value);
+      const totalPaymentInput = document.getElementById('tuition-total-payment');
+      const totalPayment = parseFloat(totalPaymentInput?.value || '');
+      const originalTotalFees = parseFloat(totalPaymentInput?.dataset.originalTotalFees || '');
       const amount = parseFloat(document.getElementById('tuition-amount').value);
       const balanceInput = document.getElementById('tuition-balance');
       if (!balanceInput) return;
-      if (!isNaN(totalPayment) && !isNaN(amount)) {
-        balanceInput.value = Math.max(totalPayment - amount, 0).toFixed(2);
+
+      const initialBalance = parseFloat(balanceInput.dataset.initialBalance || '');
+      if (!isNaN(amount)) {
+        if (!isNaN(initialBalance)) {
+          balanceInput.value = Math.max(initialBalance - amount, 0).toFixed(2);
+        } else if (!isNaN(originalTotalFees)) {
+          balanceInput.value = Math.max(originalTotalFees - amount, 0).toFixed(2);
+        } else if (!isNaN(totalPayment)) {
+          balanceInput.value = Math.max(totalPayment - amount, 0).toFixed(2);
+        } else {
+          balanceInput.value = '';
+        }
+      } else if (!isNaN(initialBalance)) {
+        balanceInput.value = initialBalance.toFixed(2);
+      } else if (!isNaN(originalTotalFees)) {
+        balanceInput.value = originalTotalFees.toFixed(2);
       } else if (!isNaN(totalPayment)) {
         balanceInput.value = totalPayment.toFixed(2);
       } else {
@@ -5267,11 +5308,17 @@
         if (emailInput && !emailInput.value.trim()) {
           emailInput.value = data.student.email || '';
         }
-        if (totalPaymentInput && !totalPaymentInput.value.trim()) {
-          totalPaymentInput.value = parseFloat(data.student.total_fees || 0).toFixed(2);
+        const totalFees = parseFloat(data.student.total_fees || 0);
+        if (totalPaymentInput) {
+          totalPaymentInput.dataset.originalTotalFees = isNaN(totalFees) ? '' : totalFees.toFixed(2);
+          if (!totalPaymentInput.value.trim() || parseFloat(totalPaymentInput.value) === 0) {
+            totalPaymentInput.value = totalFees.toFixed(2);
+          }
         }
         if (balanceInput) {
-          balanceInput.value = parseFloat(data.student.tuition_balance || 0).toFixed(2);
+          const initialBalance = parseFloat(data.student.tuition_balance || 0);
+          balanceInput.value = initialBalance.toFixed(2);
+          balanceInput.dataset.initialBalance = isNaN(initialBalance) ? '' : initialBalance.toFixed(2);
         }
 
         updateTuitionBalance();
@@ -5355,7 +5402,12 @@
         if (courseSelect) courseSelect.value = '';
         if (yearSelect) yearSelect.value = '';
         if (totalPaymentInput) totalPaymentInput.value = '';
-        if (balanceInput) balanceInput.value = '';
+        if (balanceInput) {
+          balanceInput.value = '';
+        }
+        if (totalPaymentInput) {
+          totalPaymentInput.dataset.originalTotalFees = '';
+        }
       }
     }
 

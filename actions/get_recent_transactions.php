@@ -97,7 +97,8 @@ try {
     // Fetch transactions
         $sql = "SELECT ct.*, u.student_id, u.first_name AS user_first_name, u.last_name AS user_last_name,
                  CONCAT(ac.first_name, ' ', ac.last_name) as cashier_name,
-                 tr.balance AS tuition_balance
+                 tr.balance AS tuition_balance,
+                 tr.balance AS balance
              FROM cashier_transactions ct
              LEFT JOIN users u ON ct.user_id = u.id
              LEFT JOIN admincashier_acc ac ON ct.cashier_id = ac.id

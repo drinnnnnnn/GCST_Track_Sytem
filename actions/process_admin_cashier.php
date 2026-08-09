@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿<?php
 /**
  * process_admin_cashier.php
  * Centralized controller for Admin/Cashier account management.

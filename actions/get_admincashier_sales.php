@@ -26,6 +26,8 @@ switch ($period) {
         break;
 }
 
+$excludeReceiptCategoryCondition = "(t.receipt_category IS NULL OR LOWER(TRIM(t.receipt_category)) NOT IN ('tuition receipt', 'tuition fee receipt', 'tuition fee', 'payment receipt', 'payment fee'))";
+
 try {
     // 1. Summary Totals (Total Sales, Total Transactions, Avg Transaction Value)
     $summaryQuery = "SELECT 
@@ -33,7 +35,7 @@ try {
         IFNULL(SUM(t.total_amount), 0) as total_sales,
         IFNULL(AVG(t.total_amount), 0) as average_transaction_value
         FROM cashier_transactions t
-        WHERE $dateCondition AND t.payment_status = 'paid'";
+        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition";
     
     $summaryResult = $conn->query($summaryQuery);
     $summary = $summaryResult ? $summaryResult->fetch_assoc() : null;
@@ -42,7 +44,7 @@ try {
     $itemsQuery = "SELECT IFNULL(SUM(ti.quantity), 0) as total_items_sold 
         FROM transaction_items ti
         JOIN cashier_transactions t ON ti.cashier_transaction_id = t.id
-        WHERE $dateCondition AND t.payment_status = 'paid'";
+        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition";
     
     $itemsResult = $conn->query($itemsQuery);
     $itemsRow = $itemsResult ? $itemsResult->fetch_assoc() : null;
@@ -50,7 +52,7 @@ try {
     // 3. Sales Trend Chart Data
     $chartQuery = "SELECT DATE(t.created_at) as sale_date, SUM(t.total_amount) as daily_total
         FROM cashier_transactions t
-        WHERE $dateCondition AND t.payment_status = 'paid'
+        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition
         GROUP BY DATE(t.created_at)
         ORDER BY sale_date ASC";
     
@@ -67,7 +69,7 @@ try {
         FROM transaction_items ti
         JOIN products p ON ti.product_id = p.product_id
         JOIN cashier_transactions t ON ti.cashier_transaction_id = t.id
-        WHERE $dateCondition AND t.payment_status = 'paid'
+        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition
         GROUP BY ti.product_id
         ORDER BY quantity DESC
         LIMIT 5";
@@ -93,7 +95,7 @@ try {
         FROM cashier_transactions t
         JOIN transaction_items ti ON t.id = ti.cashier_transaction_id
         LEFT JOIN users u ON t.user_id = u.id
-        WHERE $dateCondition AND t.payment_status = 'paid'
+        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition
         GROUP BY t.id, t.created_at, t.transaction_number, t.student_name, u.student_id, t.guest_school_id
         ORDER BY t.created_at DESC
         LIMIT $limit";
