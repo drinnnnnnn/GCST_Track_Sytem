@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -563,14 +563,14 @@
 
   // Handle Mouse Click
   card?.addEventListener('click', () => {
-    window.location.href = 'admincashier_queuing_system.html';
+    window.location.href = 'admincashier_queuing_system.php';
   });
 
   // Handle Keyboard Access (Enter and Space)
   card?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault(); // Prevents page scrolling when Space is pressed
-      window.location.href = 'admincashier_queuing_system.html';
+      window.location.href = 'admincashier_queuing_system.php';
     }
   });
 }
@@ -591,18 +591,18 @@ document.addEventListener('DOMContentLoaded', initWaitingQueueInteractions);
       }
 
       card?.addEventListener('click', () => {
-        window.location.href = 'admincashier_inventorys.html';
+        window.location.href = 'admincashier_inventorys.php';
       });
 
       card?.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          window.location.href = 'admincashier_inventorys.html';
+          window.location.href = 'admincashier_inventorys.php';
         }
       });
 
       inventoryBtn?.addEventListener('click', () => {
-        window.location.href = 'admincashier_inventorys.html';
+        window.location.href = 'admincashier_inventorys.php';
       });
     }
 
@@ -611,14 +611,14 @@ document.addEventListener('DOMContentLoaded', initWaitingQueueInteractions);
 
       // Handle Mouse Click
       card?.addEventListener('click', () => {
-        window.location.href = 'admincashier_sale.html#inventory-details';
+        window.location.href = 'admincashier_sale.php#inventory-details';
       });
 
       // Handle Keyboard Access (Enter and Space)
       card?.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault(); // Prevents page scrolling when Space is pressed
-          window.location.href = 'admincashier_sale.html#inventory-details';
+          window.location.href = 'admincashier_sale.php#inventory-details';
         }
       });
     }
@@ -629,14 +629,14 @@ document.addEventListener('DOMContentLoaded', initWaitingQueueInteractions);
 
       // Handle Mouse Click
       card?.addEventListener('click', () => {
-        window.location.href = 'admincashier_sale.html';
+        window.location.href = 'admincashier_sale.php';
       });
 
       // Handle Keyboard Access (Enter and Space)
       card?.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault(); // Prevents page scrolling when Space is pressed
-          window.location.href = 'admincashier_sale.html';
+          window.location.href = 'admincashier_sale.php';
         }
       });
     }

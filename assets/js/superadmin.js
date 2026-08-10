@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿/**
  * GCST Track System - Super Admin Core Logic
  * Refactored for modularity, performance, and maintainability.
  */
@@ -58,13 +58,13 @@ const SuperAdmin = (function() {
         try {
             const data = await apiFetch('/actions/get_user.php');
             if (!data.admin_id || !CONFIG.ALLOWED_ROLES.includes(data.role)) {
-                window.location.replace(`${CONFIG.BASE_PATH}/pages/sign_in_superadmin.html`);
+                window.location.replace(`${CONFIG.BASE_PATH}/pages/sign_in_superadmin.php`);
                 return null;
             }
             state.currentAdminId = data.admin_id;
             return data;
         } catch {
-            window.location.replace(`${CONFIG.BASE_PATH}/pages/sign_in_superadmin.html`);
+            window.location.replace(`${CONFIG.BASE_PATH}/pages/sign_in_superadmin.php`);
             return null;
         }
     }
@@ -105,7 +105,7 @@ const SuperAdmin = (function() {
 
         window.addEventListener('storage', (e) => {
             if (e.key === 'gcst_superadmin_logout_event') {
-                window.location.replace(`${CONFIG.BASE_PATH}/pages/sign_in_superadmin.html`);
+                window.location.replace(`${CONFIG.BASE_PATH}/pages/sign_in_superadmin.php`);
             }
         });
     }
@@ -242,7 +242,7 @@ const SuperAdmin = (function() {
                 document.querySelector('header')?.classList.add('minimized');
             }
 
-            const currentFile = window.location.pathname.split('/').pop() || 'superadmin_dashb.html';
+            const currentFile = window.location.pathname.split('/').pop() || 'superadmin_dashb.php';
             elements.sidebarContainer.querySelectorAll('.sidebar-link').forEach(link => {
                 const linkFile = link.pathname.split('/').pop();
                 link.classList.toggle('active', linkFile === currentFile && !link.href.startsWith('javascript'));

@@ -1,5 +1,40 @@
-﻿﻿let currentAdminId = null;
+﻿let currentAdminId = null;
 let notificationPollInterval = null;
+const BASE_PATH = '/GCST_Track_System';
+
+function normalizePagePath(targetPath) {
+  if (!targetPath || typeof targetPath !== 'string') return targetPath;
+
+  const value = targetPath.trim();
+  if (!value || value.startsWith('javascript:') || value.startsWith('#')) {
+    return value;
+  }
+
+  const [pathOnly] = value.split(/[?#]/, 1);
+  let normalized = pathOnly.replace(/\\/g, '/');
+
+  if (normalized.endsWith('.html')) {
+    normalized = normalized.replace(/\.html$/i, '.php');
+  } else if (!/\.[a-z0-9]+$/i.test(normalized)) {
+    normalized = `${normalized}.php`;
+  }
+
+  const suffix = value.substring(pathOnly.length);
+  return normalized + suffix;
+}
+
+function redirectToPage(targetPath) {
+  window.location.assign(normalizePagePath(targetPath));
+}
+
+function redirectHtmlToPhp() {
+  const currentPath = window.location.pathname || '';
+  if (!/\.html$/i.test(currentPath)) return false;
+
+  const targetPath = `${currentPath.replace(/\.html$/i, '.php')}${window.location.search}${window.location.hash}`;
+  window.location.replace(targetPath);
+  return true;
+}
 
 /**
  * Initialize menu and notification listeners
@@ -53,20 +88,20 @@ function initializeAdminCashierUI() {
  * Check authentication and redirect if not logged in
  */
 function checkAuthentication() {
-  return fetch('../../actions/get_user.php')
+  return fetch(`${BASE_PATH}/actions/get_user.php`)
     .then(res => res.json())
     .then(data => {
       const allowedRoles = ['student', 'user'];
       const currentId = data.student_id || data.user_id;
       if (!currentId || !allowedRoles.includes(data.role)) {
-        window.location.href = "../../pages/sign_in.html";
+        redirectToPage(`${BASE_PATH}/pages/sign_in.php`);
         return null;
       }
       currentAdminId = currentId;
       return data;
     })
     .catch(() => {
-      window.location.href = "../../pages/sign_in.html";
+      redirectToPage(`${BASE_PATH}/pages/sign_in.php`);
       return null;
     });
 }
@@ -102,7 +137,7 @@ function updateDateTime() {
  * Load notifications from server
  */
 function loadNotifications() {
-  fetch('../../actions/get_notifications.php')
+  fetch(`${BASE_PATH}/actions/get_notifications.php`)
     .then(res => res.json())
     .then(data => {
       const notificationsList = document.getElementById('notifications-list');
@@ -144,7 +179,7 @@ function loadNotifications() {
  * Clear all notifications
  */
 function clearAllNotifications() {
-  fetch('http://localhost/GCST_Track_System/actions/mark_notifications_read.php', {
+  fetch(`${BASE_PATH}/actions/mark_notifications_read.php`, {
     method: 'POST'
   })
     .then(() => {
@@ -243,6 +278,7 @@ function showError(element, message = 'An error occurred') {
  */
 function initializeAdminCashierPage(pageCallback) {
   window.addEventListener('DOMContentLoaded', async () => {
+    if (redirectHtmlToPhp()) return;
     try {
       // Initialize UI elements
       initializeAdminCashierUI();
@@ -330,7 +366,7 @@ async function autoLoadSidebar() {
       container.innerHTML = getSidebarHTML();
 
       // Automatically highlight the active link based on the current URL
-      const getFileName = (path) => path.split('/').pop() || 'InUser_home.html';
+      const getFileName = (path) => path.split('/').pop() || 'InUser_home.php';
       const currentFile = getFileName(window.location.pathname);
 
       const navLinks = container.querySelectorAll('.nav-item');

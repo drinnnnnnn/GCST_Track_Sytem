@@ -1,4 +1,4 @@
-﻿﻿﻿<?php
+﻿﻿<?php
 /**
  * process_admin_cashier.php
  * Centralized controller for Admin/Cashier account management.
@@ -100,7 +100,7 @@ try {
 
             if (!$username || !$last_name || !$first_name || !$email || !$contact_number || !$pin || !$password) {
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Missing fields'], 400);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?error=missing');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?error=missing');
                 exit();
             }
 
@@ -108,7 +108,7 @@ try {
                 $file = $_FILES['signature_image'];
                 if ($file['error'] !== UPLOAD_ERR_OK) {
                     if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Signature upload failed'], 400);
-                    header('Location: ../pages/superadmin/register_admin_cashier.html?error=invalid_signature');
+                    header('Location: ../pages/superadmin/register_admin_cashier.php?error=invalid_signature');
                     exit();
                 }
 
@@ -118,13 +118,13 @@ try {
 
                 if (!in_array($actualMime, $allowedMime, true)) {
                     if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Invalid signature image format'], 400);
-                    header('Location: ../pages/superadmin/register_admin_cashier.html?error=invalid_signature');
+                    header('Location: ../pages/superadmin/register_admin_cashier.php?error=invalid_signature');
                     exit();
                 }
 
                 if ($file['size'] > 2 * 1024 * 1024) {
                     if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Signature image file size must be 2MB or smaller'], 400);
-                    header('Location: ../pages/superadmin/register_admin_cashier.html?error=invalid_signature');
+                    header('Location: ../pages/superadmin/register_admin_cashier.php?error=invalid_signature');
                     exit();
                 }
 
@@ -139,7 +139,7 @@ try {
 
                 if (!move_uploaded_file($file['tmp_name'], $destination)) {
                     if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Unable to save uploaded signature image'], 500);
-                    header('Location: ../pages/superadmin/register_admin_cashier.html?error=invalid_signature');
+                    header('Location: ../pages/superadmin/register_admin_cashier.php?error=invalid_signature');
                     exit();
                 }
 
@@ -148,25 +148,25 @@ try {
 
             if (!preg_match('/^\d{11}$/', $contact_number)) {
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Contact number must be 11 digits'], 400);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?error=invalid_contact');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?error=invalid_contact');
                 exit();
             }
 
             if (!preg_match('/^\d{4}$/', $pin)) {
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'PIN must be 4 digits'], 400);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?error=invalid_pin');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?error=invalid_pin');
                 exit();
             }
 
             if ($password !== $confirm_password) {
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Passwords do not match'], 400);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?error=nomatch');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?error=nomatch');
                 exit();
             }
 
             if (strlen($password) < 8) {
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Password too weak'], 400);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?error=weak_password');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?error=weak_password');
                 exit();
             }
 
@@ -176,7 +176,7 @@ try {
             if ($stmt->get_result()->num_rows > 0) {
                 $stmt->close();
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Email or username already exists'], 409);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?error=exists');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?error=exists');
                 exit();
             }
             $stmt->close();
@@ -189,7 +189,7 @@ try {
                 if ($existingPin !== '' && (password_verify($pin, $existingPin) || $existingPin === $pin)) {
                     $pinCheck->close();
                     if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'PIN already in use'], 409);
-                    header('Location: ../pages/superadmin/register_admin_cashier.html?error=pin_duplicate');
+                    header('Location: ../pages/superadmin/register_admin_cashier.php?error=pin_duplicate');
                     exit();
                 }
             }
@@ -214,7 +214,7 @@ try {
                 $stmt->close();
                 
                 if (isAjax()) sendJsonResponse(['success' => true, 'message' => 'Account registered successfully']);
-                header('Location: ../pages/superadmin/register_admin_cashier.html?success=1');
+                header('Location: ../pages/superadmin/register_admin_cashier.php?success=1');
                 exit();
             }
             throw new Exception("Registration database error: " . $stmt->error);
@@ -228,7 +228,7 @@ try {
 
             if (empty($identifier) || empty($password) || empty($pin)) {
                 if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Username or email, password, and PIN are required'], 400);
-                header('Location: ../pages/sign_in_admin_cashier.html?error=invalid');
+                header('Location: ../pages/sign_in_admin_cashier.php?error=invalid');
                 exit();
             }
 
@@ -259,7 +259,7 @@ try {
                 if ($passwordMatches && $pinValid) {
                     if ($user['status'] !== 'active') {
                         if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Account suspended'], 403);
-                        header('Location: ../pages/sign_in_admin_cashier.html?error=suspended');
+                        header('Location: ../pages/sign_in_admin_cashier.php?error=suspended');
                         exit();
                     }
 
@@ -285,8 +285,8 @@ try {
                     
                     logAudit($conn, 'admincashier', $userId, 'login', 'Admin Cashier logged in.');
 
-                    if (isAjax()) sendJsonResponse(['success' => true, 'redirect' => '../pages/admincashier/admincashier_dashb.html']);
-                    header('Location: ../pages/admincashier/admincashier_dashb.html');
+                    if (isAjax()) sendJsonResponse(['success' => true, 'redirect' => '../pages/admincashier/admincashier_dashb.php']);
+                    header('Location: ../pages/admincashier/admincashier_dashb.php');
                     exit();
                 }
 
@@ -309,12 +309,12 @@ try {
 
                 if ($statusRow && $statusRow['status'] === 'inactive' && intval($statusRow['login_attempts']) >= 4) {
                     if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Account suspended after too many failed login attempts.'], 403);
-                    header('Location: ../pages/sign_in_admin_cashier.html?error=locked');
+                    header('Location: ../pages/sign_in_admin_cashier.php?error=locked');
                     exit();
                 }
             }
             if (isAjax()) sendJsonResponse(['success' => false, 'message' => 'Invalid credentials'], 401);
-            header('Location: ../pages/sign_in_admin_cashier.html?error=invalid');
+            header('Location: ../pages/sign_in_admin_cashier.php?error=invalid');
             exit();
         }
 

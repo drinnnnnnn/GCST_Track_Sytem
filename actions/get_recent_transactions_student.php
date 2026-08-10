@@ -21,30 +21,133 @@ try {
     $offset = ($page - 1) * $limit;
 
     // Strictly filter where the student_id matches the active session
-    $where = "WHERE u.student_id = '" . $conn->real_escape_string($session_student_id) . "'";
+    $studentId = $conn->real_escape_string($session_student_id);
+    $filterClausesCashier = ["(u.student_id = '$studentId' OR ct.guest_school_id = '$studentId')", 'tr.transaction_number IS NULL'];
+    $filterClausesTuition = ["(tr.student_id = '$studentId' OR u2.student_id = '$studentId')"];
 
-    if ($search) {
-        $where .= " AND ct.transaction_number LIKE '%$search%'";
+    if ($from) {
+        $filterClausesCashier[] = "DATE(ct.created_at) >= '$from'";
+        $filterClausesTuition[] = "DATE(tr.created_at) >= '$from'";
     }
-    if ($from) { $where .= " AND DATE(ct.created_at) >= '$from'"; }
-    if ($to) { $where .= " AND DATE(ct.created_at) <= '$to'"; }
+    if ($to) {
+        $filterClausesCashier[] = "DATE(ct.created_at) <= '$to'";
+        $filterClausesTuition[] = "DATE(tr.created_at) <= '$to'";
+    }
+    if ($search) {
+        $filterClausesCashier[] = "(ct.transaction_number LIKE '%$search%' OR ct.receipt_number LIKE '%$search%')";
+        $filterClausesTuition[] = "(tr.transaction_number LIKE '%$search%' OR tr.receipt_number LIKE '%$search%')";
+    }
 
-    // Get total count for pagination
-    $countResult = $conn->query("SELECT COUNT(*) as total FROM cashier_transactions ct LEFT JOIN users u ON ct.user_id = u.id $where");
-    $totalRows = $countResult->fetch_assoc()['total'] ?? 0;
+    $cashierWhere = 'WHERE ' . implode(' AND ', $filterClausesCashier);
+    $tuitionWhere = 'WHERE ' . implode(' AND ', $filterClausesTuition);
+
+    $countSql = "SELECT COUNT(*) as total FROM (
+        SELECT ct.id AS record_id
+        FROM cashier_transactions ct
+        LEFT JOIN users u ON ct.user_id = u.id
+        LEFT JOIN tuition_receipts tr ON (tr.transaction_number = ct.transaction_number OR tr.receipt_number = ct.receipt_number)
+        $cashierWhere
+        UNION ALL
+        SELECT tr.id AS record_id
+        FROM tuition_receipts tr
+        LEFT JOIN users u2 ON tr.user_id = u2.id
+        $tuitionWhere
+    ) AS combined_transactions";
+
+    $countResult = $conn->query($countSql);
+    if (!$countResult) {
+        throw new Exception('Database error: ' . $conn->error);
+    }
+    $totalRows = intval($countResult->fetch_assoc()['total'] ?? 0);
     $totalPages = ceil($totalRows / $limit);
 
-    // Fetch transactions joined with cashier name for better display
-    $sql = "SELECT ct.*, u.student_id,
-                   CONCAT(ac.first_name, ' ', ac.last_name) as cashier_name
-            FROM cashier_transactions ct
-            LEFT JOIN users u ON ct.user_id = u.id
-            LEFT JOIN admincashier_acc ac ON ct.cashier_id = ac.id
-            $where
-            ORDER BY ct.created_at DESC
-            LIMIT $limit OFFSET $offset";
+    $sql = "SELECT * FROM (
+        SELECT ct.id,
+               ct.transaction_number,
+               ct.receipt_number,
+               ct.user_id,
+               u.student_id,
+               ct.cashier_id,
+               ct.transaction_type,
+               ct.receipt_category,
+               CASE
+                   WHEN TRIM(COALESCE(ct.receipt_category, '')) = '' OR TRIM(ct.receipt_category) = '0' THEN COALESCE(NULLIF(ct.transaction_type, ''), 'Payment Receipt')
+                   WHEN LOWER(TRIM(ct.receipt_category)) IN ('tuition fee', 'tuition fee receipt') THEN 'Tuition Fee Receipt'
+                   ELSE ct.receipt_category
+               END AS receipt_type,
+               ct.subtotal,
+               ct.discount_percent,
+               ct.discount_amount,
+               ct.total_amount,
+               ct.payment_received,
+               ct.change_amount,
+               ct.payment_status,
+               ct.payment_method,
+               ct.created_at,
+               CONCAT(ac.first_name, ' ', ac.last_name) AS cashier_name,
+               'cashier' AS source
+        FROM cashier_transactions ct
+        LEFT JOIN users u ON ct.user_id = u.id
+        LEFT JOIN tuition_receipts tr ON (tr.transaction_number = ct.transaction_number OR tr.receipt_number = ct.receipt_number)
+        LEFT JOIN admincashier_acc ac ON ct.cashier_id = ac.id
+        $cashierWhere
+        UNION ALL
+        SELECT tr.id,
+               tr.transaction_number,
+               tr.receipt_number,
+               tr.user_id,
+               tr.student_id AS student_id,
+               tr.cashier_id,
+               'tuition' AS transaction_type,
+               CASE
+                   WHEN TRIM(COALESCE(tr.receipt_category, '')) = '' OR TRIM(tr.receipt_category) = '0' THEN 'Tuition Receipt'
+                   WHEN LOWER(TRIM(tr.receipt_category)) IN ('tuition fee', 'tuition fee receipt') THEN 'Tuition Fee Receipt'
+                   ELSE tr.receipt_category
+               END AS receipt_category,
+               CASE
+                   WHEN TRIM(COALESCE(tr.receipt_category, '')) = '' OR TRIM(tr.receipt_category) = '0' THEN 'Tuition Receipt'
+                   WHEN LOWER(TRIM(tr.receipt_category)) IN ('tuition fee', 'tuition fee receipt') THEN 'Tuition Fee Receipt'
+                   ELSE tr.receipt_category
+               END AS receipt_type,
+               tr.amount_paid AS subtotal,
+               0 AS discount_percent,
+               0 AS discount_amount,
+               tr.amount_paid AS total_amount,
+               tr.amount_paid AS payment_received,
+               0 AS change_amount,
+               tr.payment_status,
+               tr.payment_method,
+               tr.created_at,
+               CONCAT(aa.first_name, ' ', aa.last_name) AS cashier_name,
+               CASE
+                   WHEN LOWER(TRIM(COALESCE(tr.receipt_category, ''))) LIKE '%tuition%' THEN 'tuition'
+                   WHEN TRIM(COALESCE(tr.receipt_category, '')) = '' THEN 'tuition'
+                   WHEN LOWER(TRIM(COALESCE(tr.receipt_category, ''))) IN (
+                       'payment receipt',
+                       'medical receipt',
+                       'insurance receipt',
+                       'educational receipt',
+                       'foundation day receipt'
+                   ) THEN 'payment'
+                   ELSE 'tuition'
+               END AS source
+        FROM tuition_receipts tr
+        LEFT JOIN users u2 ON tr.user_id = u2.id
+        LEFT JOIN admincashier_acc aa ON tr.cashier_id = aa.id
+        $tuitionWhere
+    ) AS combined_txns
+    ORDER BY created_at DESC
+    LIMIT $limit OFFSET $offset";
+
+    if (!$countResult) {
+        throw new Exception('Database error: ' . $conn->error);
+    }
 
     $result = $conn->query($sql);
+    if (!$result) {
+        throw new Exception('Database error: ' . $conn->error);
+    }
+
     $txns = [];
     while ($row = $result->fetch_assoc()) {
         $txns[] = $row;
@@ -57,5 +160,5 @@ try {
         'current_page' => $page
     ]);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => $e->getMessage(), 'message' => $e->getMessage()]);
 }

@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -219,7 +219,7 @@
             <button type="submit" class="btn btn-anim animate-item" id="submitBtn">Sign In</button>
             
             <div class="signup-link footer-anim animate-item">
-                Don't have an account? <a href="http://localhost/GCST_Track_System/pages/superadmin/sign_up.html">Sign Up</a>
+                Don't have an account? <a href="http://localhost/GCST_Track_System/pages/superadmin/sign_up.php">Sign Up</a>
             </div>
         </form>
     </div>

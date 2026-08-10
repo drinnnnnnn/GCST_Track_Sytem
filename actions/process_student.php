@@ -43,6 +43,7 @@ switch ($action) {
     case 'update_status':
         $id = filter_var($input['student_id'] ?? 0, FILTER_VALIDATE_INT);
         $status = $input['status'] ?? '';
+        $reason = trim((string)($input['reason'] ?? ''));
         if (!$id || !in_array($status, ['active', 'pending', 'rejected', 'suspended'])) {
             echo json_encode(['success' => false, 'message' => 'Invalid status change requested.']);
             exit;
@@ -60,20 +61,27 @@ switch ($action) {
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => "Account status updated to $status."]);
 
-            // Notify student via email when account is activated or deactivated
+            // Notify student via email when account is activated, deactivated, or rejected
             $normalized = strtolower($status);
-            if (!empty($userEmail) && filter_var($userEmail, FILTER_VALIDATE_EMAIL) && in_array($normalized, ['active', 'suspended'])) {
+            if (!empty($userEmail) && filter_var($userEmail, FILTER_VALIDATE_EMAIL) && in_array($normalized, ['active', 'suspended', 'rejected'])) {
                 $displayName = trim(($userFirst ?? '') . ' ' . ($userLast ?? '')) ?: 'Student';
                 if ($normalized === 'active') {
                     $subject = 'Your GCST Student Account Has Been Activated';
                     $body = "<h3>Hello " . htmlspecialchars($displayName) . ",</h3>" .
                             "<p>Your student account has been <strong>activated</strong>. You can now access the student portal and its features.</p>" .
                             "<p>If you did not request this change, please contact the school administration immediately.</p>";
-                } else {
+                } elseif ($normalized === 'suspended') {
                     $subject = 'Your GCST Student Account Has Been Deactivated';
                     $body = "<h3>Hello " . htmlspecialchars($displayName) . ",</h3>" .
                             "<p>Your student account has been <strong>deactivated</strong>. You will no longer be able to sign in until this is reinstated.</p>" .
+                            (!empty($reason) ? "<p><strong>Reason:</strong> " . htmlspecialchars($reason) . "</p>" : "") .
                             "<p>If you believe this is an error, please contact the school administration.</p>";
+                } else {
+                    $subject = 'Your GCST Student Account Request Has Been Rejected';
+                    $body = "<h3>Hello " . htmlspecialchars($displayName) . ",</h3>" .
+                            "<p>Your student account request has been <strong>rejected</strong>. You will not be able to access the student portal until a new request is approved.</p>" .
+                            (!empty($reason) ? "<p><strong>Reason:</strong> " . htmlspecialchars($reason) . "</p>" : "") .
+                            "<p>If you believe this is an error, please contact the school administration for assistance.</p>";
                 }
                 sendEmailWithLog($conn, $userEmail, $subject, $body, 'Account Status Notification');
             }
@@ -133,7 +141,7 @@ switch ($action) {
             // If status changed to active or suspended, notify the student
             $newStatus = $status;
             $oldStatus = strtolower($prevStatus ?? '');
-            if ($newStatus !== $oldStatus && in_array($newStatus, ['active', 'suspended'])) {
+            if ($newStatus !== $oldStatus && in_array($newStatus, ['active', 'suspended', 'rejected'])) {
                 $notifyEmail = $prevEmail ?: $email;
                 if (!empty($notifyEmail) && filter_var($notifyEmail, FILTER_VALIDATE_EMAIL)) {
                     $displayName = trim(($prevFirst ?? '') . ' ' . ($prevLast ?? '')) ?: trim(($fname ?? '') . ' ' . ($lname ?? '')) ?: 'Student';
@@ -142,11 +150,16 @@ switch ($action) {
                         $body = "<h3>Hello " . htmlspecialchars($displayName) . ",</h3>" .
                                 "<p>Your student account has been <strong>activated</strong>. You can now access the student portal and its features.</p>" .
                                 "<p>If you did not request this change, please contact the school administration immediately.</p>";
-                    } else {
+                    } elseif ($newStatus === 'suspended') {
                         $subject = 'Your GCST Student Account Has Been Deactivated';
                         $body = "<h3>Hello " . htmlspecialchars($displayName) . ",</h3>" .
                                 "<p>Your student account has been <strong>deactivated</strong>. You will no longer be able to sign in until this is reinstated.</p>" .
                                 "<p>If you believe this is an error, please contact the school administration.</p>";
+                    } else {
+                        $subject = 'Your GCST Student Account Request Has Been Rejected';
+                        $body = "<h3>Hello " . htmlspecialchars($displayName) . ",</h3>" .
+                                "<p>Your student account request has been <strong>rejected</strong>. You will not be able to access the student portal until a new request is approved.</p>" .
+                                "<p>If you believe this is an error, please contact the school administration for assistance.</p>";
                     }
                     sendEmailWithLog($conn, $notifyEmail, $subject, $body, 'Account Status Notification');
                 }

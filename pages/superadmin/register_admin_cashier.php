@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -377,7 +377,7 @@
 
             <div class="footer-anim animate-item mt-8 flex flex-col items-center gap-3">
                 <div class="signin-link mt-0 opacity-60 hover:opacity-100 transition-opacity">
-                    <a href="superadmin_dashb.html" class="text-xs">Go to Main Dashboard</a>
+                    <a href="superadmin_dashb.php" class="text-xs">Go to Main Dashboard</a>
                 </div>
             </div>
         </form>

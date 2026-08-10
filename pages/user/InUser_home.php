@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -516,7 +516,7 @@
             <p id="overdue-count">You have overdue books. Please return them as soon as possible.</p>
           </div>
         </div>
-        <a href="user_rentals.html?filter=overdue" class="btn btn-primary">View Overdue</a>
+        <a href="user_queue_tickets.php" class="btn btn-primary">View Queue Tickets</a>
       </div>
     </div>
 

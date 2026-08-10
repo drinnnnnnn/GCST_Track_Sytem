@@ -1,4 +1,4 @@
-﻿/**
+/**
  * GCST Track System - Admin/Cashier Core Logic
  * Refactored for performance and UI/UX consistency
  */
@@ -7,6 +7,41 @@ let currentAdminId = null;
 let currentTicket = null;
 let notificationPollInterval = null;
 const BASE_PATH = '/GCST_Track_System';
+
+function normalizePagePath(targetPath) {
+    if (!targetPath || typeof targetPath !== 'string') return targetPath;
+
+    const value = targetPath.trim();
+    if (!value || value.startsWith('javascript:') || value.startsWith('#')) {
+        return value;
+    }
+
+    const [pathOnly] = value.split(/[?#]/, 1);
+    let normalized = pathOnly.replace(/\\/g, '/');
+
+    if (normalized.endsWith('.html')) {
+        normalized = normalized.replace(/\.html$/i, '.php');
+    } else if (!/\.[a-z0-9]+$/i.test(normalized)) {
+        normalized = `${normalized}.php`;
+    }
+
+    const suffix = value.substring(pathOnly.length);
+    return normalized + suffix;
+}
+
+function redirectToPage(targetPath) {
+    window.location.assign(normalizePagePath(targetPath));
+}
+
+function redirectHtmlToPhp() {
+    const currentPath = window.location.pathname || '';
+    if (!/\.html$/i.test(currentPath)) return false;
+
+    const targetPath = `${currentPath.replace(/\.html$/i, '.php')}${window.location.search}${window.location.hash}`;
+    window.location.replace(targetPath);
+    return true;
+}
+
 /**
  * Initialize menu and notification listeners
  * Call this in DOMContentLoaded of every page
@@ -52,14 +87,14 @@ function checkAuthentication() {
         const allowedRoles = ['admin', 'cashier', 'admincashier', 'superadmin'];
         const currentId = data.admin_id;
         if (!currentId || !allowedRoles.includes(data.role)) {
-            window.location.href = `${BASE_PATH}/pages/sign_in_admin_cashier.html`;
+            redirectToPage(`${BASE_PATH}/pages/sign_in_admin_cashier.php`);
             return null;
         }
         currentAdminId = currentId;
         return data;
     })
     .catch(() => {
-        window.location.href = `${BASE_PATH}/pages/sign_in_admin_cashier.html`;
+        redirectToPage(`${BASE_PATH}/pages/sign_in_admin_cashier.php`);
         return null;
     });
 }
@@ -196,7 +231,7 @@ function stopNotifPolling() {
 // Visibility API: Pause polling when tab is inactive to save resources
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopNotifPolling();
-    else if (!window.location.pathname.includes('admincashier_inventorys.html')) {
+    else if (!window.location.pathname.includes('admincashier_inventorys.php')) {
         startNotifPolling();
     }
 });
@@ -255,6 +290,8 @@ function showError(element, message = 'An error occurred') {
  * @param {Function} pageCallback - Callback function to initialize page-specific content
  */
 window.initializeAdminCashierPage = function(pageCallback) {
+    if (redirectHtmlToPhp()) return;
+
     const initSequence = async () => {
         try {
             // 1. Load sidebar first so the user sees the UI immediately
@@ -270,7 +307,7 @@ window.initializeAdminCashierPage = function(pageCallback) {
             updateDateTime();
             setInterval(updateDateTime, 60000);
 
-            if (!window.location.pathname.includes('admincashier_inventorys.html')) {
+            if (!window.location.pathname.includes('admincashier_inventorys.php')) {
                 startNotifPolling();
             }
 
@@ -370,7 +407,7 @@ async function autoLoadSidebar() {
         }
       
         // Automatically highlight the active link based on the current URL
-        const getFileName = (path) => path.split('/').pop() || 'admincashier_dashb.html';
+        const getFileName = (path) => path.split('/').pop() || 'admincashier_dashb.php';
         const currentFile = getFileName(window.location.pathname);
       
         container.querySelectorAll('.sidebar-link').forEach(link => {

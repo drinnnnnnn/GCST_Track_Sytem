@@ -38,23 +38,23 @@ if (function_exists('preventPageCache')) {
 // 6. Pagpasyahan ang tamang landing page base sa Role
 switch ($userRole) {
     case 'superadmin':
-        $redirect = '/GCST_Track_System/pages/sign_in_superadmin.html';
+        $redirect = '/GCST_Track_System/pages/sign_in_superadmin.php';
         break;
         
     case 'admincashier':
-        $redirect = '/GCST_Track_System/pages/sign_in_admin_cashier.html';
+        $redirect = '/GCST_Track_System/pages/sign_in_admin_cashier.php';
         break;
         
     case 'user':
     default:
-        $redirect = '/GCST_Track_System/pages/user/user_home.html';
+        $redirect = '/GCST_Track_System/pages/user/user_home.php';
         break;
 }
 
 // 7. URL Explicit Override Filter
 if (isset($_GET['redirect'])) {
     $target = basename($_GET['redirect']);
-    if (preg_match('/^[a-zA-Z0-9_\-]+\.html$/', $target)) {
+    if (preg_match('/^[a-zA-Z0-9_\-]+\.php$/', $target)) {
         if ($userRole === 'user') {
             $redirect = '/GCST_Track_System/pages/user/' . $target;
         } else {

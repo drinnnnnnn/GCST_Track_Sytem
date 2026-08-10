@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -676,7 +676,7 @@
       </div>
       
       <nav class="flex items-center space-x-2">
-        <a href="../../pages/sign_in.html" class="p-3 text-slate-600 hover:text-blue-600 transition-colors" title="Sign In">
+        <a href="../../pages/sign_in.php" class="p-3 text-slate-600 hover:text-blue-600 transition-colors" title="Sign In">
           <i class="fas fa-sign-in-alt text-lg"></i>
         </a>
         <a href="#footer" class="p-3 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-md" title="About Us">
@@ -781,7 +781,7 @@
     </div>
   </div>
 
-    <!-- Institutional Cards Section (from index.html) -->
+    <!-- Institutional Cards Section (from index.php) -->
     <section id="institution" class="max-w-7xl mx-auto py-0">
       <div class="text-center mb-16">
           <h3 class="text-3xl font-bold text-slate-900">Institutional Governance</h3>

@@ -26,33 +26,44 @@ switch ($period) {
         break;
 }
 
-$excludeReceiptCategoryCondition = "(t.receipt_category IS NULL OR LOWER(TRIM(t.receipt_category)) NOT IN ('tuition receipt', 'tuition fee receipt', 'tuition fee', 'payment receipt', 'payment fee'))";
+$excludeReceiptCategoryCondition = "(t.receipt_category IS NULL OR TRIM(t.receipt_category) = '')";
 
 try {
     // 1. Summary Totals (Total Sales, Total Transactions, Avg Transaction Value)
-    $summaryQuery = "SELECT 
-        IFNULL(COUNT(t.id), 0) as total_transactions,
-        IFNULL(SUM(t.total_amount), 0) as total_sales,
-        IFNULL(AVG(t.total_amount), 0) as average_transaction_value
+    $summaryQuery = "SELECT
+        IFNULL(COUNT(DISTINCT t.id), 0) as total_transactions,
+        IFNULL(SUM(COALESCE(ti.total_item_amount, (ti.quantity * ti.unit_price), 0)), 0) as total_sales,
+        IFNULL(SUM(COALESCE(ti.total_item_amount, (ti.quantity * ti.unit_price), 0)) / NULLIF(COUNT(DISTINCT t.id), 0), 0) as average_transaction_value
         FROM cashier_transactions t
-        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition";
+        JOIN transaction_items ti ON ti.cashier_transaction_id = t.id
+        WHERE $dateCondition
+          AND t.payment_status = 'paid'
+          AND $excludeReceiptCategoryCondition
+          AND ti.product_id > 0";
     
     $summaryResult = $conn->query($summaryQuery);
     $summary = $summaryResult ? $summaryResult->fetch_assoc() : null;
 
     // 2. Total Items Sold
-    $itemsQuery = "SELECT IFNULL(SUM(ti.quantity), 0) as total_items_sold 
+    $itemsQuery = "SELECT IFNULL(SUM(ti.quantity), 0) as total_items_sold
         FROM transaction_items ti
         JOIN cashier_transactions t ON ti.cashier_transaction_id = t.id
-        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition";
+        WHERE $dateCondition
+          AND t.payment_status = 'paid'
+          AND $excludeReceiptCategoryCondition
+          AND ti.product_id > 0";
     
     $itemsResult = $conn->query($itemsQuery);
     $itemsRow = $itemsResult ? $itemsResult->fetch_assoc() : null;
 
     // 3. Sales Trend Chart Data
-    $chartQuery = "SELECT DATE(t.created_at) as sale_date, SUM(t.total_amount) as daily_total
+    $chartQuery = "SELECT DATE(t.created_at) as sale_date, SUM(COALESCE(ti.total_item_amount, (ti.quantity * ti.unit_price), 0)) as daily_total
         FROM cashier_transactions t
-        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition
+        JOIN transaction_items ti ON ti.cashier_transaction_id = t.id
+        WHERE $dateCondition
+          AND t.payment_status = 'paid'
+          AND $excludeReceiptCategoryCondition
+          AND ti.product_id > 0
         GROUP BY DATE(t.created_at)
         ORDER BY sale_date ASC";
     
@@ -69,7 +80,10 @@ try {
         FROM transaction_items ti
         JOIN products p ON ti.product_id = p.product_id
         JOIN cashier_transactions t ON ti.cashier_transaction_id = t.id
-        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition
+        WHERE $dateCondition
+          AND t.payment_status = 'paid'
+          AND $excludeReceiptCategoryCondition
+          AND ti.product_id > 0
         GROUP BY ti.product_id
         ORDER BY quantity DESC
         LIMIT 5";
@@ -81,22 +95,21 @@ try {
     }
 
     // 5. Sales History
-    $historyQuery = "SELECT t.id, t.created_at as date, t.transaction_number, 
-        GROUP_CONCAT(IFNULL(NULLIF(ti.product_name, ''), 'Deleted Product') SEPARATOR ', ') as item, 
+    $historyQuery = "SELECT t.id, t.created_at as date, t.transaction_number,
+        GROUP_CONCAT(IFNULL(NULLIF(ti.product_name, ''), 'Deleted Product') SEPARATOR ', ') as item,
         SUM(ti.quantity) as quantity,
-        ROUND(SUM(COALESCE(ti.total_item_amount, (ti.quantity * ti.unit_price), 0)), 2) as item_total_amount,
-        COALESCE(MAX(CASE
-            WHEN COALESCE(t.total_amount, 0) > 0 THEN t.total_amount
-            WHEN COALESCE(t.subtotal, 0) > 0 THEN t.subtotal
-            ELSE NULL
-        END), 0) as amount,
-        t.student_name, 
-        COALESCE(u.student_id, t.guest_school_id) as student_id
+        ROUND(SUM(COALESCE(ti.total_item_amount, (ti.quantity * ti.unit_price), 0)), 2) as amount,
+        t.student_name,
+        COALESCE(u.student_id, t.guest_school_id) as student_id,
+        COALESCE(NULLIF(t.receipt_category, ''), 'Product Sale') as category,
+        COALESCE(NULLIF(t.payment_method, ''), 'Cash') as payment_method
         FROM cashier_transactions t
-        JOIN transaction_items ti ON t.id = ti.cashier_transaction_id
+        JOIN transaction_items ti ON t.id = ti.cashier_transaction_id AND ti.product_id > 0
         LEFT JOIN users u ON t.user_id = u.id
-        WHERE $dateCondition AND t.payment_status = 'paid' AND $excludeReceiptCategoryCondition
-        GROUP BY t.id, t.created_at, t.transaction_number, t.student_name, u.student_id, t.guest_school_id
+        WHERE $dateCondition
+          AND t.payment_status = 'paid'
+          AND $excludeReceiptCategoryCondition
+        GROUP BY t.id, t.created_at, t.transaction_number, t.student_name, u.student_id, t.guest_school_id, t.receipt_category, t.payment_method
         ORDER BY t.created_at DESC
         LIMIT $limit";
 

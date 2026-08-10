@@ -1,4 +1,4 @@
-﻿﻿<?php 
+﻿<?php 
 session_start();
 require_once __DIR__ . '/../database/connection.php';
 require_once __DIR__ . '/../database/models/SuperAdminModel.php';
@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_input = trim($_POST['password'] ?? '');
 
     if ($student_id_input === '' || $password_input === '') {
-        header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?error=invalid");
+        header("Location: http://localhost/GCST_Track_System/pages/sign_in.php?error=invalid");
         exit();
     }
 
@@ -31,17 +31,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $normalizedStatus = strtolower(trim($status));
         if ($normalizedStatus === 'pending') {
-            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?error=pending");
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.php?error=pending");
             exit();
         }
 
         if ($normalizedStatus === 'rejected') {
-            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?error=rejected");
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.php?error=rejected");
             exit();
         }
 
         if ($normalizedStatus === 'suspended') {
-            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?error=suspended");
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.php?error=suspended");
             exit();
         }
 
@@ -64,14 +64,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role'] = 'student';
             $_SESSION['login_ip'] = $_SERVER['REMOTE_ADDR'] ?? '';
             $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            header("Location: http://localhost/GCST_Track_System/pages/user/InUser_home.html");
+            header("Location: http://localhost/GCST_Track_System/pages/user/InUser_home.php");
             exit();
         } else {
-            header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?error=invalid");
+            header("Location: http://localhost/GCST_Track_System/pages/sign_in.php?error=invalid");
             exit();
         }
     } else {
-        header("Location: http://localhost/GCST_Track_System/pages/sign_in.html?error=invalid");
+        header("Location: http://localhost/GCST_Track_System/pages/sign_in.php?error=invalid");
         exit();
     }
 

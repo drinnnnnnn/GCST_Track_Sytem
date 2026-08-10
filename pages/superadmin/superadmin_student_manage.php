@@ -597,15 +597,17 @@
             document.body.style.overflow = '';
         }
 
-        function openConfirmModal({ title, message, iconClass = 'fa-circle-question', confirmText = 'Confirm', confirmType = 'btn-modal-confirm', onConfirm }) {
+        function openConfirmModal({ title, message, iconClass = 'fa-circle-question', confirmText = 'Confirm', confirmType = 'btn-modal-confirm', detailsHtml = '', onConfirm }) {
             const confirmTitle = document.getElementById('confirm-modal-title');
             const confirmMessage = document.getElementById('confirm-modal-message');
             const confirmIcon = document.getElementById('confirm-modal-icon');
             const confirmAction = document.getElementById('confirm-modal-action');
+            const confirmDetails = document.getElementById('confirm-modal-details');
 
             if (confirmTitle) confirmTitle.textContent = title;
             if (confirmMessage) confirmMessage.textContent = message;
             if (confirmIcon) confirmIcon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+            if (confirmDetails) confirmDetails.innerHTML = detailsHtml || '';
             if (confirmAction) {
                 confirmAction.textContent = confirmText;
                 confirmAction.className = `btn-modal flex-1 ${confirmType}`;
@@ -619,12 +621,14 @@
             pendingConfirmAction = null;
         }
 
-        function confirmPendingAction() {
+        async function confirmPendingAction() {
             if (typeof pendingConfirmAction === 'function') {
                 const action = pendingConfirmAction;
                 pendingConfirmAction = null;
-                closeConfirmModal();
-                action();
+                const result = await action();
+                if (result !== false) {
+                    closeConfirmModal();
+                }
             }
         }
 
@@ -889,12 +893,25 @@
                 iconClass,
                 confirmText,
                 confirmType,
+                detailsHtml: (normalizedStatus === 'suspended' || normalizedStatus === 'rejected')
+                    ? `
+                        <div class="space-y-2">
+                            <label for="confirm-update-reason" class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Reason for ${normalizedStatus === 'suspended' ? 'deactivation' : 'rejection'}</label>
+                            <textarea id="confirm-update-reason" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="Explain why this account is being ${normalizedStatus === 'suspended' ? 'deactivated' : 'rejected'}..."></textarea>
+                        </div>`
+                    : '',
                 onConfirm: async () => {
+                    const reason = document.getElementById('confirm-update-reason')?.value.trim() || '';
+                    if ((normalizedStatus === 'suspended' || normalizedStatus === 'rejected') && !reason) {
+                        showToast(`Please provide a reason for ${normalizedStatus === 'suspended' ? 'deactivation' : 'rejection'}.`, 'warning');
+                        return false;
+                    }
+
                     try {
                         const res = await fetch(apiPath, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'update_status', student_id: id, status: normalizedStatus })
+                            body: JSON.stringify({ action: 'update_status', student_id: id, status: normalizedStatus, reason })
                         });
                         const result = await res.json();
                         if (result.success) {
@@ -903,10 +920,12 @@
                             closeReviewModal();
                         } else {
                             showToast(result.message || `Failed to ${actionText} student.`, 'error');
+                            return false;
                         }
                     } catch (err) {
                         console.error(err);
                         showToast('Operation failed. Please try again.', 'error');
+                        return false;
                     }
                 }
             });

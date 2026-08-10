@@ -660,21 +660,21 @@ export function getSidebarHTML() {
     <div class="sidebar-nav-wrap">
         <p class="nav-section-label">Main Menu</p>
         <nav class="sidebar-nav">
-            <a href="superadmin_dashb.html" class="sidebar-link${activeClass('superadmin_dashb.html')}" title="Dashboard" onclick="handleSidebarLinkClick()">
+            <a href="superadmin_dashb.php" class="sidebar-link${activeClass('superadmin_dashb.php')}" title="Dashboard" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
             </a>
-            <a href="superadmin_admin_manage.html" class="sidebar-link${activeClass('superadmin_admin_manage.html')}" title="Manage Admins" onclick="handleSidebarLinkClick()">
+            <a href="superadmin_admin_manage.php" class="sidebar-link${activeClass('superadmin_admin_manage.php')}" title="Manage Admins" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-user-shield"></i> <span>Manage Admins</span>
             </a>
-            <a href="superadmin_student_manage.html" class="sidebar-link${activeClass('superadmin_student_manage.html')}" title="Manage Students" onclick="handleSidebarLinkClick()">
+            <a href="superadmin_student_manage.php" class="sidebar-link${activeClass('superadmin_student_manage.php')}" title="Manage Students" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-user-graduate"></i> <span>Manage Students</span>
             </a>
 
             <p class="nav-section-label">System Control</p>
-            <a href="register_admin_cashier.html" class="sidebar-link${activeClass('register_admin_cashier.html')}" title="Register Staff" onclick="handleSidebarLinkClick()">
+            <a href="register_admin_cashier.php" class="sidebar-link${activeClass('register_admin_cashier.php')}" title="Register Staff" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-user-plus"></i> <span>Register Staff</span>
             </a>
-            <a href="superadmin_system_maintenance.html" class="sidebar-link${activeClass('superadmin_system_maintenance.html')}" title="System Maintenance" onclick="handleSidebarLinkClick()">
+            <a href="superadmin_system_maintenance.php" class="sidebar-link${activeClass('superadmin_system_maintenance.php')}" title="System Maintenance" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-tools"></i> <span>System Maintenance</span>
             </a>
         </nav>

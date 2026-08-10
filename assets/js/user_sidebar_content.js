@@ -404,7 +404,7 @@ export function getSidebarHTML() {
 <div id="nav-backdrop" class="nav-backdrop" onclick="closeMobileMenu()"></div>
 <nav class="user-top-navbar">
     <div class="nav-inner">
-        <a href="InUser_home.html" class="nav-brand">
+        <a href="InUser_home.php" class="nav-brand">
             <img src="/GCST_Track_System/assets/images/icons/granby_logo.png" alt="Logo">
             <div class="brand-text">
                 <h1 class="brand-title">
@@ -417,19 +417,19 @@ export function getSidebarHTML() {
 
         <div class="nav-menu-wrapper" id="nav-menu-wrapper">
             <div class="nav-center">
-                <a href="InUser_home.html" class="nav-item">
+                <a href="InUser_home.php" class="nav-item">
                     <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
                 </a>
-                <a href="user_browse_products.html" class="nav-item">
+                <a href="user_browse_products.php" class="nav-item">
                     <i class="fas fa-shopping-bag"></i> <span>Browse Products</span>
                 </a>
-                <a href="user_queue_tickets.html" class="nav-item">
+                <a href="user_queue_tickets.php" class="nav-item">
                     <i class="fas fa-ticket-alt"></i> <span>Queue Tickets</span>
                 </a>
             </div>
 
             <div class="nav-right">
-                <a href="user_profile.html" class="nav-item">
+                <a href="user_profile.php" class="nav-item">
                     <i class="fas fa-user-circle"></i> <span>Profile</span>
                 </a>
                 <a href="javascript:void(0)" data-action="logout" class="nav-item nav-logout">

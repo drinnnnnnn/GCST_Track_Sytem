@@ -822,13 +822,14 @@
               <tr>
                 <th class="px-4 py-3 border border-slate-200">Date</th>
                 <th class="px-4 py-3 border border-slate-200">Transaction #</th>
+                <th class="px-4 py-3 border border-slate-200">Receipt Type</th>
                 <th class="px-4 py-3 border border-slate-200">Status</th>
                 <th class="px-4 py-3 border border-slate-200">Total</th>
                 <th class="px-4 py-3 border border-slate-200">Action</th>
               </tr>
             </thead>
             <tbody id="txn-history-body">
-              <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">Loading transaction history...</td></tr>
+              <tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">Loading transaction history...</td></tr>
             </tbody>
           </table>
           <div id="txn-mobile-list" class="txn-mobile-list"></div>
@@ -907,10 +908,9 @@
         </div>
         <div class="grid gap-2 md:grid-cols-2">
           <div><span class="block text-slate-500">Subtotal</span><strong id="receipt-modal-subtotal" class="text-slate-900"></strong></div>
-          <div><span class="block text-slate-500">Discount</span><strong id="receipt-modal-discount" class="text-slate-900"></strong></div>
+          <div><span class="block text-slate-500">Payment Method</span><strong id="receipt-modal-payment-method" class="text-slate-900"></strong></div>
           <div><span class="block text-slate-500">Total</span><strong id="receipt-modal-total" class="text-slate-900"></strong></div>
           <div><span class="block text-slate-500">Paid</span><strong id="receipt-modal-paid" class="text-slate-900"></strong></div>
-          <div><span class="block text-slate-500">Change</span><strong id="receipt-modal-change" class="text-slate-900"></strong></div>
         </div>
         <div class="flex justify-end gap-3">
           <button type="button" onclick="closeReceiptModal()" class="btn btn-secondary">Close</button>
@@ -1226,6 +1226,24 @@
       }).format(date);
     }
 
+    function escapeHtml(text) {
+      if (typeof text !== 'string') return text;
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeReceiptType(value) {
+      const normalized = String(value ?? '').trim();
+      if (normalized === '' || normalized === '0') return null;
+      const lower = normalized.toLowerCase();
+      if (lower === 'tuition fee' || lower === 'tuition fee receipt') return 'Tuition Fee Receipt';
+      return value;
+    }
+
     function renderTransactionHistory(transactions) {
       const tbody = document.getElementById('txn-history-body');
       const mobileList = document.getElementById('txn-mobile-list');
@@ -1234,7 +1252,7 @@
       if (mobileList) mobileList.innerHTML = '';
 
       if (!transactions || transactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">No transactions found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">No transactions found.</td></tr>';
         if (mobileList) {
           mobileList.innerHTML = '<div class="txn-mobile-card"><div class="text-slate-500 text-center">No transactions found.</div></div>';
         }
@@ -1243,9 +1261,11 @@
 
       transactions.forEach(txn => {
         const row = document.createElement('tr');
+        const receiptType = normalizeReceiptType(txn.receipt_type) || normalizeReceiptType(txn.receipt_category) || txn.transaction_type || (txn.source === 'tuition' ? 'Tuition Receipt' : 'Payment Receipt');
         row.innerHTML = `
           <td class="px-4 py-4 text-slate-700">${formatDateTime(txn.created_at)}</td>
           <td class="px-4 py-4 text-slate-700">${txn.transaction_number || txn.receipt_number || 'N/A'}</td>
+          <td class="px-4 py-4 text-slate-700">${escapeHtml(receiptType)}</td>
           <td class="px-4 py-4"><span class="status-badge ${txn.payment_status === 'paid' ? 'complete' : txn.payment_status === 'pending' ? 'pending' : 'failed'}">${txn.payment_status?.toUpperCase() || 'N/A'}</span></td>
           <td class="px-4 py-4 text-slate-700">${formatCurrency(txn.total_amount)}</td>
           <td class="px-4 py-4"><button class="btn btn-secondary btn-sm" onclick="viewTransactionReceipt('${encodeURIComponent(txn.transaction_number || txn.id)}')">View Receipt</button></td>
@@ -1263,6 +1283,10 @@
             <div class="txn-row">
               <span class="txn-label">Transaction</span>
               <span class="txn-value">${txn.transaction_number || txn.receipt_number || 'N/A'}</span>
+            </div>
+            <div class="txn-row">
+              <span class="txn-label">Receipt Type</span>
+              <span class="txn-value">${escapeHtml(normalizeReceiptType(txn.receipt_type) || normalizeReceiptType(txn.receipt_category) || txn.transaction_type || (txn.source === 'tuition' ? 'Tuition Receipt' : 'Payment Receipt'))}</span>
             </div>
             <div class="txn-row">
               <span class="txn-label">Status</span>
@@ -1337,7 +1361,7 @@
       const search = document.getElementById('txn-search')?.value.trim() || '';
       const body = document.getElementById('txn-history-body');
       if (body) {
-        body.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">Loading transaction history...</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">Loading transaction history...</td></tr>';
       }
 
       try {
@@ -1346,7 +1370,7 @@
 
         const response = await fetchWithError(`../../actions/get_recent_transactions_student.php?${params.toString()}`, { cache: 'no-store' });
         if (!response || response.success !== true) {
-          throw new Error(response?.message || 'Unable to load transaction history.');
+          throw new Error(response?.message || response?.error || 'Unable to load transaction history.');
         }
 
         renderTransactionHistory(response.transactions || []);
@@ -1354,7 +1378,7 @@
       } catch (err) {
         console.error(err);
         if (body) {
-          body.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-rose-500">${err.message || 'Error loading transactions.'}</td></tr>`;
+          body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-rose-500">${err.message || 'Error loading transactions.'}</td></tr>`;
         }
 
         // Reset pagination UI on error
@@ -1396,17 +1420,31 @@
         document.getElementById('receipt-modal-status').textContent = txn.payment_status ? txn.payment_status.toUpperCase() : 'N/A';
         document.getElementById('receipt-modal-date').textContent = formatDateTime(txn.created_at);
         document.getElementById('receipt-modal-cashier').textContent = txn.cashier_name || 'N/A';
+        document.getElementById('receipt-modal-payment-method').textContent = txn.payment_method || txn.payment_type || 'N/A';
         document.getElementById('receipt-modal-subtotal').textContent = formatCurrency(txn.subtotal);
-        document.getElementById('receipt-modal-discount').textContent = `-${formatCurrency(txn.discount_amount)}`;
         document.getElementById('receipt-modal-total').textContent = formatCurrency(txn.total_amount);
         document.getElementById('receipt-modal-paid').textContent = formatCurrency(txn.payment_received);
-        document.getElementById('receipt-modal-change').textContent = formatCurrency(txn.change_amount);
 
         const itemsContainer = document.getElementById('receipt-modal-items');
         itemsContainer.innerHTML = '';
 
         const items = Array.isArray(txn.items) ? txn.items : [];
-        if (items.length === 0) {
+        const rawReceiptCategory = String(txn.receipt_type || txn.receipt_category || txn.transaction_type || '').trim();
+        const normalizedReceiptCategory = rawReceiptCategory.toLowerCase();
+        const isTuitionReceipt = normalizedReceiptCategory.includes('tuition') || normalizedReceiptCategory.includes('fee');
+        const isPaymentReceipt = normalizedReceiptCategory !== '' && !isTuitionReceipt && normalizedReceiptCategory.includes('receipt');
+        const receiptCategoryLabel = (rawReceiptCategory === '' || rawReceiptCategory === '0')
+          ? (txn.source === 'payment' ? 'Payment Receipt' : 'Tuition Receipt')
+          : rawReceiptCategory;
+
+        if (isTuitionReceipt || isPaymentReceipt) {
+          itemsContainer.innerHTML = `
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <div class="font-semibold text-slate-900">Receipt Type</div>
+              <div class="text-sm text-slate-500">${receiptCategoryLabel}</div>
+            </div>
+          `;
+        } else if (items.length === 0) {
           itemsContainer.innerHTML = '<div class="text-slate-500">No items available for this receipt.</div>';
         } else {
           items.forEach(item => {

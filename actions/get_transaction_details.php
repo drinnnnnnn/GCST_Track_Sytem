@@ -77,6 +77,7 @@ function buildPaymentStatusText($paymentStatus, $balance = null) {
 try {
     $transaction = null;
     $resolvedSource = '';
+    $foundInTuitionRecord = false;
 
     $shouldSearchTuition = ($source === 'tuition');
     $shouldSearchReceipt = ($source === 'receipt' || $source === '');
@@ -119,7 +120,24 @@ try {
             $transaction = $stmt->get_result()->fetch_assoc();
             $stmt->close();
             if ($transaction) {
-                $resolvedSource = 'tuition';
+                $receiptCategoryNormalized = strtolower(trim((string)($transaction['receipt_category'] ?? '')));
+                if ($receiptCategoryNormalized === '' || strpos($receiptCategoryNormalized, 'tuition') !== false || strpos($receiptCategoryNormalized, 'fee') !== false) {
+                    $resolvedSource = 'tuition';
+                } elseif (in_array($receiptCategoryNormalized, [
+                    'payment receipt',
+                    'medical receipt',
+                    'insurance receipt',
+                    'educational receipt',
+                    'foundation day receipt'
+                ], true)) {
+                    $resolvedSource = 'payment';
+                } elseif (strpos($receiptCategoryNormalized, 'payment') !== false) {
+                    $resolvedSource = 'payment';
+                } elseif (strpos($receiptCategoryNormalized, 'receipt') !== false) {
+                    $resolvedSource = 'payment';
+                } else {
+                    $resolvedSource = 'tuition';
+                }
             }
         }
     }
@@ -207,7 +225,24 @@ try {
             $transaction = $stmt->get_result()->fetch_assoc();
             $stmt->close();
             if ($transaction) {
-                $resolvedSource = 'tuition';
+                $receiptCategoryNormalized = strtolower(trim((string)($transaction['receipt_category'] ?? '')));
+                if ($receiptCategoryNormalized === '' || strpos($receiptCategoryNormalized, 'tuition') !== false || strpos($receiptCategoryNormalized, 'fee') !== false) {
+                    $resolvedSource = 'tuition';
+                } elseif (in_array($receiptCategoryNormalized, [
+                    'payment receipt',
+                    'medical receipt',
+                    'insurance receipt',
+                    'educational receipt',
+                    'foundation day receipt'
+                ], true)) {
+                    $resolvedSource = 'payment';
+                } elseif (strpos($receiptCategoryNormalized, 'payment') !== false) {
+                    $resolvedSource = 'payment';
+                } elseif (strpos($receiptCategoryNormalized, 'receipt') !== false) {
+                    $resolvedSource = 'payment';
+                } else {
+                    $resolvedSource = 'tuition';
+                }
             }
         }
     }
@@ -324,15 +359,18 @@ try {
         $transaction['subtotal'] = isset($transaction['subtotal']) && is_numeric($transaction['subtotal']) && floatval($transaction['subtotal']) > 0
             ? floatval($transaction['subtotal'])
             : $transaction['total_amount'];
-        $transaction['receipt_type'] = $transaction['receipt_category'] ?? 'Transaction';
+
+        $receiptCategory = trim((string)($transaction['receipt_category'] ?? ''));
+        if ($receiptCategory === '' || $receiptCategory === '0') {
+            $receiptCategory = 'Transaction';
+        }
+        if (strtolower($receiptCategory) === 'tuition fee') {
+            $receiptCategory = 'Tuition Fee Receipt';
+        }
+        $transaction['receipt_category'] = $receiptCategory;
+        $transaction['receipt_type'] = $receiptCategory;
     } else {
-        $transaction['items'] = [[
-            'product_name' => $transaction['receipt_category'] ?? 'Receipt Item',
-            'quantity' => 1,
-            'unit_price' => $transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0,
-            'total' => $transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0,
-            'details' => 'Receipt record'
-        ]];
+        $transaction['items'] = [];
         $transaction['subtotal'] = floatval($transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? 0);
         $transaction['discount_percent'] = 0;
         $transaction['discount_amount'] = 0;
@@ -342,8 +380,17 @@ try {
         $transaction['balance'] = floatval($transaction['balance'] ?? $transaction['tuition_balance'] ?? 0);
         $transaction['total_payment'] = floatval($transaction['total_payment'] ?? $transaction['tuition_total_payment'] ?? $transaction['total_amount'] ?? 0);
         $transaction['amount_paid'] = floatval($transaction['amount_paid'] ?? $transaction['tuition_amount_paid'] ?? $transaction['payment_received'] ?? 0);
-        $transaction['receipt_type'] = $transaction['receipt_category'] ?? 'Receipt';
-        $transaction['transaction_type'] = $transaction['receipt_category'] ?? 'receipt';
+
+        $receiptCategory = trim((string)($transaction['receipt_category'] ?? ''));
+        if ($receiptCategory === '' || $receiptCategory === '0') {
+            $receiptCategory = $transaction['source'] === 'payment' ? 'Payment Receipt' : 'Tuition Receipt';
+        }
+        if (strtolower($receiptCategory) === 'tuition fee') {
+            $receiptCategory = 'Tuition Fee Receipt';
+        }
+        $transaction['receipt_category'] = $receiptCategory;
+        $transaction['receipt_type'] = $receiptCategory;
+        $transaction['transaction_type'] = $receiptCategory;
     }
 
     $transaction['payment_status_text'] = buildPaymentStatusText($transaction['payment_status'] ?? null, $transaction['balance'] ?? null);

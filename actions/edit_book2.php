@@ -48,10 +48,10 @@ if ($bookId > 0) {
     }
 
     if ($stmt->execute()) {
-        header("Location: /GCST_Track_System/pages/admin/edit_book.html?book_id=$bookId&status=edited");
+        header("Location: /GCST_Track_System/pages/admin/edit_book.php?book_id=$bookId&status=edited");
         exit();
     } else {
-        header("Location: /GCST_Track_System/pages/admin/edit_book.html?book_id=$bookId&status=error");
+        header("Location: /GCST_Track_System/pages/admin/edit_book.php?book_id=$bookId&status=error");
         exit();
     }
 }

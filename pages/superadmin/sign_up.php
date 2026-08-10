@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -456,7 +456,7 @@
             <button type="submit" class="btn btn-anim animate-item">Register Account</button>
 
             <div class="signin-link footer-anim animate-item">
-                Already have an account? <a href="../../pages/sign_in.html">Go to Sign In</a>
+                Already have an account? <a href="../../pages/sign_in.php">Go to Sign In</a>
             </div>
         </form>
     </div>
