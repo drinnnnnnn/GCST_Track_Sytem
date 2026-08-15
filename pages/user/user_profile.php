@@ -1244,6 +1244,27 @@
       return value;
     }
 
+    function normalizePaymentStatusText(txn) {
+      const rawText = String(txn?.payment_status_text || txn?.payment_status || '').trim();
+      if (!rawText) return 'N/A';
+      const lower = rawText.toLowerCase();
+      if (lower === 'partial payment' || lower === 'partial_payment' || lower === 'partial') return 'Partial Payment';
+      if (lower === 'fully paid' || lower === 'fully_paid' || lower === 'full payment' || lower === 'full_payment') return 'Fully Paid';
+      if (lower === 'paid') return 'Paid';
+      if (lower === 'pending') return 'Pending';
+      if (lower === 'voided') return 'Voided';
+      return rawText;
+    }
+
+    function getPaymentStatusClass(txn) {
+      const status = normalizePaymentStatusText(txn).toLowerCase();
+      if (status === 'partial payment') return 'pending';
+      if (status === 'fully paid') return 'complete';
+      if (status === 'paid') return 'complete';
+      if (status === 'pending') return 'pending';
+      return 'failed';
+    }
+
     function renderTransactionHistory(transactions) {
       const tbody = document.getElementById('txn-history-body');
       const mobileList = document.getElementById('txn-mobile-list');
@@ -1262,11 +1283,12 @@
       transactions.forEach(txn => {
         const row = document.createElement('tr');
         const receiptType = normalizeReceiptType(txn.receipt_type) || normalizeReceiptType(txn.receipt_category) || txn.transaction_type || (txn.source === 'tuition' ? 'Tuition Receipt' : 'Payment Receipt');
+        const statusText = normalizePaymentStatusText(txn);
         row.innerHTML = `
           <td class="px-4 py-4 text-slate-700">${formatDateTime(txn.created_at)}</td>
           <td class="px-4 py-4 text-slate-700">${txn.transaction_number || txn.receipt_number || 'N/A'}</td>
           <td class="px-4 py-4 text-slate-700">${escapeHtml(receiptType)}</td>
-          <td class="px-4 py-4"><span class="status-badge ${txn.payment_status === 'paid' ? 'complete' : txn.payment_status === 'pending' ? 'pending' : 'failed'}">${txn.payment_status?.toUpperCase() || 'N/A'}</span></td>
+          <td class="px-4 py-4"><span class="status-badge ${getPaymentStatusClass(txn)}">${statusText}</span></td>
           <td class="px-4 py-4 text-slate-700">${formatCurrency(txn.total_amount)}</td>
           <td class="px-4 py-4"><button class="btn btn-secondary btn-sm" onclick="viewTransactionReceipt('${encodeURIComponent(txn.transaction_number || txn.id)}')">View Receipt</button></td>
         `;
@@ -1290,7 +1312,7 @@
             </div>
             <div class="txn-row">
               <span class="txn-label">Status</span>
-              <span class="txn-value"><span class="status-badge ${txn.payment_status === 'paid' ? 'complete' : txn.payment_status === 'pending' ? 'pending' : 'failed'}">${txn.payment_status?.toUpperCase() || 'N/A'}</span></span>
+              <span class="txn-value"><span class="status-badge ${getPaymentStatusClass(txn)}">${statusText}</span></span>
             </div>
             <div class="txn-row">
               <span class="txn-label">Total</span>
@@ -1416,8 +1438,9 @@
         }
 
         const txn = response.transaction || {};
+        const modalStatus = normalizePaymentStatusText(txn);
         document.getElementById('receipt-modal-transaction').textContent = txn.transaction_number || 'N/A';
-        document.getElementById('receipt-modal-status').textContent = txn.payment_status ? txn.payment_status.toUpperCase() : 'N/A';
+        document.getElementById('receipt-modal-status').textContent = modalStatus;
         document.getElementById('receipt-modal-date').textContent = formatDateTime(txn.created_at);
         document.getElementById('receipt-modal-cashier').textContent = txn.cashier_name || 'N/A';
         document.getElementById('receipt-modal-payment-method').textContent = txn.payment_method || txn.payment_type || 'N/A';

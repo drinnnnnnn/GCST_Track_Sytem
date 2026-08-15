@@ -38,10 +38,13 @@ try {
      * COALESCE ensures that if no records are found, 0 is returned instead of NULL.
      */
     $sql = "SELECT 
-                (SELECT COALESCE(SUM(total_amount), 0) 
-                 FROM cashier_transactions 
-                 WHERE DATE(created_at) = CURDATE() 
-                 AND payment_status = 'paid') as total_sales_today,
+                (SELECT COALESCE(SUM(COALESCE(ti.total_item_amount, (ti.quantity * ti.unit_price), 0)), 0)
+                 FROM transaction_items ti
+                 INNER JOIN cashier_transactions ct ON ct.id = ti.cashier_transaction_id
+                 WHERE DATE(ct.created_at) = CURDATE()
+                   AND ct.payment_status = 'paid'
+                   AND (ct.receipt_category IS NULL OR TRIM(ct.receipt_category) = '')
+                   AND ti.product_id > 0) as total_sales_today,
                 
                 (SELECT COALESCE(SUM(stock_count), 0) 
                  FROM products) as total_inventory,

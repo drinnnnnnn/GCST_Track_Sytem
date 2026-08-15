@@ -85,7 +85,9 @@ try {
                ct.payment_method,
                ct.created_at,
                CONCAT(ac.first_name, ' ', ac.last_name) AS cashier_name,
-               'cashier' AS source
+               'cashier' AS source,
+               NULL AS payment_type,
+               NULL AS balance
         FROM cashier_transactions ct
         LEFT JOIN users u ON ct.user_id = u.id
         LEFT JOIN tuition_receipts tr ON (tr.transaction_number = ct.transaction_number OR tr.receipt_number = ct.receipt_number)
@@ -130,7 +132,9 @@ try {
                        'foundation day receipt'
                    ) THEN 'payment'
                    ELSE 'tuition'
-               END AS source
+               END AS source,
+               tr.payment_type AS payment_type,
+               tr.balance AS balance
         FROM tuition_receipts tr
         LEFT JOIN users u2 ON tr.user_id = u2.id
         LEFT JOIN admincashier_acc aa ON tr.cashier_id = aa.id
@@ -150,6 +154,26 @@ try {
 
     $txns = [];
     while ($row = $result->fetch_assoc()) {
+        $statusText = strtolower(trim((string)($row['payment_status'] ?? '')));
+        $paymentTypeText = strtolower(trim((string)($row['payment_type'] ?? '')));
+        $balanceValue = $row['balance'] ?? null;
+
+        if (strtolower((string)($row['source'] ?? '')) === 'tuition' || strpos(strtolower((string)($row['receipt_type'] ?? '')), 'tuition') !== false) {
+            if ($paymentTypeText === 'partial payment') {
+                $row['payment_status_text'] = 'Partial Payment';
+            } elseif ($balanceValue !== null && is_numeric($balanceValue) && floatval($balanceValue) <= 0.0) {
+                $row['payment_status_text'] = 'Fully Paid';
+            } elseif ($statusText === 'pending') {
+                $row['payment_status_text'] = 'Pending';
+            } elseif ($statusText === 'paid') {
+                $row['payment_status_text'] = 'Paid';
+            } else {
+                $row['payment_status_text'] = ucfirst($statusText ?: 'Paid');
+            }
+        } else {
+            $row['payment_status_text'] = $statusText === 'pending' ? 'Pending' : ($statusText === 'paid' ? 'Paid' : ucfirst($statusText ?: 'Paid'));
+        }
+
         $txns[] = $row;
     }
 
