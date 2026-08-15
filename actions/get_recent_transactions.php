@@ -6,8 +6,17 @@ requireAuth(['admincashier', 'superadmin', 'student', 'user']);
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/db_connect.php';
 
-function buildTransactionStatusText($paymentStatus, $receiptCategory = '', $balance = null) {
+function buildTransactionStatusText($paymentStatus, $receiptCategory = '', $balance = null, $paymentType = '') {
     $status = strtolower(trim((string)$paymentStatus));
+    
+    // Check if this is a tuition fee receipt with partial payment
+    $receiptCategoryLower = strtolower(trim((string)$receiptCategory));
+    $paymentTypeLower = strtolower(trim((string)$paymentType));
+    
+    if (strpos($receiptCategoryLower, 'tuition') !== false && $paymentTypeLower === 'partial payment') {
+        return 'Partial Payment';
+    }
+    
     if ($balance !== null && is_numeric($balance) && floatval($balance) <= 0.0) {
         return 'Fully Paid';
     }
@@ -73,6 +82,8 @@ try {
         $where .= " AND ct.payment_status = 'pending'";
     } elseif ($normalizedStatus === 'fully_paid' || $normalizedStatus === 'fully paid') {
         $where .= " AND ct.payment_status = 'paid' AND tr.balance <= 0.0";
+    } elseif ($normalizedStatus === 'partial_payment' || $normalizedStatus === 'partial payment') {
+        $where .= " AND tr.payment_type = 'Partial Payment'";
     } elseif ($normalizedStatus === 'tuition fee') {
         $where .= " AND (ct.receipt_category = 'Tuition Receipt' OR ct.receipt_category = 'Tuition Fee Receipt' OR ct.receipt_category = 'Tuition Fee')";
     } elseif ($normalizedStatus === 'medical receipt') {
@@ -98,7 +109,8 @@ try {
         $sql = "SELECT ct.*, u.student_id, u.first_name AS user_first_name, u.last_name AS user_last_name,
                  CONCAT(ac.first_name, ' ', ac.last_name) as cashier_name,
                  tr.balance AS tuition_balance,
-                 tr.balance AS balance
+                 tr.balance AS balance,
+                 tr.payment_type AS payment_type_tuition
              FROM cashier_transactions ct
              LEFT JOIN users u ON ct.user_id = u.id
              LEFT JOIN admincashier_acc ac ON ct.cashier_id = ac.id
@@ -119,7 +131,12 @@ try {
                 $row['student_name'] = $full;
             }
         }
-        $row['payment_status_text'] = buildTransactionStatusText($row['payment_status'] ?? null, $row['receipt_category'] ?? '', $row['tuition_balance'] ?? null);
+        $row['payment_status_text'] = buildTransactionStatusText(
+            $row['payment_status'] ?? null, 
+            $row['receipt_category'] ?? '', 
+            $row['tuition_balance'] ?? null,
+            $row['payment_type_tuition'] ?? ''
+        );
         $txns[] = $row;
     }
 

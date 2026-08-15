@@ -2140,6 +2140,7 @@
                 <option value="paid">Paid</option>
                 <option value="pending">Pending</option>
                 <option value="fully_paid">Fully Paid</option>
+                <option value="partial_payment">Partial Payment</option>
                 <option value="Tuition Fee">Tuition Fee</option>
                 <option value="Medical Receipt">Medical Receipt</option>
                 <option value="Insurance Receipt">Insurance Receipt</option>
@@ -2353,8 +2354,8 @@
                 <input id="tuition-student-name" type="text" class="search-input receipt-input" placeholder="Name" title="Please enter the student name." />
               </div>
               <div class="receipt-field-group">
-                <label class="receipt-label">Amount Paid (₱)</label>
-                <input id="tuition-amount" type="number" min="0" step="0.01" class="search-input receipt-input" placeholder="0.00" oninput="updateTuitionBalance()" />
+                <label class="receipt-label">Amount Paying Now (₱)</label>
+                <input id="tuition-amount" type="number" min="0" step="0.01" class="search-input receipt-input" placeholder="0.00" oninput="updateTuitionBalance()" title="Enter the amount of payment to be made in this transaction" />
               </div>
               <div class="receipt-field-group">
                 <label class="receipt-label">Course</label>
@@ -2403,16 +2404,16 @@
             <div class="receipt-card-title"><i class="fas fa-calculator"></i> Tuition Fee Breakdown</div>
             <div class="receipt-form-grid">
               <div class="receipt-field-group">
-                <label class="receipt-label">Total Payment (₱)</label>
-                <input id="tuition-total-payment" type="number" min="0" step="0.01" class="search-input receipt-input" placeholder="0.00" oninput="updateTuitionBalance()" />
+                <label class="receipt-label">Total Fees Due (₱)</label>
+                <input id="tuition-total-payment" type="number" min="0" step="0.01" class="search-input receipt-input" placeholder="0.00" oninput="updateTuitionBalance()" title="Total outstanding tuition fees for the student" />
               </div>
               <div class="receipt-field-group">
                 <label class="receipt-label">O.R.#</label>
                 <input id="tuition-or-number" type="text" inputmode="numeric" pattern="\d*" class="search-input receipt-input" placeholder="Only digits" maxlength="20" />
               </div>
               <div class="receipt-field-group">
-                <label class="receipt-label">Balance (₱)</label>
-                <input id="tuition-balance" type="text" readonly class="search-input receipt-input" placeholder="0.00" style="background: #f8fafc;" />
+                <label class="receipt-label">Remaining Balance (₱)</label>
+                <input id="tuition-balance" type="text" readonly class="search-input receipt-input" placeholder="0.00" style="background: #f8fafc;" title="Auto-calculated: Total Fees Due - Amount Paying Now" />
                 <div id="tuition-balance-loading" style="display:none; margin-top: 6px; font-size: 0.82rem; color: #2563eb;">
                   <i class="fas fa-circle-notch fa-spin" style="margin-right: 6px;"></i>Loading tuition balance...
                 </div>
@@ -5163,17 +5164,9 @@
       document.getElementById('tuition-student-semester').value = '';
       document.getElementById('tuition-provisional-number').value = '';
       document.getElementById('tuition-amount').value = '';
-      const totalPaymentInput = document.getElementById('tuition-total-payment');
-      if (totalPaymentInput) {
-        totalPaymentInput.value = '';
-        totalPaymentInput.dataset.originalTotalFees = '';
-      }
+      document.getElementById('tuition-total-payment').value = '';
       document.getElementById('tuition-or-number').value = '';
-      const balanceInput = document.getElementById('tuition-balance');
-      if (balanceInput) {
-        balanceInput.value = '';
-        balanceInput.dataset.initialBalance = '';
-      }
+      document.getElementById('tuition-balance').value = '';
       document.getElementById('tuition-remarks').value = '';
       document.getElementById('tuition-note').value = '';
       document.getElementById('tuition-receipt-mode').value = 'Payment Receipt';
@@ -5228,31 +5221,32 @@
 
     function updateTuitionBalance() {
       const totalPaymentInput = document.getElementById('tuition-total-payment');
-      const totalPayment = parseFloat(totalPaymentInput?.value || '');
-      const originalTotalFees = parseFloat(totalPaymentInput?.dataset.originalTotalFees || '');
-      const amount = parseFloat(document.getElementById('tuition-amount').value);
+      const amountPaidInput = document.getElementById('tuition-amount');
       const balanceInput = document.getElementById('tuition-balance');
-      if (!balanceInput) return;
-
-      const initialBalance = parseFloat(balanceInput.dataset.initialBalance || '');
-      if (!isNaN(amount)) {
-        if (!isNaN(initialBalance)) {
-          balanceInput.value = Math.max(initialBalance - amount, 0).toFixed(2);
-        } else if (!isNaN(originalTotalFees)) {
-          balanceInput.value = Math.max(originalTotalFees - amount, 0).toFixed(2);
-        } else if (!isNaN(totalPayment)) {
-          balanceInput.value = Math.max(totalPayment - amount, 0).toFixed(2);
+      const paymentTypeSelect = document.getElementById('tuition-payment-type');
+      
+      if (!totalPaymentInput || !amountPaidInput || !balanceInput) return;
+      
+      // Get the total fees due
+      const totalFees = parseFloat(totalPaymentInput.value) || 0;
+      // Get the amount being paid now
+      const amountPaid = parseFloat(amountPaidInput.value) || 0;
+      
+      // Calculate balance: Total Fees Due - Amount Paid (minimum 0)
+      const balance = Math.max(0, totalFees - amountPaid);
+      
+      // Update the balance field
+      balanceInput.value = balance.toFixed(2);
+      
+      // Auto-detect payment type based on amounts
+      if (paymentTypeSelect && totalFees > 0 && amountPaid > 0) {
+        if (amountPaid >= totalFees) {
+          // Amount paid is greater than or equal to total fees = Full Payment
+          paymentTypeSelect.value = 'Full Payment';
         } else {
-          balanceInput.value = '';
+          // Amount paid is less than total fees = Partial Payment
+          paymentTypeSelect.value = 'Partial Payment';
         }
-      } else if (!isNaN(initialBalance)) {
-        balanceInput.value = initialBalance.toFixed(2);
-      } else if (!isNaN(originalTotalFees)) {
-        balanceInput.value = originalTotalFees.toFixed(2);
-      } else if (!isNaN(totalPayment)) {
-        balanceInput.value = totalPayment.toFixed(2);
-      } else {
-        balanceInput.value = '';
       }
     }
 
@@ -5298,6 +5292,7 @@
         }
 
         const totalPaymentInput = document.getElementById('tuition-total-payment');
+        const amountPaidInput = document.getElementById('tuition-amount');
         const balanceInput = document.getElementById('tuition-balance');
         const nameInput = document.getElementById('tuition-student-name');
         const emailInput = document.getElementById('tuition-student-email');
@@ -5308,17 +5303,31 @@
         if (emailInput && !emailInput.value.trim()) {
           emailInput.value = data.student.email || '';
         }
-        const totalFees = parseFloat(data.student.total_fees || 0);
+        
+        // Use the current outstanding balance (after previous payments), not the original total fees
+        const currentOutstandingBalance = parseFloat(data.student.tuition_balance || 0);
+        
+        // Set the total fees due (should reflect current outstanding balance after partial payments)
         if (totalPaymentInput) {
-          totalPaymentInput.dataset.originalTotalFees = isNaN(totalFees) ? '' : totalFees.toFixed(2);
-          if (!totalPaymentInput.value.trim() || parseFloat(totalPaymentInput.value) === 0) {
-            totalPaymentInput.value = totalFees.toFixed(2);
-          }
+          totalPaymentInput.value = !isNaN(currentOutstandingBalance) ? currentOutstandingBalance.toFixed(2) : '0.00';
         }
+        
+        // Reset the amount paid to 0 for new payment entry
+        if (amountPaidInput) {
+          amountPaidInput.value = '0.00';
+        }
+        
+        // Update the balance field to show current outstanding balance
         if (balanceInput) {
-          const initialBalance = parseFloat(data.student.tuition_balance || 0);
-          balanceInput.value = initialBalance.toFixed(2);
-          balanceInput.dataset.initialBalance = isNaN(initialBalance) ? '' : initialBalance.toFixed(2);
+          balanceInput.value = !isNaN(currentOutstandingBalance) ? currentOutstandingBalance.toFixed(2) : '0.00';
+        }
+        
+        // Initialize payment type based on student's balance
+        const paymentTypeSelect = document.getElementById('tuition-payment-type');
+        if (paymentTypeSelect) {
+          // If student has a balance, it will be partial payment
+          // Set default to Partial Payment for new payments
+          paymentTypeSelect.value = currentOutstandingBalance > 0 ? 'Partial Payment' : 'Full Payment';
         }
 
         updateTuitionBalance();
@@ -5395,6 +5404,7 @@
         const yearSelect = document.getElementById('tuition-student-year-level');
         const emailInput = document.getElementById('tuition-student-email');
         const totalPaymentInput = document.getElementById('tuition-total-payment');
+        const amountPaidInput = document.getElementById('tuition-amount');
         const balanceInput = document.getElementById('tuition-balance');
 
         if (studentNameInput) studentNameInput.value = '';
@@ -5402,12 +5412,8 @@
         if (courseSelect) courseSelect.value = '';
         if (yearSelect) yearSelect.value = '';
         if (totalPaymentInput) totalPaymentInput.value = '';
-        if (balanceInput) {
-          balanceInput.value = '';
-        }
-        if (totalPaymentInput) {
-          totalPaymentInput.dataset.originalTotalFees = '';
-        }
+        if (amountPaidInput) amountPaidInput.value = '';
+        if (balanceInput) balanceInput.value = '';
       }
     }
 
@@ -5728,7 +5734,7 @@
               <td><span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; text-transform: uppercase; font-size: 0.7rem;">${highlightMatch(entry.receiptType, currentSearch)}</span></td>
               <td style="font-weight: 700; color: #1e293b; text-align: right;">${formatCurrency(entry.total)}</td>
               <td style="font-size: 0.85rem; color: #4b5563;">${highlightMatch(entry.cashier, currentSearch)}</td>
-              <td><span class="badge ${String(entry.status || '').toLowerCase() === 'paid' || String(entry.status || '').toLowerCase() === 'fully paid' ? 'badge-success' : 'badge-warning'}" style="text-transform: uppercase; font-size: 0.75rem;">${highlightMatch(entry.status, currentSearch)}</span></td>
+              <td><span class="badge" style="${getStatusBadgeStyle(entry.status)} text-transform: uppercase; font-size: 0.75rem; padding: 6px 12px; border-radius: 999px; display: inline-block;">${highlightMatch(entry.status, currentSearch)}</span></td>
               <td style="text-align: center;"><button class="btn btn-secondary btn-sm" onclick="reprintReceipt('${entry.receiptNumber}', 'receipt')" title="View Details"><i class="fas fa-eye"></i></button></td>
             </tr>
           `).join('');
@@ -6144,6 +6150,19 @@
       return String(text).replace(regex, '<mark style="background: #fef08a; color: #1e293b; padding: 0 2px; border-radius: 4px; font-weight: inherit;">$1</mark>');
     }
 
+    function getStatusBadgeStyle(statusText) {
+      const statusLower = String(statusText || '').toLowerCase();
+      if (statusLower === 'paid' || statusLower === 'fully paid') {
+        return 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
+      } else if (statusLower === 'partial payment') {
+        return 'background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd;';
+      } else if (statusLower === 'pending') {
+        return 'background: #fef3c7; color: #b45309; border: 1px solid #fcd34d;';
+      } else {
+        return 'background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db;';
+      }
+    }
+
     function renderRecentTransactions(data, query = '', status = 'all') {
       const body = document.getElementById('txn-history-body');
       const empty = document.getElementById('txn-history-empty');
@@ -6217,7 +6236,9 @@
           <td><span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; text-transform: uppercase; font-size: 0.7rem;">${highlightMatch(txn.receipt_category || txn.transaction_type, query)}</span></td>
           <td style="font-weight: 700; color: #1e293b;">${formatCurrency(txn.total_amount)}</td>
           <td style="font-size: 0.85rem; color: #4b5563;">${highlightMatch(txn.cashier_name || '', query)}</td>
-          <td><span class="badge ${String(txn.payment_status_text || txn.payment_status || '').toLowerCase() === 'paid' || String(txn.payment_status_text || txn.payment_status || '').toLowerCase() === 'fully paid' ? 'badge-success' : 'badge-warning'}" style="text-transform: uppercase; font-size: 0.75rem;">${highlightMatch(txn.payment_status_text || txn.payment_status, query)}</span></td>
+          <td>
+            <span class="badge" style="${getStatusBadgeStyle(txn.payment_status_text || txn.payment_status)} text-transform: uppercase; font-size: 0.75rem; padding: 6px 12px; border-radius: 999px; display: inline-block;">${highlightMatch(txn.payment_status_text || txn.payment_status, query)}</span>
+          </td>
           <td><button class="btn btn-secondary btn-sm" onclick="reprintReceipt('${txn.transaction_number}', 'cashier')" title="View Details"><i class="fas fa-eye"></i> View</button></td>
         `;
         body.appendChild(tr);
