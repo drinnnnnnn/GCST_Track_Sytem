@@ -2388,7 +2388,7 @@
                   <option value="Irregular Student">Irregular Student</option>
                 </select>
               </div>
-              <div class="receipt-field-group">
+              <div id="tuition-semester-field-group" class="receipt-field-group">
                 <label class="receipt-label">Semester</label>
                 <select id="tuition-student-semester" class="search-input receipt-input">
                   <option value="">Select Semester</option>
@@ -2442,7 +2442,7 @@
                   <option value="Educational Receipt">Educational Receipt</option>
                 </select>
               </div>
-              <div class="receipt-field-group">
+              <div id="tuition-payment-type-group" class="receipt-field-group">
                 <label class="receipt-label">Partial / Full Payment</label>
                 <select id="tuition-payment-type" class="search-input receipt-select">
                   <option value="Partial Payment">Partial Payment</option>
@@ -3833,21 +3833,142 @@
     }
 
     function openTuitionReceiptConfirmationModal() {
-      const modal = document.getElementById('tuition-receipt-confirm-modal');
-      if (!modal) return;
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      // Populate all transaction review details
+      const studentName = document.getElementById('tuition-student-name')?.value || '—';
+      const studentId = document.getElementById('tuition-student-id')?.value || '—';
+      const course = document.getElementById('tuition-student-course')?.value || '—';
+      const yearLevel = document.getElementById('tuition-student-year-level')?.value || '—';
+      const studentType = document.getElementById('tuition-student-type')?.value || '—';
+      const semester = document.getElementById('tuition-student-semester')?.value || '—';
+      const provNumber = document.getElementById('tuition-provisional-number')?.value || '—';
+      const amount = document.getElementById('tuition-amount')?.value || '0.00';
+      const paymentMethod = document.getElementById('tuition-form-of-payment')?.value || 'Cash';
+      const checkNumber = document.getElementById('tuition-check-number')?.value || '—';
+      const authRep = document.getElementById('tuition-authorized-rep')?.value || '—';
+      const email = document.getElementById('tuition-student-email')?.value || '—';
+      const remarks = document.getElementById('tuition-remarks')?.value || '—';
+      const notes = document.getElementById('tuition-note')?.value || '—';
+      const receiptMode = currentReceiptMode === 'tuition' ? 'Tuition Fee' : 'Payment';
+      const paymentType = document.getElementById('tuition-payment-type')?.value || '—';
+      const orNumber = document.getElementById('tuition-or-number')?.value || '—';
+      const totalPayment = document.getElementById('tuition-total-payment')?.value || '0.00';
+      
+      // Update review modal with all fields
+      const reviewModal = document.getElementById('tuition-receipt-review-modal');
+      if (reviewModal) {
+        // Student Details
+        document.getElementById('tuition-review-student-name').textContent = studentName;
+        document.getElementById('tuition-review-student-id').textContent = studentId;
+        document.getElementById('tuition-review-course').textContent = course;
+        document.getElementById('tuition-review-year-level').textContent = yearLevel;
+        document.getElementById('tuition-review-student-type').textContent = studentType;
+        document.getElementById('tuition-review-semester').textContent = semester;
+        
+        // Semester visibility based on mode
+        const semesterRow = document.getElementById('tuition-review-semester-row');
+        if (semesterRow) {
+          semesterRow.style.display = currentReceiptMode === 'tuition' ? '' : 'none';
+        }
+        
+        // Payment Details
+        document.getElementById('tuition-review-prov-number').textContent = provNumber;
+        document.getElementById('tuition-review-receipt-type').textContent = receiptMode + ' Receipt';
+        document.getElementById('tuition-review-amount').textContent = formatCurrency(parseFloat(amount) || 0);
+        document.getElementById('tuition-review-payment-method').textContent = paymentMethod;
+        
+        // Conditional fields based on mode
+        const totalPaymentRow = document.getElementById('tuition-review-total-payment-row');
+        const paymentTypeRow = document.getElementById('tuition-review-payment-type-row');
+        const orNumberRow = document.getElementById('tuition-review-or-number-row');
+        
+        if (totalPaymentRow) {
+          if (currentReceiptMode === 'tuition') {
+            totalPaymentRow.style.display = '';
+            document.getElementById('tuition-review-total-payment').textContent = formatCurrency(parseFloat(totalPayment) || 0);
+          } else {
+            totalPaymentRow.style.display = 'none';
+          }
+        }
+        
+        if (paymentTypeRow) {
+          if (currentReceiptMode === 'tuition') {
+            paymentTypeRow.style.display = '';
+            document.getElementById('tuition-review-payment-type').textContent = paymentType;
+          } else {
+            paymentTypeRow.style.display = 'none';
+          }
+        }
+        
+        if (orNumberRow) {
+          if (currentReceiptMode === 'tuition') {
+            orNumberRow.style.display = '';
+            document.getElementById('tuition-review-or-number').textContent = orNumber;
+          } else {
+            orNumberRow.style.display = 'none';
+          }
+        }
+        
+        // Check number visibility
+        const checkNumberRow = document.getElementById('tuition-review-check-number-row');
+        if (checkNumberRow) {
+          checkNumberRow.style.display = paymentMethod === 'Check' ? '' : 'none';
+          if (paymentMethod === 'Check') {
+            document.getElementById('tuition-review-check-number').textContent = checkNumber;
+          }
+        }
+        
+        // Additional Information
+        const authRepRow = document.getElementById('tuition-review-auth-rep-row');
+        const emailRow = document.getElementById('tuition-review-email-row');
+        const remarksRow = document.getElementById('tuition-review-remarks-row');
+        const notesRow = document.getElementById('tuition-review-notes-row');
+        
+        if (authRepRow) {
+          authRepRow.style.display = authRep && authRep !== '—' ? '' : 'none';
+          document.getElementById('tuition-review-auth-rep').textContent = authRep;
+        }
+        
+        if (emailRow) {
+          emailRow.style.display = email && email !== '—' ? '' : 'none';
+          document.getElementById('tuition-review-email').textContent = email;
+        }
+        
+        if (remarksRow) {
+          remarksRow.style.display = remarks && remarks !== '—' ? '' : 'none';
+          document.getElementById('tuition-review-remarks').textContent = remarks;
+        }
+        
+        if (notesRow) {
+          notesRow.style.display = notes && notes !== '—' ? '' : 'none';
+          document.getElementById('tuition-review-notes').textContent = notes;
+        }
+        
+        // Populate Admin Signature
+        const adminNameElement = document.getElementById('tuition-review-admin-name');
+        const signatureImageElement = document.getElementById('tuition-review-signature-image');
+        if (adminNameElement) {
+          adminNameElement.textContent = currentAdminName || 'Admin Cashier';
+        }
+        if (signatureImageElement && currentAdminSignatureImage) {
+          signatureImageElement.src = getSignatureImageUrl(currentAdminSignatureImage);
+          signatureImageElement.style.display = '';
+        } else if (signatureImageElement) {
+          signatureImageElement.style.display = 'none';
+        }
+        
+        reviewModal.classList.remove('hidden');
+      }
     }
 
-    function closeTuitionReceiptConfirmationModal() {
-      const modal = document.getElementById('tuition-receipt-confirm-modal');
-      if (!modal) return;
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
+    function closeTuitionReceiptReviewModal() {
+      const modal = document.getElementById('tuition-receipt-review-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
     }
 
-    function confirmGenerateTuitionReceipt() {
-      closeTuitionReceiptConfirmationModal();
+    function confirmTuitionReceiptGeneration() {
+      closeTuitionReceiptReviewModal();
       showReceiptLoadingOverlay();
       generateTuitionReceipt();
     }
@@ -4884,6 +5005,18 @@
         } else {
           paymentTypeSelect.value = 'Full Payment';
         }
+      }
+
+      // Hide Semester field in payment receipt mode
+      const semesterField = document.getElementById('tuition-semester-field-group');
+      if (semesterField) {
+        semesterField.style.display = isTuition ? '' : 'none';
+      }
+
+      // Hide Partial / Full Payment field in payment receipt mode (always Full Payment in payment mode)
+      const paymentTypeGroup = document.getElementById('tuition-payment-type-group');
+      if (paymentTypeGroup) {
+        paymentTypeGroup.style.display = isTuition ? '' : 'none';
       }
 
       toggleReceiptGenerateButtonVisibility();
@@ -7313,6 +7446,146 @@
       <div class="confirmation-modal-actions">
         <button type="button" class="confirmation-modal-btn cancel" onclick="closeTuitionReceiptConfirmationModal()">Cancel</button>
         <button type="button" class="confirmation-modal-btn confirm" onclick="confirmGenerateTuitionReceipt()">Yes, Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tuition Receipt Transaction Review Modal -->
+  <div id="tuition-receipt-review-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+    <div class="panel" style="width: min(600px, 92vw); border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28); animation: modalFadeIn 0.2s ease-out; max-height: 90vh; overflow-y: auto;">
+      <div style="padding: 22px 24px 18px; border-bottom: 1px solid #e2e8f0; background: linear-gradient(90deg, #f8fafc 0%, #eef2ff 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div>
+            <p style="margin: 0; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #4f46e5;">Transaction Review</p>
+            <h3 style="margin: 6px 0 0; font-size: 1.2rem; font-weight: 800; color: #0f172a;">Confirm Transaction</h3>
+          </div>
+          <button id="tuition-review-close" type="button" class="btn btn-sm" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 12px;" onclick="closeTuitionReceiptReviewModal()" aria-label="Close review">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div style="padding: 24px; background: #fff;">
+        <p style="margin: 0 0 20px; color: #334155; font-size: 0.95rem; line-height: 1.5; font-weight: 500;">Please review all the information before finalizing this receipt:</p>
+        
+        <!-- Student Details Section -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: #4f46e5; margin-bottom: 14px; letter-spacing: 0.08em; padding-bottom: 8px; border-bottom: 2px solid #eef2ff;">Student Details</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Student Name</span>
+              <strong id="tuition-review-student-name" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Student ID</span>
+              <strong id="tuition-review-student-id" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Course</span>
+              <strong id="tuition-review-course" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Year Level</span>
+              <strong id="tuition-review-year-level" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Student Type</span>
+              <strong id="tuition-review-student-type" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div id="tuition-review-semester-row" style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Semester</span>
+              <strong id="tuition-review-semester" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Details Section -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: #4f46e5; margin-bottom: 14px; letter-spacing: 0.08em; padding-bottom: 8px; border-bottom: 2px solid #eef2ff;">Payment Details</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Prov. Receipt #</span>
+              <strong id="tuition-review-prov-number" style="color: #0f172a; font-size: 0.95rem; font-family: monospace;">—</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Receipt Type</span>
+              <strong id="tuition-review-receipt-type" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Amount Paying</span>
+              <strong id="tuition-review-amount" style="color: #0f172a; font-size: 0.95rem;">₱0.00</strong>
+            </div>
+            <div id="tuition-review-total-payment-row" style="display: none; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Total Payment</span>
+              <strong id="tuition-review-total-payment" style="color: #0f172a; font-size: 0.95rem;">₱0.00</strong>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Form of Payment</span>
+              <strong id="tuition-review-payment-method" style="color: #0f172a; font-size: 0.95rem;">Cash</strong>
+            </div>
+            <div id="tuition-review-check-number-row" style="display: none; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Check Number</span>
+              <strong id="tuition-review-check-number" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div id="tuition-review-payment-type-row" style="display: none; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Payment Type</span>
+              <strong id="tuition-review-payment-type" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div id="tuition-review-or-number-row" style="display: none; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">O.R. #</span>
+              <strong id="tuition-review-or-number" style="color: #0f172a; font-size: 0.95rem; font-family: monospace;">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: #4f46e5; margin-bottom: 14px; letter-spacing: 0.08em; padding-bottom: 8px; border-bottom: 2px solid #eef2ff;">Additional Information</div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div id="tuition-review-auth-rep-row" style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Authorized Representative</span>
+              <strong id="tuition-review-auth-rep" style="color: #0f172a; font-size: 0.95rem;">—</strong>
+            </div>
+            <div id="tuition-review-email-row" style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Student Email</span>
+              <strong id="tuition-review-email" style="color: #0f172a; font-size: 0.95rem; word-break: break-all;">—</strong>
+            </div>
+            <div id="tuition-review-remarks-row" style="display: none; flex-direction: column; gap: 6px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Remarks</span>
+              <div id="tuition-review-remarks" style="color: #0f172a; font-size: 0.88rem; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; line-height: 1.4;">—</div>
+            </div>
+            <div id="tuition-review-notes-row" style="display: none; flex-direction: column; gap: 6px;">
+              <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Additional Notes</span>
+              <div id="tuition-review-notes" style="color: #0f172a; font-size: 0.88rem; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; line-height: 1.4;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+          <button id="tuition-review-cancel" type="button" class="btn btn-secondary" onclick="closeTuitionReceiptReviewModal()">Cancel</button>
+          <button id="tuition-review-confirm" type="button" class="btn btn-primary" onclick="confirmTuitionReceiptGeneration()">
+            <i class="fas fa-check-circle"></i> Generate Receipt
+          </button>
+        </div>
+
+        <!-- Signature Section -->
+        <div style="margin-top: 32px; padding-top: 28px; border-top: 2px solid #eef2ff;">
+          <div style="text-align: center;">
+            <div style="font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: #4f46e5; margin-bottom: 16px; letter-spacing: 0.08em;">Approved By</div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <!-- Signature Image -->
+              <div id="tuition-review-signature-container" style="height: 60px; width: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                <img id="tuition-review-signature-image" src="" alt="Signature" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
+              </div>
+              <!-- Signature Line -->
+              <div style="width: 160px; border-top: 2px solid #0f172a; margin: 12px 0; margin-bottom: 4px;"></div>
+              <!-- Admin Name -->
+              <div id="tuition-review-admin-name" style="font-size: 0.92rem; font-weight: 700; color: #0f172a; margin-top: 4px;">Admin Cashier</div>
+              <!-- Admin Title -->
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px;">Admin Cashier</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
