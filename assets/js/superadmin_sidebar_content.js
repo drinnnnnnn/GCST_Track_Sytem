@@ -200,7 +200,7 @@ export function getSidebarHTML() {
         flex-direction: column;
         padding: 1rem 0.9rem;
         border-right: 1px solid rgba(var(--border-rgb), 0.18);
-        background: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(18px) saturate(170%);
         -webkit-backdrop-filter: blur(18px) saturate(170%);
         transition: width 0.35s ease, transform 0.35s ease, background 0.25s ease;
@@ -238,7 +238,7 @@ export function getSidebarHTML() {
         align-items: center;
         justify-content: space-between;
         gap: 0.75rem;
-        margin: 0.25rem 0 1.4rem;
+        margin: 0.25rem 0 1.1rem;
         padding: 0.9rem 0.8rem;
         border-radius: 1rem;
         background: rgba(255, 255, 255, 0.65);
@@ -326,46 +326,30 @@ export function getSidebarHTML() {
         color: var(--primary);
         line-height: 1;
     }
-    /* The button container */
-    .sidebar-minimize-btn {
-        position: absolute;
-        top: 20px;
-        right: -14px;
-        width: 28px;
-        height: 28px;
-        display: flex;
+    .brand-toggle {
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: #ffffff;
-        border: 1px solid #dadce0;
-        border-radius: 50%;
-        color: #5f6368;
+        flex-shrink: 0;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0.75rem;
         cursor: pointer;
-        z-index: 1005;
-        /* Ensure no box-shadow is present */
-        box-shadow: none; 
-        transition: none;
     }
 
-    .sidebar-minimize-btn:hover {
-        background: #f8f9fa;
-        border-color: #d1d5da;
-        color: #202124;
-        box-shadow: none; 
-        transition: none;
+    .brand-toggle:hover .brand-logo {
+        transform: scale(1.06);
+        filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.14));
     }
 
-    /* Icon refinement */
-    .sidebar-minimize-btn i {
-        font-size: 12px;
-        /* This pushes it slightly to the right to visually balance the chevron */
-        margin-left: 1px; 
-        transition: none;
+    .brand-toggle:focus-visible {
+        outline: 3px solid rgba(102, 126, 234, 0.25);
+        outline-offset: 4px;
     }
 
-    /* Instant rotation for Open/Close state */
-    .sidebar.minimized .sidebar-minimize-btn i {
-        transform: rotate(180deg);
+    .brand-logo {
+        transition: transform 0.25s ease, filter 0.25s ease;
     }
 
     .sidebar-nav-wrap {
@@ -410,11 +394,11 @@ export function getSidebarHTML() {
         display: flex;
         align-items: center;
         gap: 0.95rem;
-        padding: 0.9rem 0.95rem;
-        border-radius: 0.95rem;
+        padding: 0.78rem 0.95rem;
+        border-radius: 11px;
         color: var(--text-muted);
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 0.86rem;
         text-decoration: none;
         transition: all 0.2s ease;
         position: relative;
@@ -437,9 +421,9 @@ export function getSidebarHTML() {
         box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.12);
     }
     .sidebar-link.active {
-        background: var(--primary-blue);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: #ffffff;
-        box-shadow: 0 10px 18px -12px rgba(37, 99, 235, 0.45);
+        box-shadow: 0 9px 18px rgba(220, 38, 38, 0.22);
     }
     .sidebar-link.active::before {
         content: '';
@@ -476,15 +460,25 @@ export function getSidebarHTML() {
 
         .sidebar.minimized .sidebar-brand {
             justify-content: center;
-            padding: 0.9rem 0;
+            margin-bottom: 1rem;
+            padding: 0.65rem 0;
         }
 
         .sidebar.minimized .brand-content {
             justify-content: center;
         }
 
+        .sidebar.minimized .brand-toggle {
+            width: 3.25rem;
+            height: 3.25rem;
+        }
+
+        .sidebar.minimized .brand-logo {
+            width: 3.25rem;
+            height: 3.25rem;
+        }
+
         .sidebar.minimized .brand-text,
-        .sidebar.minimized .nav-section-label,
         .sidebar.minimized .sidebar-link span {
             opacity: 0;
             width: 0;
@@ -493,15 +487,34 @@ export function getSidebarHTML() {
             transition: opacity 0.2s ease, width 0.2s ease;
         }
 
+        .sidebar.minimized .nav-section-label {
+            display: none;
+        }
+
         .sidebar.minimized .sidebar-link {
             justify-content: center;
-            padding: 0.9rem 0.7rem;
+            min-height: 3.25rem;
+            padding: 0.35rem;
             border-radius: 0.9rem;
         }
 
         .sidebar.minimized .sidebar-link i {
+            width: 2.75rem;
+            height: 2.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             margin: 0;
             font-size: 1.1rem;
+            border-radius: 0.8rem;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(var(--border-rgb), 0.14);
+        }
+
+        .sidebar.minimized .sidebar-link.active i {
+            background: transparent;
+            border-color: transparent;
+            color: inherit;
         }
 
         .sidebar.minimized .sidebar-footer {
@@ -521,10 +534,6 @@ export function getSidebarHTML() {
 
         .sidebar.active {
             transform: translateX(0);
-        }
-
-        .sidebar-minimize-btn {
-            display: none;
         }
 
         .mobile-sidebar-toggle {
@@ -644,7 +653,9 @@ export function getSidebarHTML() {
 <aside id="main-sidebar" class="sidebar" aria-label="Main Sidebar">
     <div class="sidebar-brand" id="sidebar-brand-area">
         <div class="brand-content">
-            <img src="/GCST_Track_System/assets/images/icons/granby_logo.png" alt="Granby Colleges Logo" class="brand-logo">
+            <button onclick="toggleMinimizeSidebar()" id="brand-toggle" class="brand-toggle" title="Collapse sidebar" aria-label="Collapse sidebar" type="button">
+                <img src="/GCST_Track_System/assets/images/icons/granby_logo.png" alt="Granby Colleges Logo" class="brand-logo">
+            </button>
             <div class="brand-text">
                 <span class="brand-subtitle">Granby Colleges of</span>
                 <h2 class="brand-title">Science & Technology</h2>
@@ -652,9 +663,6 @@ export function getSidebarHTML() {
             </div>
         </div>
 
-        <button onclick="toggleMinimizeSidebar()" id="sidebar-minimize-btn" class="sidebar-minimize-btn" title="Toggle Sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
     </div>
 
     <div class="sidebar-nav-wrap">
@@ -669,11 +677,11 @@ export function getSidebarHTML() {
             <a href="superadmin_student_manage.php" class="sidebar-link${activeClass('superadmin_student_manage.php')}" title="Manage Students" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-user-graduate"></i> <span>Manage Students</span>
             </a>
-
-            <p class="nav-section-label">System Control</p>
             <a href="register_admin_cashier.php" class="sidebar-link${activeClass('register_admin_cashier.php')}" title="Register Staff" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-user-plus"></i> <span>Register Staff</span>
             </a>
+
+            <p class="nav-section-label">System Control</p>
             <a href="superadmin_system_maintenance.php" class="sidebar-link${activeClass('superadmin_system_maintenance.php')}" title="System Maintenance" onclick="handleSidebarLinkClick()">
                 <i class="fas fa-tools"></i> <span>System Maintenance</span>
             </a>

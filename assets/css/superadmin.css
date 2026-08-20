@@ -1360,3 +1360,213 @@ button:focus-visible { box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3); }
   0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } 
 }
  .text-muted { color: var(--muted); }
+
+/* ===== SUPERADMIN UI POLISH ===== */
+:root {
+  --bg: #f1f4f8;
+  --surface-soft: #f7f9fc;
+  --text: #172235;
+  --muted: #66758d;
+  --border: #dfe5ed;
+  --border-soft: #edf1f5;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow-lg: 0 16px 38px rgba(30, 45, 68, 0.08);
+}
+
+body {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(220, 38, 38, 0.06), transparent 26rem),
+    linear-gradient(145deg, #f5f7fa 0%, #edf1f6 100%);
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+}
+
+main,
+.main-content {
+  padding: 28px 24px 48px;
+}
+
+.greeting-section {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 32px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 18px 42px rgba(30, 45, 68, 0.08);
+}
+
+.greeting-section::after {
+  content: '';
+  position: absolute;
+  right: -44px;
+  top: -70px;
+  width: 180px;
+  height: 180px;
+  border: 22px solid rgba(220, 38, 38, 0.07);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.greeting-content h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.85rem, 3vw, 2.5rem);
+  letter-spacing: -0.035em;
+}
+
+.greeting-content p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.balance-section h2,
+.activity-section h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.08rem;
+  letter-spacing: -0.01em;
+}
+
+.balance-cards,
+.charts-grid {
+  gap: 14px;
+}
+
+.balance-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 132px;
+  padding: 1.35rem 1.4rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(223, 229, 237, 0.9);
+  box-shadow: 0 10px 26px rgba(30, 45, 68, 0.06);
+}
+
+.balance-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.balance-card:hover::before { opacity: 1; }
+
+.balance-card h3 {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: #71809a;
+}
+
+.balance-card p,
+.balance-card .amount {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+}
+
+.chart-container,
+.chart-card,
+.products-section {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(223, 229, 237, 0.9);
+  box-shadow: 0 12px 30px rgba(30, 45, 68, 0.06);
+}
+
+.chart-card { padding: 1.3rem 1.4rem; }
+
+.chart-container h3,
+.chart-card h3 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+.products-section {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.table-responsive {
+  margin-bottom: 0;
+  border-radius: 12px;
+}
+
+.products-table,
+.logs-table,
+.inventory-table,
+.queue-table {
+  font-size: 0.82rem;
+}
+
+.products-table th,
+.logs-table th,
+.inventory-table th,
+.queue-table th {
+  padding: 0.85rem 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.products-table td,
+.logs-table td,
+.inventory-table td,
+.queue-table td {
+  padding: 0.85rem 0.9rem;
+}
+
+.sidebar {
+  background: rgba(255, 255, 255, 0.9);
+  border-right-color: rgba(203, 213, 225, 0.7);
+  box-shadow: 12px 0 32px rgba(30, 45, 68, 0.05);
+}
+
+.sidebar-brand {
+  padding-bottom: 1.1rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.sidebar-link {
+  padding: 0.78rem 0.95rem;
+  margin-bottom: 0.25rem;
+  border-radius: 11px;
+  font-size: 0.86rem;
+}
+
+.sidebar-link.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  box-shadow: 0 9px 18px rgba(220, 38, 38, 0.22);
+}
+
+.sidebar-link.active::after {
+  content: '';
+  position: absolute;
+  right: 0.55rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.sidebar-link:hover { transform: translateX(3px); }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.22);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+  main,
+  .main-content { padding: 22px 16px 38px; }
+}
+
+@media (max-width: 640px) {
+  main,
+  .main-content { padding: 16px 12px 28px; }
+  .greeting-section { padding: 24px 20px; }
+  .balance-card { min-height: 118px; }
+}

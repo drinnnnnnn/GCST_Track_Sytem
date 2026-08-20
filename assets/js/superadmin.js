@@ -241,6 +241,10 @@ const SuperAdmin = (function() {
                 document.querySelector('.content-wrapper')?.classList.add('minimized');
                 document.querySelector('header')?.classList.add('minimized');
             }
+            const toggleButton = document.getElementById('brand-toggle');
+            const toggleLabel = isMinimized ? 'Expand sidebar' : 'Collapse sidebar';
+            toggleButton?.setAttribute('title', toggleLabel);
+            toggleButton?.setAttribute('aria-label', toggleLabel);
 
             const currentFile = window.location.pathname.split('/').pop() || 'superadmin_dashb.php';
             elements.sidebarContainer.querySelectorAll('.sidebar-link').forEach(link => {
@@ -337,6 +341,10 @@ window.toggleMinimizeSidebar = function() {
     const isMin = sidebar?.classList.toggle('minimized');
     content?.classList.toggle('minimized');
     header?.classList.toggle('minimized');
+    const toggleButton = document.getElementById('brand-toggle');
+    const toggleLabel = isMin ? 'Expand sidebar' : 'Collapse sidebar';
+    toggleButton?.setAttribute('title', toggleLabel);
+    toggleButton?.setAttribute('aria-label', toggleLabel);
     localStorage.setItem('sidebar-minimized', isMin ? 'true' : 'false');
 };
 

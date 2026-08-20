@@ -388,6 +388,11 @@ window.toggleMinimizeSidebar = function() {
   contentWrapper?.classList.toggle('minimized');
   header?.classList.toggle('minimized');
 
+  const toggleButton = document.getElementById('brand-toggle');
+  const toggleLabel = isMinimized ? 'Expand sidebar' : 'Collapse sidebar';
+  toggleButton?.setAttribute('title', toggleLabel);
+  toggleButton?.setAttribute('aria-label', toggleLabel);
+
   localStorage.setItem('sidebar-minimized', isMinimized ? 'true' : 'false');
 }
 async function autoLoadSidebar() {
@@ -405,6 +410,10 @@ async function autoLoadSidebar() {
             document.querySelector('.content-wrapper')?.classList.add('minimized');
             document.querySelector('header')?.classList.add('minimized');
         }
+        const toggleButton = document.getElementById('brand-toggle');
+        const toggleLabel = isMinimized ? 'Expand sidebar' : 'Collapse sidebar';
+        toggleButton?.setAttribute('title', toggleLabel);
+        toggleButton?.setAttribute('aria-label', toggleLabel);
       
         // Automatically highlight the active link based on the current URL
         const getFileName = (path) => path.split('/').pop() || 'admincashier_dashb.php';

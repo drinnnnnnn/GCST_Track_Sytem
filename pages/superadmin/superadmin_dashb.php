@@ -16,7 +16,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4f46e5',
+                        primary: '#dc2626',
                         danger: '#dc2626',
                         success: '#10b981'
                     },

@@ -145,6 +145,86 @@
             from { opacity: 0; transform: translateY(8px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
+
+        .maintenance-header {
+          align-items: center;
+        }
+
+        .maintenance-header .greeting-content {
+          position: relative;
+          z-index: 1;
+        }
+
+        .maintenance-meta {
+          position: relative;
+          z-index: 1;
+          min-width: 220px;
+          padding: 1rem 1.1rem;
+          border: 1px solid #fee2e2;
+          border-radius: 1rem;
+          background: rgba(255, 247, 247, 0.86);
+          box-shadow: 0 10px 22px rgba(220, 38, 38, 0.07);
+        }
+
+        .maintenance-meta-label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #991b1b;
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .maintenance-meta-label::before {
+          content: '';
+          width: 0.5rem;
+          height: 0.5rem;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+        }
+
+        .maintenance-meta strong {
+          display: block;
+          margin-top: 0.45rem;
+          color: #172235;
+          font-family: 'Outfit', sans-serif;
+          font-size: 1.05rem;
+        }
+
+        .maintenance-meta span {
+          display: block;
+          margin-top: 0.2rem;
+          color: #71809a;
+          font-size: 0.72rem;
+        }
+
+        .maintenance-refresh-list {
+          display: grid;
+          gap: 0.35rem;
+          margin-top: 0.9rem;
+        }
+
+        .maintenance-refresh-list p {
+          display: flex;
+          gap: 0.35rem;
+          align-items: baseline;
+          margin: 0;
+          color: #66758d;
+          font-size: 0.78rem;
+        }
+
+        @media (max-width: 700px) {
+          .maintenance-header {
+            align-items: stretch;
+          }
+
+          .maintenance-meta {
+            width: 100%;
+          }
+        }
     </style>
 </head>
 <body class="antialiased font-sans">
@@ -155,14 +235,19 @@
   <div class="content-wrapper">
     <main>
       <!-- Modern Greeting / Header Section -->
-      <section class="greeting-section animate-fade-in">
+      <section class="greeting-section maintenance-header animate-fade-in">
         <div class="greeting-content">
           <h1>Maintenance & Health</h1>
           <p>Monitor health metrics, manage secure database backups, and optimize system performance.</p>
-          <div class="text-sm text-slate-500 mt-2">
+          <div class="maintenance-refresh-list">
             <p id="lastMetricsUpdated">Metrics refreshed: --</p>
             <p id="lastBackupsUpdated">Backups refreshed: --</p>
           </div>
+        </div>
+        <div class="maintenance-meta" aria-label="Maintenance monitoring status">
+          <div class="maintenance-meta-label">Control center</div>
+          <strong>Health monitoring</strong>
+          <span>Live system signals and database activity</span>
         </div>
       </section>
 

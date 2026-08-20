@@ -79,31 +79,30 @@ export function getSidebarHTML() {
     return `
 <style>
     :root {
-        --sidebar-width: 280px;
+        --sidebar-width: 304px;
         --sidebar-min-width: 88px;
-        --primary-blue: #2563eb;
-        --bg-sidebar: rgba(255, 255, 255, 0.88);
-        --text-main: #0f172a;
-        --text-muted: #64748b;
-        --border-color: rgba(226, 232, 240, 0.75);
-        --nav-transition: all 0.3s ease;
-        --surface-hover: #f8fafc;
-        --shadow-soft: 0 18px 45px -24px rgba(15, 23, 42, 0.35);
+        --primary-blue: #4157f3;
+        --primary-blue-soft: #f2f3ff;
+        --bg-sidebar: #ffffff;
+        --text-main: #172644;
+        --text-muted: #71809a;
+        --border-color: #e9edf5;
+        --nav-transition: all 0.25s ease;
+        --surface-hover: #f8f9fc;
+        --shadow-soft: 10px 0 34px rgba(31, 53, 97, 0.06);
     }
 
     #main-sidebar.sidebar {
         position: fixed;
         top: 0; left: 0; bottom: 0;
         width: var(--sidebar-width);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.9));
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        background: var(--bg-sidebar);
         border-right: 1px solid var(--border-color);
-        box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.2), var(--shadow-soft);
+        box-shadow: var(--shadow-soft);
         z-index: 1000;
         display: flex;
         flex-direction: column;
-        padding: 1rem 0.85rem;
+        padding: 1.25rem 1rem 1rem;
         transition: var(--nav-transition);
         overflow-y: auto;
         overflow-x: hidden;
@@ -144,13 +143,6 @@ export function getSidebarHTML() {
             margin: 0;
             font-size: 1.1rem;
         }
-        #main-sidebar.sidebar.minimized .sidebar-minimize-btn { 
-            right: -12px;
-            transform: translateY(-50%) rotate(180deg);
-        }
-        #main-sidebar.sidebar.minimized .sidebar-minimize-btn:hover {
-            transform: translateY(-50%) rotate(180deg) scale(1.05);
-        }
     }
 
     @media (max-width: 1024px) {
@@ -161,7 +153,6 @@ export function getSidebarHTML() {
             box-shadow: 18px 0 40px rgba(0,0,0,0.08);
         }
         #main-sidebar.sidebar.active { transform: translateX(0); }
-        .sidebar-minimize-btn { display: none; }
     }
 
     .sidebar-brand {
@@ -169,8 +160,8 @@ export function getSidebarHTML() {
         align-items: center;
         justify-content: space-between;
         gap: 0.9rem;
-        margin-bottom: 1rem;
-        padding: 0.7rem 0.65rem 1rem;
+        margin-bottom: 2rem;
+        padding: 0.75rem 0.65rem 1rem;
         position: relative;
         border-radius: 1rem;
         transition: background 0.2s ease;
@@ -179,29 +170,50 @@ export function getSidebarHTML() {
     .brand-content {
         display: flex;
         align-items: center;
-        gap: 0.8rem;
+        gap: 0.95rem;
         min-width: 0;
         flex: 1;
-        padding-top: 1rem;
+        padding-top: 0;
     }
     
+    .brand-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0.9rem;
+        cursor: pointer;
+    }
+
     .brand-logo {
-        width: 46px;
-        height: 46px;
+        width: 58px;
+        height: 58px;
         object-fit: contain;
         flex-shrink: 0;
-        border-radius: 0.75rem;
-        
-        /* Pushes the logo down from the top */
-        margin-top: 1rem; 
+        border-radius: 0.9rem;
+        margin-top: 0;
+        transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .brand-toggle:hover .brand-logo {
+        transform: scale(1.06);
+        filter: drop-shadow(0 5px 8px rgba(65, 87, 243, 0.16));
+    }
+
+    .brand-toggle:focus-visible {
+        outline: 3px solid rgba(65, 87, 243, 0.2);
+        outline-offset: 4px;
     }
 
     .sidebar-brand:hover {
         background: rgba(248, 250, 252, 0.75);
     }
     .sidebar-brand img {
-        width: 46px;
-        height: 46px;
+        width: 58px;
+        height: 58px;
         object-fit: contain;
         flex-shrink: 0;
     }
@@ -224,8 +236,8 @@ export function getSidebarHTML() {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 0.15rem; /* Slightly increased for better breathing room */
-        padding-top: 1rem;
+        gap: 0.22rem;
+        padding-top: 0;
         min-width: 0;
         overflow: hidden;
     }
@@ -241,70 +253,34 @@ export function getSidebarHTML() {
 
     /* Typography Hierarchy */
     .brand-subtitle {
-        font-size: 0.68rem;
+        font-size: 0.73rem;
         font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: var(--muted, #64748b);
+        color: var(--primary-blue);
     }
 
     .brand-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--text-main, #0f172a);
-        letter-spacing: -0.02em;
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: 0;
     }
 
     .brand-role {
-        font-size: 0.7rem;
+        font-size: 0.76rem;
         font-weight: 600;
-        color: var(--muted, #64748b); /* Added color consistency */
-        opacity: 0.8; /* Subtle visual separation */
+        color: var(--primary-blue);
+        opacity: 0.9;
     }
 
-
-    .sidebar-minimize-btn {
-    position: absolute;
-    top: 20px;
-    right: -14px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #ffffff;
-    border: 1px solid #dadce0;
-    border-radius: 50%;
-    color: #5f6368;
-    cursor: pointer;
-    z-index: 1005;
-    /* Ensure no box-shadow is present */
-    box-shadow: none; 
-    transition: none;
-}
-
-.sidebar-minimize-btn:hover {
-    background: #f8f9fa;
-    border-color: #d1d5da;
-    color: #202124;
-}
-
-.sidebar-minimize-btn i {
-    font-size: 12px;
-    margin-left: 1px; 
-    transition: none;
-}
-
-.sidebar.minimized .sidebar-minimize-btn i {
-    transform: rotate(180deg);
-}
 
     .nav-section-label {
         font-size: 0.68rem;
         font-weight: 700;
         text-transform: uppercase;
         color: var(--text-muted);
-        margin: 0.9rem 0 0.45rem 0.95rem;
+        margin: 0.95rem 0 0.7rem 0.95rem;
         letter-spacing: 0.1em;
         opacity: 0.82;
     }
@@ -313,18 +289,18 @@ export function getSidebarHTML() {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 0.3rem;
+        gap: 0.45rem;
     }
 
     .sidebar-link {
         display: flex;
         align-items: center;
-        gap: 0.95rem;
-        padding: 0.9rem 0.95rem;
-        border-radius: 0.95rem;
+        gap: 1rem;
+        padding: 0.72rem 0.8rem;
+        border-radius: 1.1rem;
         color: var(--text-muted);
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 1rem;
         text-decoration: none;
         transition: all 0.2s ease;
         position: relative;
@@ -332,33 +308,52 @@ export function getSidebarHTML() {
         white-space: nowrap;
     }
     .sidebar-link i {
-        width: 1.2rem;
+        width: 2.8rem;
+        height: 2.8rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        font-size: 1rem;
+        font-size: 1.15rem;
+        color: #63728b;
+        background: #fbfcfe;
+        border: 1px solid #edf0f5;
+        border-radius: 0.9rem;
         flex-shrink: 0;
+        transition: var(--nav-transition);
     }
     .sidebar-link:hover {
-        background: var(--surface-hover);
+        background: var(--primary-blue-soft);
         color: var(--primary-blue);
         transform: translateX(2px);
+    }
+    .sidebar-link:hover i {
+        color: var(--primary-blue);
+        border-color: #e0e4ff;
+        background: #ffffff;
     }
     .sidebar-link:focus-visible {
         outline: none;
         box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.12);
     }
     .sidebar-link.active {
-        background: var(--primary-blue);
-        color: #ffffff;
-        box-shadow: 0 10px 18px -12px rgba(37, 99, 235, 0.45);
+        background: var(--primary-blue-soft);
+        color: var(--primary-blue);
+        box-shadow: none;
+    }
+    .sidebar-link.active i {
+        color: var(--primary-blue);
+        background: #ffffff;
+        border-color: #e0e4ff;
     }
     .sidebar-link.active::before {
         content: '';
         position: absolute;
-        left: 0.4rem;
+        left: 0;
         top: 50%;
-        width: 0.25rem;
-        height: 1.25rem;
-        background: rgba(255, 255, 255, 0.9);
+        width: 0.3rem;
+        height: 100%;
+        background: var(--primary-blue);
         border-radius: 999px;
         transform: translateY(-50%);
     }
@@ -367,17 +362,26 @@ export function getSidebarHTML() {
 
     .sidebar-footer {
         margin-top: auto;
-        padding-top: 0.8rem;
+        padding-top: 1rem;
+        margin-left: 0.15rem;
+        margin-right: 0.15rem;
         border-top: 1px solid var(--border-color);
     }
     .btn-logout {
         color: #ef4444;
         font-weight: 700;
+        border: 1px solid #ffe1e1;
+        background: #fffafa;
     }
     .btn-logout:hover {
-        background: #fef2f2;
+        background: #fff1f1;
         color: #dc2626;
         transform: translateX(2px);
+    }
+    .btn-logout i {
+        color: #ef4444;
+        background: #fffafa;
+        border-color: #ffe4e4;
     }
 
     .logout-modal-overlay {
@@ -471,7 +475,9 @@ export function getSidebarHTML() {
 <aside id="main-sidebar" class="sidebar" aria-label="Main Sidebar">
     <div class="sidebar-brand" id="sidebar-brand-area">
         <div class="brand-content">
-            <img src="/GCST_Track_System/assets/images/icons/granby_logo.png" alt="Granby Colleges Logo" class="brand-logo">
+            <button onclick="toggleMinimizeSidebar()" id="brand-toggle" class="brand-toggle" title="Collapse sidebar" aria-label="Collapse sidebar" type="button">
+                <img src="/GCST_Track_System/assets/images/icons/granby_logo.png" alt="Granby Colleges Logo" class="brand-logo">
+            </button>
             <div class="brand-text">
                 <span class="brand-subtitle">Granby Colleges of</span>
                 <h2 class="brand-title">Science & Technology</h2>
@@ -479,9 +485,6 @@ export function getSidebarHTML() {
             </div>
         </div>
 
-        <button onclick="toggleMinimizeSidebar()" id="sidebar-minimize-btn" class="sidebar-minimize-btn" title="Toggle Sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
     </div>
 
     <p class="nav-section-label">Main Menu</p>
@@ -499,7 +502,6 @@ export function getSidebarHTML() {
             <i class="fas fa-boxes"></i> <span>Inventory</span>
         </a>
         
-        <p class="nav-section-label">System Services</p>
         <a href="/GCST_Track_System/pages/admincashier/admincashier_queuing_system.php" class="sidebar-link" title="Queuing System" onclick="handleSidebarLinkClick()">
             <i class="fas fa-users-cog"></i> <span>Queuing System</span>
         </a>

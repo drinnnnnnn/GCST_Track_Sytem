@@ -2045,6 +2045,287 @@
         font-size: 0.85rem;
       }
     }
+
+    /* Cashier workstation refinements */
+    .cashier-layout > .panel:first-child {
+      background: #fbfcfe;
+    }
+    .cashier-layout > .panel:first-child .panel-header {
+      margin-bottom: 14px;
+    }
+    .cashier-layout > .panel:first-child .panel-header h2,
+    .management-section .panel-header h2 {
+      color: #172033 !important;
+      letter-spacing: -0.02em;
+    }
+    .cashier-search-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .cashier-search-tools .search-input {
+      min-width: 0;
+    }
+    .search-clear-btn {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 12px;
+      flex: 0 0 auto;
+    }
+    .cashier-shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .cashier-shortcut kbd {
+      padding: 3px 7px;
+      border: 1px solid #dbe2ea;
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+    #category-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-width: 0;
+    }
+    .filter-btn {
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-color: #dbe2ea;
+      background: #ffffff;
+    }
+    .filter-btn:hover,
+    .filter-btn.active {
+      color: #ffffff;
+      background: #315fe8;
+      border-color: #315fe8;
+      box-shadow: 0 6px 14px rgba(49, 95, 232, 0.18);
+    }
+    .product-card {
+      flex-basis: 205px;
+      max-width: 250px;
+      min-height: 410px;
+      border-radius: 14px;
+      box-shadow: 0 7px 18px rgba(15, 23, 42, 0.055);
+    }
+    .product-image-container {
+      min-height: 132px;
+      max-height: 170px;
+      aspect-ratio: 5 / 4;
+    }
+    .product-body {
+      padding: 0.85rem 0.85rem 0.35rem;
+      gap: 0.3rem;
+    }
+    .product-body h3 {
+      font-size: 0.98rem;
+      line-height: 1.28;
+    }
+    .product-category {
+      margin-top: 2px;
+      color: #475569;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+    }
+    .product-metadata-section {
+      min-height: 76px;
+      margin: 4px 0 2px;
+      padding: 7px 8px;
+      border-left: 3px solid #dbeafe;
+      border-radius: 0 8px 8px 0;
+      background: #f8fafc;
+    }
+    .compact-meta {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      white-space: normal;
+      text-overflow: clip;
+      color: #475569;
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 1px 0;
+    }
+    .compact-meta i {
+      width: 14px;
+      color: #64748b;
+      text-align: center;
+    }
+    .product-stock-row {
+      min-height: 28px;
+      margin-top: 0.25rem;
+    }
+    .stock-badge {
+      padding: 5px 11px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    .product-actions {
+      padding: 0.65rem 0.8rem 0.8rem;
+      gap: 0.45rem;
+    }
+    .add-to-cart-btn {
+      min-height: 40px;
+      padding: 0.62rem 0.75rem;
+      font-size: 0.84rem;
+    }
+    .cart-header-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #64748b;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .cart-header-meta strong {
+      color: #315fe8;
+    }
+
+    @media (max-width: 768px) {
+      .cashier-search-tools,
+      .cashier-shortcut {
+        width: 100%;
+      }
+      .cashier-shortcut { justify-content: flex-end; }
+      .product-card {
+        flex-basis: 100%;
+        max-width: 100%;
+      }
+    }
+
+    /* Cashier workstation usability layer */
+    .cashier-layout {
+      align-items: start;
+    }
+
+    .cashier-layout > .panel:first-child {
+      min-height: clamp(560px, calc(100vh - 190px), 820px);
+    }
+
+    .cashier-layout > .panel:first-child > .panel-header,
+    .cashier-layout > .panel:first-child > .search-group,
+    .cashier-layout > .panel:first-child > .filter-group {
+      position: relative;
+      z-index: 3;
+      background: #fbfcfe;
+    }
+
+    .cashier-layout > .panel:first-child > .panel-header {
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+    }
+
+    .cashier-layout > .panel:first-child > .search-group {
+      margin: 0 -24px;
+      padding: 10px 24px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .cashier-layout > .panel:first-child > .filter-group {
+      margin: 0 -24px 8px;
+      padding: 10px 24px 4px;
+    }
+
+    .cashier-layout > .panel:first-child .search-input {
+      border-color: #cfd8e6;
+      background: #ffffff;
+    }
+
+    .cashier-layout > .panel:first-child .search-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .cashier-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+    }
+
+    .cashier-sidebar > .panel {
+      min-height: min(680px, calc(100vh - 40px));
+    }
+
+    #cart-footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 4;
+      background: #ffffff;
+      box-shadow: 0 -10px 20px rgba(255, 255, 255, 0.92);
+    }
+
+    #open-checkout-btn {
+      min-height: 50px;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+    }
+
+    #open-checkout-btn:disabled {
+      box-shadow: none;
+    }
+
+    @media (max-width: 1280px) {
+      .cashier-sidebar {
+        position: static;
+        max-height: none;
+      }
+
+      .cashier-sidebar > .panel {
+        min-height: 420px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .cashier-layout > .panel:first-child {
+        min-height: 0;
+      }
+
+      .cashier-layout > .panel:first-child > .search-group,
+      .cashier-layout > .panel:first-child > .filter-group {
+        margin-left: -16px;
+        margin-right: -16px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .cashier-layout > .panel:first-child > .search-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .cashier-layout > .panel:first-child > .search-group .btn {
+        width: 100%;
+      }
+
+      .cashier-sidebar > .panel {
+        min-height: 0;
+      }
+
+      #cart-content {
+        max-height: 52vh;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .product-card,
+      .add-to-cart-btn,
+      .btn {
+        transition: none;
+      }
+    }
   </style>
 </head>
 
@@ -2066,10 +2347,12 @@
       <div class="panel">
         <div class="panel-header">
           <h2 class="text-3xl font-bold text-gray-500 mb-4">Products</h2>
-          <span id="product-count">0 items</span>
+          <span id="product-count" class="panel-count">0 items</span>
         </div>
         <div class="search-group">
-          <input id="product-search" class="search-input" type="text" placeholder="Search by name or Category" />
+          <div class="cashier-search-tools">
+            <input id="product-search" class="search-input" type="text" placeholder="Search products, category, author, or SKU" aria-label="Search products" />
+          </div>
           <button id="qr-scan-btn" class="btn btn-secondary" title="Scan Order QR Code"><i class="fas fa-qrcode"></i> Scan Order</button>
           <button type="button" class="btn btn-secondary" title="Generate Payment Receipt" onclick="openTuitionModal()">
               <i class="fas fa-file-invoice"></i> Payment Receipt
@@ -2087,9 +2370,13 @@
       <div class="cashier-sidebar">
         <div class="panel">
           <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-            <h2>Cart</h2>
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+              <h2>Cart</h2>
+              <span class="cart-header-meta"><strong id="cart-item-count">0</strong> items</span>
+            </div>
             <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
               <button id="delete-selected-cart" class="btn btn-danger btn-sm hidden" onclick="deleteSelectedCartItems()"><i class="fas fa-minus-circle"></i> Remove Selected</button>
+              <button id="clear-cart" class="btn btn-secondary btn-sm" type="button" title="Clear cart"><i class="fas fa-trash-alt"></i> Clear</button>
             </div>
           </div>
           <div id="cart-content" style="flex: 1; overflow-y: auto; margin-bottom: 16px;">
@@ -3621,6 +3908,13 @@
       const cartFooter = document.getElementById('cart-footer');
       const deleteSelectedBtn = document.getElementById('delete-selected-cart');
       const selectAllCheckbox = document.getElementById('select-all-cart');
+      const cartItemCount = document.getElementById('cart-item-count');
+      const checkoutButton = document.getElementById('open-checkout-btn');
+
+      if (cartItemCount) {
+        const itemCount = cart.reduce((total, item) => total + (parseFloat(item.quantity) || 0), 0);
+        cartItemCount.textContent = Number.isInteger(itemCount) ? itemCount : itemCount.toFixed(2);
+      }
 
       if (cartList) cartList.innerHTML = '';
       if (cart.length === 0) {
@@ -3628,6 +3922,7 @@
         if (cartEmpty) cartEmpty.classList.remove('hidden');
         if (cartFooter) cartFooter.classList.add('hidden');
         if (deleteSelectedBtn) deleteSelectedBtn.classList.add('hidden');
+        if (checkoutButton) checkoutButton.disabled = true;
       } else {
         if (cartContent) cartContent.style.display = 'block';
         if (cartEmpty) cartEmpty.classList.add('hidden');
@@ -3635,6 +3930,7 @@
 
         const hasSelected = cart.some(item => item.selected);
         if (deleteSelectedBtn) deleteSelectedBtn.classList.toggle('hidden', !hasSelected);
+        if (checkoutButton) checkoutButton.disabled = !hasSelected;
         if (selectAllCheckbox) {
           selectAllCheckbox.checked = cart.every(item => item.selected);
         }
@@ -7048,6 +7344,23 @@
         debouncedRender();
       });
     }
+
+    document.addEventListener('keydown', (event) => {
+      const activeElement = document.activeElement;
+      const isTyping = activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName);
+
+      if (event.key === '/' && !isTyping) {
+        event.preventDefault();
+        productSearchInput?.focus();
+      }
+
+      if (event.key === 'Escape' && activeElement === productSearchInput && productSearchInput.value) {
+        productSearchInput.value = '';
+        state.query = '';
+        state.currentPage = 1;
+        renderProducts();
+      }
+    });
 
     const courseFilterSelect = document.getElementById('course-filter');
     if (courseFilterSelect) {
