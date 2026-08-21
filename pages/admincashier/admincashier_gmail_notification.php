@@ -12,11 +12,66 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+    .balance-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .balance-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 128px;
+      padding: 24px 24px 22px;
+      border: 1px solid #edf2f7;
+      border-radius: 20px;
+      background: #ffffff;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .balance-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: #4558ff;
+    }
+
+    .balance-card:nth-child(2)::before { background: #10b981; }
+    .balance-card:nth-child(3)::before { background: #f59e0b; }
+    .balance-card:nth-child(4)::before { background: #ef4444; }
+
+    .balance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
+    }
+
+    .balance-card h3 {
+      margin: 0 0 10px;
+      color: #64748b;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
     .balance-card p {
       margin: 0;
-      font-size: 1.9rem;
-      font-weight: 700;
+      color: #4558ff;
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1.15;
     }
+
+    @media (max-width: 1100px) {
+      .balance-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .balance-cards { grid-template-columns: 1fr; }
+    }
+
     .logs-section {
       background: var(--surface);
       border-radius: 24px;
@@ -111,6 +166,56 @@
     .logs-table tbody tr:hover {
       background: rgba(59, 130, 246, 0.04);
     }
+
+    .logs-pagination-info {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: right;
+    }
+
+    .logs-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .logs-pagination button {
+      min-width: 38px;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid #dbe3f0;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 700;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .logs-pagination button:hover:not(:disabled) {
+      background: #f7f9ff;
+      border-color: #4558ff;
+      color: #4558ff;
+      transform: translateY(-1px);
+    }
+
+    .logs-pagination button.active {
+      background: #4558ff;
+      border-color: #4558ff;
+      color: #ffffff;
+      box-shadow: 0 6px 14px rgba(69, 88, 255, 0.2);
+    }
+
+    .logs-pagination button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: #f8fafc;
+    }
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -142,28 +247,41 @@
     }
     .toast {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
-      padding: 14px 16px;
-      border-radius: 14px;
-      color: #fff;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+      padding: 14px 18px 14px 16px;
+      border: 1px solid #e8eef5;
+      border-left: 5px solid #315fe8;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #334155;
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
       animation: slideInRight 0.25s ease;
       pointer-events: auto;
       overflow: hidden;
     }
-    .toast.success { background: #16a34a; }
-    .toast.error { background: #dc2626; }
-    .toast.warning { background: #f59e0b; }
-    .toast.info { background: #2563eb; }
+    .toast.success { border-left-color: #10b981; }
+    .toast.error { border-left-color: #ef4444; }
+    .toast.warning { border-left-color: #f59e0b; }
+    .toast.info { border-left-color: #315fe8; }
     .toast-icon {
-      font-size: 1rem;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #1e293b;
+      color: #ffffff;
+      font-size: 0.9rem;
       font-weight: 700;
       line-height: 1;
-      margin-top: 2px;
+      flex: 0 0 auto;
     }
     .toast-message {
       font-size: 0.92rem;
+      color: #334155;
+      font-weight: 700;
       line-height: 1.45;
       word-break: break-word;
     }
@@ -375,6 +493,79 @@
       .modal-actions { flex-direction: column-reverse; }
       .modal-actions .toolbar-button { width: 100%; min-width: unset; }
     }
+
+    body.dark-mode .content-wrapper .balance-card {
+      background: #172033 !important;
+      border-color: #334155 !important;
+      color: #e5edf8 !important;
+      box-shadow: 0 14px 34px rgba(2, 6, 23, 0.28) !important;
+    }
+
+    body.dark-mode .content-wrapper .balance-card h3,
+    body.dark-mode .content-wrapper .balance-card p {
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .content-wrapper .logs-section,
+    body.dark-mode .content-wrapper .modal-card {
+      background: #172033 !important;
+      border-color: #334155 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .logs-table th {
+      background: #1e293b !important;
+      color: #a9b7cb !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper .logs-table td {
+      background: #172033 !important;
+      color: #cbd5e1 !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper .toolbar-group input,
+    body.dark-mode .content-wrapper .toolbar-group select,
+    body.dark-mode .content-wrapper .modal-row input,
+    body.dark-mode .content-wrapper .modal-row textarea,
+    body.dark-mode .content-wrapper .modal-row select {
+      background: #0f172a !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .toolbar-button.secondary,
+    body.dark-mode .content-wrapper .logs-pagination button,
+    body.dark-mode .content-wrapper .delete-modal-details {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .content-wrapper .toast,
+    body.dark-mode .content-wrapper .toast-message,
+    body.dark-mode .content-wrapper .delete-modal-message,
+    body.dark-mode .content-wrapper .delete-modal-message strong {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #toastContainer .toast {
+      background: #172033 !important;
+      border-color: #475569 !important;
+      border-left-color: #10b981 !important;
+      color: #e5edf8 !important;
+      box-shadow: 0 16px 30px rgba(2, 6, 23, 0.45) !important;
+    }
+
+    body.dark-mode #toastContainer .toast-icon {
+      background: #0f172a !important;
+      color: #86efac !important;
+    }
+
+    body.dark-mode #toastContainer .toast-message {
+      color: #ffffff !important;
+    }
   </style>
 </head>
 
@@ -458,6 +649,8 @@
           </tbody>
         </table>
       </div>
+      <div id="emailLogsPaginationInfo" class="logs-pagination-info"></div>
+      <div id="emailLogsPagination" class="logs-pagination" aria-label="Email logs pagination"></div>
     </section>
   </main>
 
@@ -542,6 +735,8 @@
     // --- Gmail Notification Logic (Local) ---
     const GMAIL_API_URL = '../../actions/get_admincashier_gmail_notifications.php';
     let emailLogs = [];
+    const EMAIL_LOGS_PER_PAGE = 6;
+    let emailLogsCurrentPage = 1;
     let gmailPollInterval = null;
     let selectedDeleteLogId = null;
 
@@ -675,6 +870,7 @@
           });
 
           emailLogs = Array.isArray(payload.email_logs) ? payload.email_logs : [];
+          emailLogsCurrentPage = 1;
           window.renderEmailLogs(emailLogs);
           window.populateEmailTypes(Array.isArray(payload.email_types) ? payload.email_types : []);
         })
@@ -692,11 +888,23 @@
 
       if (!Array.isArray(logs) || logs.length === 0) {
         body.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-inbox"></i><p>No transmission records found.</p></td></tr>';
+        document.getElementById('emailLogsPaginationInfo').textContent = 'Showing 0 records';
+        document.getElementById('emailLogsPagination').innerHTML = '';
         return;
       }
 
+      const totalPages = Math.max(1, Math.ceil(logs.length / EMAIL_LOGS_PER_PAGE));
+      emailLogsCurrentPage = Math.min(Math.max(1, emailLogsCurrentPage), totalPages);
+      const startIndex = (emailLogsCurrentPage - 1) * EMAIL_LOGS_PER_PAGE;
+      const pageLogs = logs.slice(startIndex, startIndex + EMAIL_LOGS_PER_PAGE);
+
+      const info = document.getElementById('emailLogsPaginationInfo');
+      if (info) {
+        info.textContent = `Showing ${startIndex + 1}-${Math.min(startIndex + EMAIL_LOGS_PER_PAGE, logs.length)} of ${logs.length} records`;
+      }
+
       body.innerHTML = '';
-      logs.forEach(log => {
+      pageLogs.forEach(log => {
         const row = document.createElement('tr');
         const statusClass = log.status === 'sent' ? 'status-sent' : log.status === 'failed' ? 'status-failed' : 'status-pending';
         const createdAt = log.created_at || log.sent_at || '';
@@ -718,6 +926,33 @@
           </td>`;
         body.appendChild(row);
       });
+
+      const pagination = document.getElementById('emailLogsPagination');
+      if (!pagination) return;
+      pagination.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const createPageButton = (label, page, disabled = false, active = false) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.disabled = disabled;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-label', active ? `Page ${page}` : label);
+        if (!disabled) {
+          button.addEventListener('click', () => {
+            emailLogsCurrentPage = page;
+            window.renderEmailLogs(emailLogs);
+          });
+        }
+        return button;
+      };
+
+      pagination.appendChild(createPageButton('‹', emailLogsCurrentPage - 1, emailLogsCurrentPage === 1));
+      for (let page = 1; page <= totalPages; page += 1) {
+        pagination.appendChild(createPageButton(String(page), page, false, page === emailLogsCurrentPage));
+      }
+      pagination.appendChild(createPageButton('›', emailLogsCurrentPage + 1, emailLogsCurrentPage === totalPages));
     };
 
     window.populateEmailTypes = function(types) {

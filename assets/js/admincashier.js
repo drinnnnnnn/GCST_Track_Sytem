@@ -395,6 +395,98 @@ window.toggleMinimizeSidebar = function() {
 
   localStorage.setItem('sidebar-minimized', isMinimized ? 'true' : 'false');
 }
+
+  function ensureAdminCashierDarkModeOverrides() {
+    const styleId = 'admincashier-dark-mode-final-overrides';
+    let style = document.getElementById(styleId);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+
+    style.textContent = `
+      body.dark-mode .content-wrapper #product-grid,
+      body.dark-mode .content-wrapper #cart-content,
+      body.dark-mode .content-wrapper #txn-history-content {
+        scrollbar-color: #64748b #111827 !important;
+      }
+
+      body.dark-mode .content-wrapper #product-grid::-webkit-scrollbar,
+      body.dark-mode .content-wrapper #cart-content::-webkit-scrollbar,
+      body.dark-mode .content-wrapper #txn-history-content::-webkit-scrollbar {
+        width: 8px !important;
+      }
+
+      body.dark-mode .content-wrapper #product-grid::-webkit-scrollbar-track,
+      body.dark-mode .content-wrapper #cart-content::-webkit-scrollbar-track,
+      body.dark-mode .content-wrapper #txn-history-content::-webkit-scrollbar-track {
+        background: #111827 !important;
+        border-radius: 999px !important;
+      }
+
+      body.dark-mode .content-wrapper #product-grid::-webkit-scrollbar-thumb,
+      body.dark-mode .content-wrapper #cart-content::-webkit-scrollbar-thumb,
+      body.dark-mode .content-wrapper #txn-history-content::-webkit-scrollbar-thumb {
+        background: #475569 !important;
+        border: 2px solid #111827 !important;
+        border-radius: 999px !important;
+      }
+
+      body.dark-mode .content-wrapper #cart-footer {
+        background: #172033 !important;
+        border-color: #334155 !important;
+        box-shadow: 0 -10px 20px rgba(15, 23, 42, 0.7) !important;
+      }
+
+      body.dark-mode .content-wrapper .stock-badge.stock-available {
+        background: #123b2d !important;
+        border: 1px solid #276749 !important;
+        color: #a7f3d0 !important;
+      }
+
+      body.dark-mode .content-wrapper .stock-badge.stock-low {
+        background: #3d2f12 !important;
+        border: 1px solid #8a6418 !important;
+        color: #fde68a !important;
+      }
+
+      body.dark-mode .content-wrapper .stock-badge.stock-out {
+        background: #451a1a !important;
+        border: 1px solid #8f3030 !important;
+        color: #fecaca !important;
+      }
+
+      body.dark-mode .content-wrapper #txn-status-filter,
+      body.dark-mode .content-wrapper #txn-history-search {
+        background: #0f172a !important;
+        border: 1px solid #53627a !important;
+        color: #e5edf8 !important;
+        box-shadow: none !important;
+      }
+
+      body.dark-mode .content-wrapper #txn-status-filter option {
+        background: #172033 !important;
+        color: #e5edf8 !important;
+      }
+
+      body.dark-mode .content-wrapper #txn-history-search::placeholder {
+        color: #94a3b8 !important;
+      }
+
+      body.dark-mode .content-wrapper #txn-status-filter:focus,
+      body.dark-mode .content-wrapper #txn-history-search:focus {
+        border-color: #818cf8 !important;
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.18) !important;
+      }
+
+      body.dark-mode .content-wrapper #clear-txn-search {
+        background: #334155 !important;
+        color: #dbe5f2 !important;
+      }
+    `;
+  }
+
 async function autoLoadSidebar() {
   const container = document.getElementById('sidebar-container');
   if (!container) return;
@@ -404,6 +496,18 @@ async function autoLoadSidebar() {
     const { getSidebarHTML } = await import('./admincashier_sidebar_content.js');
     if (container && typeof getSidebarHTML === 'function') {
         container.innerHTML = getSidebarHTML();
+        const darkModeEnabled = localStorage.getItem('admincashier-dark-mode') === 'true';
+        document.body.classList.toggle('dark-mode', darkModeEnabled);
+        ensureAdminCashierDarkModeOverrides();
+        const darkModeButton = document.getElementById('dark-mode-toggle');
+        const darkModeIcon = darkModeButton?.querySelector('i');
+        const darkModeText = darkModeButton?.querySelector('span');
+        const darkModeLabel = darkModeEnabled ? 'Switch to light mode' : 'Switch to dark mode';
+        darkModeButton?.setAttribute('title', darkModeLabel);
+        darkModeButton?.setAttribute('aria-label', darkModeLabel);
+        if (darkModeIcon) darkModeIcon.className = darkModeEnabled ? 'fas fa-sun' : 'fas fa-moon';
+        if (darkModeText) darkModeText.textContent = darkModeEnabled ? 'Light Mode' : 'Dark Mode';
+        darkModeButton?.addEventListener('click', window.toggleDarkMode);
         const isMinimized = localStorage.getItem('sidebar-minimized') === 'true';
         if (isMinimized) {
             document.getElementById('main-sidebar')?.classList.add('minimized');

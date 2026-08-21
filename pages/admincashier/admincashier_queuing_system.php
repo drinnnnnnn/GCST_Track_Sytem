@@ -27,6 +27,84 @@
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
+
+  .queue-stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 128px;
+    padding: 24px !important;
+    border: 1px solid #edf2f7 !important;
+    border-radius: 20px !important;
+    background: #ffffff !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .queue-stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: #4558ff;
+  }
+
+  .queue-stat-card:nth-child(2)::before { background: #a855f7; }
+  .queue-stat-card:nth-child(3)::before { background: #10b981; }
+  .queue-stat-card:nth-child(4)::before { background: #f59e0b; }
+
+  .queue-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1) !important;
+  }
+
+  .queue-stat-card .queue-stat-label {
+    color: #64748b !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .queue-stat-card .queue-stat-value {
+    color: #4558ff !important;
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    line-height: 1.15;
+  }
+
+  .queue-stat-card .queue-stat-note {
+    color: #94a3b8 !important;
+    font-size: 0.6rem !important;
+    font-weight: 600;
+  }
+
+  body.dark-mode .voice-controls {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+  }
+
+  body.dark-mode .voice-controls span,
+  body.dark-mode .voice-controls select {
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode .voice-controls .voice-divider {
+    background: #64748b !important;
+  }
+
+  body.dark-mode .voice-controls select {
+    background: #1e293b !important;
+  }
+
+  body.dark-mode .voice-controls option {
+    background: #172033;
+    color: #e5edf8;
+  }
+
+  @media (max-width: 560px) {
+    .queue-stat-card { min-height: 112px; padding: 18px !important; }
+  }
   
   .queue-list {
     margin-top: 20px;
@@ -387,31 +465,43 @@
   .toast {
     pointer-events: auto;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    color: #fff;
-    box-shadow: 0 18px 38px -18px rgba(15, 23, 42, 0.7);
+    padding: 14px 18px 14px 16px;
+    border: 1px solid #e8eef5;
+    border-left: 5px solid #315fe8;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #334155;
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
     animation: slideInRight 0.3s ease;
     overflow: hidden;
   }
 
-  .toast.success { background: #16a34a; }
-  .toast.error { background: #dc2626; }
-  .toast.warning { background: #f59e0b; }
-  .toast.info { background: #2563eb; }
+  .toast.success { border-left-color: #10b981; }
+  .toast.error { border-left-color: #ef4444; }
+  .toast.warning { border-left-color: #f59e0b; }
+  .toast.info { border-left-color: #315fe8; }
 
   .toast-icon {
-    font-size: 1rem;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #1e293b;
+    color: #ffffff;
+    font-size: 0.9rem;
     font-weight: 700;
     line-height: 1;
-    margin-top: 2px;
+    flex: 0 0 auto;
   }
 
   .toast-message {
     font-size: 0.92rem;
-    font-weight: 500;
+    color: #334155;
+    font-weight: 700;
     line-height: 1.4;
   }
 
@@ -423,6 +513,154 @@
   @keyframes fadeOut {
     from { opacity: 1; transform: translateX(0); }
     to { opacity: 0; transform: translateX(18px); }
+  }
+
+  body.dark-mode .content-wrapper .queue-stat-card,
+  body.dark-mode .content-wrapper .queue-card,
+  body.dark-mode .content-wrapper .queue-dashboard,
+  body.dark-mode .content-wrapper .ticket-preview-panel,
+  body.dark-mode .content-wrapper .ticket-preview-card,
+  body.dark-mode .content-wrapper .queue-item {
+    background: #172033 !important;
+    border-color: #334155 !important;
+    color: #e5edf8 !important;
+    box-shadow: 0 14px 34px rgba(2, 6, 23, 0.28) !important;
+  }
+
+  body.dark-mode .content-wrapper .queue-stat-card .queue-stat-label,
+  body.dark-mode .content-wrapper .queue-stat-card .queue-stat-value,
+  body.dark-mode .content-wrapper .queue-stat-card .queue-stat-note,
+  body.dark-mode .content-wrapper .queue-dashboard h2,
+  body.dark-mode .content-wrapper .ticket-preview-panel h2,
+  body.dark-mode .content-wrapper .ticket-label,
+  body.dark-mode .content-wrapper .ticket-number,
+  body.dark-mode .content-wrapper .ticket-info,
+  body.dark-mode .content-wrapper .queue-item .text-gray-800,
+  body.dark-mode .content-wrapper .queue-item .text-gray-600,
+  body.dark-mode .content-wrapper .queue-item .text-gray-400 {
+    color: #ffffff !important;
+  }
+
+  body.dark-mode .content-wrapper .status-waiting {
+    background: #3d2f12 !important;
+    color: #fde68a !important;
+  }
+
+  body.dark-mode .content-wrapper .status-serving {
+    background: #123b2d !important;
+    color: #a7f3d0 !important;
+  }
+
+  body.dark-mode .content-wrapper .status-completed {
+    background: #1e3a5f !important;
+    color: #bfdbfe !important;
+  }
+
+  body.dark-mode .content-wrapper .status-priority {
+    background: #3b2161 !important;
+    color: #e9d5ff !important;
+  }
+
+  body.dark-mode .content-wrapper .badge-priority {
+    background: #7c3aed !important;
+    color: #ffffff !important;
+  }
+
+  body.dark-mode .content-wrapper .bg-white.p-8.rounded-\[40px\],
+  body.dark-mode .content-wrapper .kiosk-next-item {
+    background: #172033 !important;
+    border-color: #334155 !important;
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode .content-wrapper .toast,
+  body.dark-mode .content-wrapper .toast-message {
+    background: #172033 !important;
+    border-color: #475569 !important;
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode #remove-ticket-modal > div,
+  body.dark-mode #reassign-modal > div {
+    background: #172033 !important;
+    border-color: #334155 !important;
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode #remove-ticket-modal > div > div:first-child {
+    background: #2a2024 !important;
+    border-color: #7f3541 !important;
+  }
+
+  body.dark-mode #remove-ticket-modal > div > div:nth-child(2),
+  body.dark-mode #remove-ticket-modal > div > div:last-child,
+  body.dark-mode #reassign-modal .bg-gray-50 {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+  }
+
+  body.dark-mode #remove-ticket-modal .bg-gray-50 {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+  }
+
+  body.dark-mode #remove-ticket-modal h3,
+  body.dark-mode #remove-ticket-modal p,
+  body.dark-mode #remove-ticket-modal span,
+  body.dark-mode #reassign-modal h3,
+  body.dark-mode #reassign-modal span,
+  body.dark-mode #reassign-modal label {
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode #remove-ticket-modal .text-gray-500,
+  body.dark-mode #remove-ticket-modal .text-gray-700,
+  body.dark-mode #reassign-modal .text-gray-500,
+  body.dark-mode #reassign-modal .text-gray-700 {
+    color: #a9b7cb !important;
+  }
+
+  body.dark-mode #remove-ticket-modal .bg-gray-50 .text-gray-500 {
+    color: #a9b7cb !important;
+  }
+
+  body.dark-mode #remove-ticket-modal .text-gray-900,
+  body.dark-mode #reassign-modal .text-gray-800 {
+    color: #ffffff !important;
+  }
+
+  body.dark-mode #remove-ticket-modal .bg-gray-50 .text-gray-900 {
+    color: #ffffff !important;
+  }
+
+  body.dark-mode #remove-ticket-modal .bg-gray-200,
+  body.dark-mode #reassign-modal .bg-gray-200 {
+    background: #334155 !important;
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode #reassign-modal select {
+    background: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e5edf8 !important;
+  }
+
+  body.dark-mode #toastContainer .toast {
+    background: #172033 !important;
+    border-color: #475569 !important;
+    border-left-color: #10b981 !important;
+    color: #e5edf8 !important;
+    box-shadow: 0 16px 30px rgba(2, 6, 23, 0.45) !important;
+  }
+
+  body.dark-mode #toastContainer .toast-icon {
+    background: #0f172a !important;
+    color: #86efac !important;
+  }
+
+  body.dark-mode #toastContainer .toast-message {
+    background: transparent !important;
+    color: #ffffff !important;
   }
 </style>
 </head>
@@ -447,27 +685,27 @@
     <section class="mb-10">
       <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
         <div class="xl:col-span-1 grid grid-cols-2 gap-4">
-          <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Waiting Regular</div>
-            <div class="text-3xl font-extrabold text-indigo-600" id="stat-regular-waiting">0</div>
+          <div class="queue-stat-card">
+            <div class="queue-stat-label mb-1">Waiting Regular</div>
+            <div class="queue-stat-value" id="stat-regular-waiting">0</div>
           </div>
-          <div class="bg-white p-6 rounded-3xl shadow-sm border border-purple-100">
-            <div class="text-[10px] font-bold text-purple-400 uppercase mb-1">Waiting PWD</div>
-            <div class="text-3xl font-extrabold text-purple-600" id="stat-priority-waiting">0</div>
+          <div class="queue-stat-card">
+            <div class="queue-stat-label mb-1">Waiting PWD</div>
+            <div class="queue-stat-value" id="stat-priority-waiting">0</div>
           </div>
-          <div class="bg-white p-6 rounded-3xl shadow-sm border border-emerald-100 col-span-2">
-            <div class="text-[10px] font-bold text-emerald-600 uppercase mb-1">Average Wait Time (Last 5)</div>
-            <div class="text-2xl font-extrabold text-gray-800" id="stat-avg-wait-time">--:--</div>
-            <div class="text-[9px] text-gray-400 mt-1" id="stat-wait-sample-size">Waiting for completed tickets...</div>
+          <div class="queue-stat-card col-span-2">
+            <div class="queue-stat-label mb-1">Average Wait Time (Last 5)</div>
+            <div class="queue-stat-value" id="stat-avg-wait-time">--:--</div>
+            <div class="queue-stat-note mt-1" id="stat-wait-sample-size">Waiting for completed tickets...</div>
           </div>
-          <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 col-span-2 flex items-center justify-between">
+          <div class="queue-stat-card col-span-2 flex items-center justify-between">
             <div>
-              <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Clock</div>
-              <div class="text-lg font-bold text-gray-800" id="display-current-time">--:--:--</div>
+              <div class="queue-stat-label mb-1">Clock</div>
+              <div class="queue-stat-value !text-lg" id="display-current-time">--:--:--</div>
             </div>
             <div class="text-right">
-              <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Next</div>
-              <div class="text-lg font-bold text-amber-500" id="display-next-queue">None</div>
+              <div class="queue-stat-label mb-1">Next</div>
+              <div class="queue-stat-value !text-lg" id="display-next-queue">None</div>
             </div>
           </div>
         </div>
@@ -504,12 +742,12 @@
         </div>
         <div class="flex items-center gap-3">
           <!-- Voice Announcement Controls -->
-          <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-[10px]">
+          <div class="voice-controls flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-[10px]">
             <label class="flex items-center gap-1.5 cursor-pointer">
               <input type="checkbox" id="voice-enabled" checked class="w-3 h-3 accent-indigo-600">
               <span class="font-bold text-gray-500 uppercase">Voice</span>
             </label>
-            <div class="h-4 w-px bg-gray-200 mx-1"></div>
+            <div class="voice-divider h-4 w-px bg-gray-200 mx-1"></div>
             <select id="voice-rate" class="bg-transparent font-bold text-gray-600 outline-none cursor-pointer" title="Speech Speed">
               <option value="0.8">Slow</option>
               <option value="0.9" selected>Normal</option>
@@ -519,9 +757,6 @@
           <button onclick="toggleKioskMode(true)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all flex items-center gap-2">
             <i class="fas fa-desktop"></i> Kiosk Mode
           </button>
-          <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
-            <i class="fas fa-user-plus fa-lg"></i>
-          </div>
         </div>
       </div>
       

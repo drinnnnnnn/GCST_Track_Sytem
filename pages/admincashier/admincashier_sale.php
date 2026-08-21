@@ -87,21 +87,51 @@
     }
     .balance-card {
       background: var(--surface);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-      min-height: 140px;
+      border: 1px solid #edf2f7;
+      border-radius: 20px;
+      padding: 24px 24px 22px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+      min-height: 128px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .balance-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: #4558ff;
+    }
+    .balance-card:nth-child(2)::before { background: #10b981; }
+    .balance-card:nth-child(3)::before { background: #f59e0b; }
+    .balance-card:nth-child(4)::before { background: #ef4444; }
+    .balance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
     }
     .balance-card h3 {
       margin: 0 0 10px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      font-weight: 600;
+      font-size: 0.76rem;
+      color: #64748b;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
     .balance-card p {
       margin: 0;
-      font-size: 1.9rem;
-      font-weight: 700;
+      font-size: 1.75rem;
+      line-height: 1.15;
+      color: #1e293b;
+      font-weight: 800;
+    }
+
+    .balance-section .balance-card .amount {
+      color: #1e293b;
+    }
+
+    .balance-section:not(#inventory-details) .balance-card .amount {
+      color: #4558ff;
     }
     .activity-section {
       margin-bottom: 24px;
@@ -288,6 +318,185 @@
       .charts-grid {
         grid-template-columns: 1fr;
       }
+    }
+
+    body.dark-mode {
+      --bg: #0f172a;
+      --surface: #172033;
+      --surface-soft: #1e293b;
+      --text: #e5edf8;
+      --muted: #9aa9bf;
+      --border: #334155;
+      color-scheme: dark;
+    }
+
+    body.dark-mode .content-wrapper .action-card,
+    body.dark-mode .content-wrapper .balance-card,
+    body.dark-mode .content-wrapper .chart-container,
+    body.dark-mode .content-wrapper .history-card,
+    body.dark-mode .content-wrapper .table-scroll-container,
+    body.dark-mode .content-wrapper .modal-content,
+    body.dark-mode .content-wrapper #inventory-details > .bg-white {
+      background: #172033 !important;
+      border-color: #334155 !important;
+      color: #e5edf8 !important;
+      box-shadow: 0 14px 34px rgba(2, 6, 23, 0.28) !important;
+    }
+
+    body.dark-mode .content-wrapper .period-button,
+    body.dark-mode .content-wrapper #historySearch,
+    body.dark-mode .content-wrapper #inventoryFilterCategory,
+    body.dark-mode .content-wrapper #inventoryFilterCourse,
+    body.dark-mode .content-wrapper #inventoryFilterStatus,
+    body.dark-mode .content-wrapper #inventorySearch {
+      background: #0f172a !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    body.dark-mode .content-wrapper .period-button:hover,
+    body.dark-mode .content-wrapper #historySearch:focus,
+    body.dark-mode .content-wrapper #inventoryFilterCategory:focus,
+    body.dark-mode .content-wrapper #inventoryFilterCourse:focus,
+    body.dark-mode .content-wrapper #inventoryFilterStatus:focus,
+    body.dark-mode .content-wrapper #inventorySearch:focus {
+      border-color: #818cf8 !important;
+      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.18) !important;
+    }
+
+    body.dark-mode .content-wrapper input::placeholder {
+      color: #94a3b8 !important;
+    }
+
+    body.dark-mode .content-wrapper select option {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .history-table th,
+    body.dark-mode .content-wrapper .history-table td {
+      border-color: #334155 !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .content-wrapper .history-table th {
+      background: #1e293b !important;
+      color: #a9b7cb !important;
+    }
+
+    body.dark-mode .content-wrapper .history-table tbody tr:hover {
+      background: #1e293b !important;
+    }
+
+    body.dark-mode .content-wrapper .history-table tbody tr[style] {
+      background: #172033 !important;
+    }
+
+    body.dark-mode .content-wrapper .balance-card p,
+    body.dark-mode .content-wrapper .balance-card .amount {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .balance-card p.text-red-600,
+    body.dark-mode .content-wrapper .balance-card .text-red-600 {
+      color: #fca5a5 !important;
+    }
+
+    body.dark-mode .content-wrapper .text-gray-400,
+    body.dark-mode .content-wrapper .text-gray-500,
+    body.dark-mode .content-wrapper .text-gray-600,
+    body.dark-mode .content-wrapper .text-gray-700,
+    body.dark-mode .content-wrapper .text-gray-800,
+    body.dark-mode .content-wrapper .text-gray-900,
+    body.dark-mode .content-wrapper .text-slate-700,
+    body.dark-mode .content-wrapper .text-slate-800 {
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .content-wrapper .text-blue-500 {
+      color: #93c5fd !important;
+    }
+
+    body.dark-mode .content-wrapper .text-green-500 {
+      color: #86efac !important;
+    }
+
+    body.dark-mode .content-wrapper .text-yellow-500 {
+      color: #fde68a !important;
+    }
+
+    body.dark-mode .content-wrapper .text-red-500,
+    body.dark-mode .content-wrapper .text-red-600 {
+      color: #fca5a5 !important;
+    }
+
+    body.dark-mode .content-wrapper .product-tag {
+      background: #1e3a5f !important;
+      border-color: #315b89 !important;
+      color: #bfdbfe !important;
+    }
+
+    body.dark-mode .content-wrapper .bg-red-100 {
+      background: #451a1a !important;
+      color: #fecaca !important;
+    }
+
+    body.dark-mode .content-wrapper .bg-yellow-100 {
+      background: #3d2f12 !important;
+      color: #fde68a !important;
+    }
+
+    body.dark-mode .content-wrapper .bg-green-100 {
+      background: #123b2d !important;
+      color: #a7f3d0 !important;
+    }
+
+    body.dark-mode .content-wrapper .bg-red-700 {
+      background: #991b1b !important;
+      color: #fee2e2 !important;
+    }
+
+    body.dark-mode .content-wrapper .view-details-btn {
+      color: #a5b4fc !important;
+    }
+
+    body.dark-mode .content-wrapper .view-details-btn:hover {
+      background: #1e293b !important;
+    }
+
+    body.dark-mode .content-wrapper .table-scroll-container::-webkit-scrollbar-track {
+      background: #111827 !important;
+    }
+
+    body.dark-mode .content-wrapper .table-scroll-container::-webkit-scrollbar-thumb {
+      background: #475569 !important;
+      border: 2px solid #111827 !important;
+    }
+
+    body.dark-mode .content-wrapper #receiptModal .text-gray-800,
+    body.dark-mode .content-wrapper #receiptModal .text-gray-700,
+    body.dark-mode .content-wrapper #receiptModal .text-gray-600,
+    body.dark-mode .content-wrapper #receiptModal .text-gray-500,
+    body.dark-mode .content-wrapper #receiptModal .text-gray-400 {
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .content-wrapper #receiptModal .bg-gray-50,
+    body.dark-mode .content-wrapper #receiptModal .bg-white {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper #receiptModal .border-gray-100,
+    body.dark-mode .content-wrapper #receiptModal .border-gray-200 {
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper #receiptModal .text-red-600 {
+      color: #fca5a5 !important;
     }
   </style>
 </head>
@@ -532,6 +741,7 @@
     let inventoryPaginationState = { page: 1, totalPages: 1, totalItems: 0 };
     let salesPaginationState = { page: 1, totalPages: 1, totalItems: 0 };
     let salesSearchTimer = null;
+    let salesThemeObserver = null;
 
     function getSafeText(value, fallback = '') {
       if (typeof value === 'string') {
@@ -926,8 +1136,17 @@
       renderInventoryTable(filtered, { resetPage: true });
     }
 
+    function getChartTheme() {
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      return {
+        text: isDarkMode ? '#cbd5e1' : '#1d2939',
+        grid: isDarkMode ? '#334155' : '#eef2f7'
+      };
+    }
+
     function createChart(elementId, type, labels, data, label, backgroundColor, borderColor) {
       const ctx = document.getElementById(elementId).getContext('2d');
+      const chartTheme = getChartTheme();
       return new Chart(ctx, {
         type,
         data: {
@@ -947,10 +1166,10 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: true } },
+          plugins: { legend: { display: true, labels: { color: chartTheme.text } } },
           scales: {
-            x: { grid: { display: false } },
-            y: { grid: { color: '#eef2f7' }, ticks: { beginAtZero: true } }
+            x: { grid: { display: false }, ticks: { color: chartTheme.text } },
+            y: { grid: { color: chartTheme.grid }, ticks: { beginAtZero: true, color: chartTheme.text } }
           }
         }
       });
@@ -958,6 +1177,7 @@
 
     function updateChart(chartRef, labels, data, label, type, backgroundColor, borderColor) {
       if (!chartRef) return;
+      const chartTheme = getChartTheme();
       chartRef.data = {
         labels,
         datasets: [{
@@ -972,7 +1192,23 @@
           barThickness: 24
         }]
       };
+      chartRef.options.plugins.legend.labels.color = chartTheme.text;
+      chartRef.options.scales.x.ticks.color = chartTheme.text;
+      chartRef.options.scales.y.ticks.color = chartTheme.text;
+      chartRef.options.scales.y.grid.color = chartTheme.grid;
       chartRef.update();
+    }
+
+    function refreshSalesChartTheme() {
+      const chartTheme = getChartTheme();
+      [salesTrendChartInstance, topProductsChartInstance].forEach(chart => {
+        if (!chart) return;
+        chart.options.plugins.legend.labels.color = chartTheme.text;
+        chart.options.scales.x.ticks.color = chartTheme.text;
+        chart.options.scales.y.ticks.color = chartTheme.text;
+        chart.options.scales.y.grid.color = chartTheme.grid;
+        chart.update();
+      });
     }
 
     window.viewReceiptDetails = async function(transactionId) {
@@ -1439,6 +1675,9 @@
     window.initAdminCashierSalesPage = function(userData) {
       currentSalesPeriod = 'today';
       currentAdminName = userData.name || 'Unknown Admin'; // New: Set admin name from user data
+      salesThemeObserver?.disconnect();
+      salesThemeObserver = new MutationObserver(refreshSalesChartTheme);
+      salesThemeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
       setActivePeriodButton(currentSalesPeriod);
       loadSalesData(currentSalesPeriod);
       loadInventoryData();

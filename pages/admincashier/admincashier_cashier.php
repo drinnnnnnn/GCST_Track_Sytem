@@ -355,6 +355,38 @@
       display: grid;
       gap: 14px;
     }
+
+    .receipt-modal-close {
+      position: sticky !important;
+      top: 12px !important;
+      right: 0 !important;
+      z-index: 20;
+      margin: -18px 0 -38px auto !important;
+      flex-shrink: 0;
+    }
+
+    .receipt-review-modal-panel {
+      width: min(900px, 94vw) !important;
+      max-width: 900px !important;
+      max-height: 92vh !important;
+      overflow-y: auto;
+      border-radius: 24px !important;
+    }
+
+    .receipt-review-modal-panel .receipt-review-content {
+      padding: 30px 36px !important;
+    }
+
+    @media (max-width: 640px) {
+      .receipt-review-modal-panel {
+        width: calc(100vw - 24px) !important;
+        max-height: 94vh !important;
+      }
+
+      .receipt-review-modal-panel .receipt-review-content {
+        padding: 22px 18px !important;
+      }
+    }
     .receipt-card {
       background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
       border: 1px solid #e2e8f0;
@@ -444,6 +476,19 @@
       border-color: #60a5fa;
       box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.12);
       background: #ffffff;
+    }
+
+    #tuition-amount::-webkit-inner-spin-button,
+    #tuition-amount::-webkit-outer-spin-button,
+    #tuition-total-payment::-webkit-inner-spin-button,
+    #tuition-total-payment::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    #tuition-amount,
+    #tuition-total-payment {
+      -moz-appearance: textfield;
     }
     .receipt-textarea {
       resize: vertical;
@@ -2213,8 +2258,323 @@
       align-items: start;
     }
 
+    .filter-group {
+      align-items: center;
+      padding: 4px 0 10px;
+      border-bottom: 1px solid #edf1f7;
+    }
+
+    .catalog-view-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .catalog-course-filter {
+      flex: 0 0 176px;
+      width: 176px;
+      max-width: 176px !important;
+      min-width: 0;
+      height: 40px;
+      padding: 0 34px 0 14px !important;
+      border: 1px solid #d8e1ed !important;
+      border-radius: 12px !important;
+      background: #ffffff !important;
+      color: #475569;
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .catalog-course-filter:hover {
+      border-color: #b8c7dc !important;
+      background: #fbfdff !important;
+    }
+
+    .catalog-course-filter:focus {
+      border-color: #315fe8 !important;
+      background: #ffffff !important;
+      box-shadow: 0 0 0 3px rgba(49, 95, 232, 0.12) !important;
+    }
+
+    .catalog-sort-label {
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .catalog-sort-select {
+      min-height: 38px;
+      padding: 0 30px 0 12px;
+      border: 1px solid #dbe2ea;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #334155;
+      font-size: 0.78rem;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .catalog-view-toggle {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid #dbe2ea;
+      border-radius: 10px;
+      background: #f8fafc;
+    }
+
+    .catalog-view-btn {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .catalog-view-btn.active,
+    .catalog-view-btn:hover {
+      background: #315fe8;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(49, 95, 232, 0.18);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+      grid-auto-rows: max-content;
+      gap: 14px;
+      align-content: start;
+      padding: 12px 2px 16px;
+      flex: 1 1 auto;
+      min-height: 360px;
+      overflow-y: auto;
+    }
+
+    .product-card {
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+      min-height: 0;
+      height: auto !important;
+      align-self: start;
+      border-radius: 12px;
+      box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .product-image-container {
+      min-height: 0;
+      max-height: none;
+      aspect-ratio: 1.2;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .product-body {
+      padding: 0.72rem 0.72rem 0.25rem;
+    }
+
+    .product-body h3 {
+      font-size: 0.84rem;
+      line-height: 1.3;
+    }
+
+    .product-metadata-section {
+      min-height: 62px;
+      margin: 3px 0 0;
+      padding: 5px 6px;
+    }
+
+    .compact-meta {
+      font-size: 0.68rem;
+      line-height: 1.35;
+    }
+
+    .product-actions {
+      padding: 0.55rem 0.65rem 0.65rem;
+    }
+
+    .add-to-cart-btn {
+      min-height: 36px;
+      padding: 0.55rem 0.6rem;
+      font-size: 0.76rem;
+    }
+
+    .product-list-view {
+      grid-template-columns: 1fr;
+    }
+
+    .product-list-view .product-card {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr) minmax(150px, 190px);
+      align-items: stretch;
+    }
+
+    .product-list-view .product-image-container {
+      aspect-ratio: auto;
+      min-height: 112px;
+      height: 100%;
+      border-radius: 12px 0 0 12px;
+      border-bottom: 0;
+    }
+
+    .product-list-view .product-actions {
+      justify-content: center;
+      border-top: 0;
+      border-left: 1px solid #eef2ff;
+    }
+
+    @media (max-width: 900px) {
+      .catalog-view-tools { width: auto; margin-left: auto; justify-content: flex-end; }
+      .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .catalog-view-tools { margin-left: auto; }
+      .catalog-course-filter { flex-basis: 100%; width: 100%; max-width: 100% !important; }
+      .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .product-list-view .product-card { grid-template-columns: 82px minmax(0, 1fr); }
+      .product-list-view .product-actions { grid-column: 1 / -1; border-left: 0; border-top: 1px solid #eef2ff; }
+    }
+
     .cashier-layout > .panel:first-child {
       min-height: clamp(560px, calc(100vh - 190px), 820px);
+    }
+
+    .management-section > .panel:first-child {
+      padding: 22px 22px 18px;
+      border: 1px solid #e5edf5;
+      border-radius: 22px;
+      background: #ffffff;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+    }
+
+    .management-section > .panel:first-child .panel-header {
+      align-items: center;
+      min-height: 62px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #e8eef5;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #fbfdff 0%, #f7faff 100%);
+    }
+
+    .management-section > .panel:first-child .panel-header h2 {
+      margin: 0 !important;
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #172033 !important;
+      letter-spacing: -0.01em;
+    }
+
+    .management-section > .panel:first-child .panel-header > div:last-child {
+      gap: 8px !important;
+      min-width: min(620px, 100%);
+    }
+
+    .management-section > .panel:first-child .panel-header > div:last-child > div {
+      border-color: #dbe4ee !important;
+      background: #f8fafc !important;
+      border-radius: 12px !important;
+    }
+
+    .management-section > .panel:first-child .panel-header input,
+    .management-section > .panel:first-child .panel-header select {
+      min-height: 38px;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .management-section > .panel:first-child .panel-header > div:last-child > div:last-child {
+      min-width: 260px;
+    }
+
+    .management-section > .panel:first-child #txn-history-content {
+      margin-top: 16px;
+      min-height: 360px;
+      border: 1px solid #e8eef5;
+      border-radius: 14px;
+      background: #ffffff;
+      scrollbar-gutter: stable;
+    }
+
+    .management-section > .panel:first-child .txn-history-table {
+      min-width: 900px;
+      margin: 0;
+    }
+
+    .management-section > .panel:first-child .txn-history-table th {
+      top: 0;
+      padding: 13px 14px;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid #e5edf5;
+    }
+
+    .management-section > .panel:first-child .txn-history-table td {
+      padding: 14px;
+      color: #475569;
+      font-size: 0.82rem;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .management-section > .panel:first-child .txn-history-table tbody tr {
+      transition: background-color 0.18s ease;
+    }
+
+    .management-section > .panel:first-child .txn-history-table tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .management-section > .panel:first-child .txn-history-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .management-section > .panel:first-child .txn-history-table td:nth-child(2) {
+      color: #315fe8;
+      font-weight: 700;
+    }
+
+    .management-section > .panel:first-child .txn-history-table td:nth-child(5) {
+      color: #172033;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .management-section > .panel:first-child .txn-history-table td:last-child .btn {
+      min-height: 34px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 0.76rem;
+    }
+
+    @media (max-width: 900px) {
+      .management-section > .panel:first-child {
+        padding: 18px 14px 14px;
+      }
+
+      .management-section > .panel:first-child .panel-header {
+        align-items: stretch;
+      }
+
+      .management-section > .panel:first-child .panel-header > div:last-child {
+        justify-content: flex-start !important;
+        min-width: 0;
+      }
+
+      .management-section > .panel:first-child .panel-header > div:last-child > div:last-child {
+        flex: 1 1 240px;
+        min-width: 0;
+      }
     }
 
     .cashier-layout > .panel:first-child > .panel-header,
@@ -2326,6 +2686,233 @@
         transition: none;
       }
     }
+
+    body.dark-mode #txn-status-filter,
+    body.dark-mode #txn-history-search {
+      background: #0f172a !important;
+      border: 1px solid #334155 !important;
+      color: #e5edf8 !important;
+      outline: none !important;
+      box-shadow: inset 0 0 0 1px #334155 !important;
+      color-scheme: dark;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body.dark-mode #txn-status-filter {
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    body.dark-mode #txn-status-filter option {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #txn-history-search::placeholder {
+      color: #94a3b8 !important;
+    }
+
+    body.dark-mode #txn-status-filter:focus,
+    body.dark-mode #txn-history-search:focus,
+    body.dark-mode #txn-status-filter:focus-visible,
+    body.dark-mode #txn-history-search:focus-visible {
+      border-color: #818cf8 !important;
+      box-shadow: inset 0 0 0 1px #818cf8, 0 0 0 2px rgba(129, 140, 248, 0.18) !important;
+      outline: 2px solid transparent !important;
+      outline-offset: -2px !important;
+      -webkit-focus-ring-color: transparent !important;
+    }
+
+    body.dark-mode #clear-txn-search {
+      background: #334155 !important;
+      color: #dbe5f2 !important;
+    }
+
+    body.dark-mode .content-wrapper .checkout-section,
+    body.dark-mode .content-wrapper .summary-card,
+    body.dark-mode .content-wrapper .receipt-card,
+    body.dark-mode .content-wrapper .receipt-panel {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper #checkout-modal > .panel,
+    body.dark-mode .content-wrapper #view-txn-modal > .panel,
+    body.dark-mode .content-wrapper #voided-report-modal > .panel,
+    body.dark-mode .content-wrapper #partial-return-modal > .panel,
+    body.dark-mode .content-wrapper #qr-modal > .panel,
+    body.dark-mode .content-wrapper .confirmation-modal-card {
+      background: #172033 !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper #checkout-modal .panel-header,
+    body.dark-mode .content-wrapper #confirm-finalize-modal > .panel > div:first-child,
+    body.dark-mode .content-wrapper #tuition-receipt-review-modal > .panel > div:first-child {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper #student-info-display,
+    body.dark-mode .content-wrapper #guest-info-fields,
+    body.dark-mode .content-wrapper #checkout-items-overview,
+    body.dark-mode .content-wrapper #cart-footer .summary-row,
+    body.dark-mode .content-wrapper #confirm-finalize-modal > .panel > div:last-child,
+    body.dark-mode .content-wrapper #confirm-finalize-modal > .panel > div:last-child > div {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .cart-item,
+    body.dark-mode .content-wrapper .qty-control,
+    body.dark-mode .content-wrapper .cart-thumb {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .cart-name,
+    body.dark-mode .content-wrapper .cart-subtotal,
+    body.dark-mode .content-wrapper .cart-item-info h4,
+    body.dark-mode .content-wrapper .qty-control span,
+    body.dark-mode .content-wrapper .summary-row label,
+    body.dark-mode .content-wrapper .summary-card .total-line strong,
+    body.dark-mode .content-wrapper .receipt-panel h3 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .cart-item-info p,
+    body.dark-mode .content-wrapper .cart-header-meta,
+    body.dark-mode .content-wrapper .checkout-label,
+    body.dark-mode .content-wrapper .scan-hint,
+    body.dark-mode .content-wrapper .confirmation-modal-message {
+      color: #a9b7cb !important;
+    }
+
+    body.dark-mode .content-wrapper .receipt-input,
+    body.dark-mode .content-wrapper .receipt-select,
+    body.dark-mode .content-wrapper .receipt-textarea,
+    body.dark-mode .content-wrapper .search-input,
+    body.dark-mode .content-wrapper .filter-btn,
+    body.dark-mode .content-wrapper .catalog-course-filter,
+    body.dark-mode .content-wrapper .catalog-sort-select {
+      background: #0f172a !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .receipt-card-title,
+    body.dark-mode .content-wrapper .receipt-label,
+    body.dark-mode .content-wrapper .panel-header h2,
+    body.dark-mode .content-wrapper .cashier-layout > .panel:first-child .panel-header h2,
+    body.dark-mode .content-wrapper .management-section .panel-header h2 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .product-card,
+    body.dark-mode .content-wrapper .product-body,
+    body.dark-mode .content-wrapper .product-actions {
+      background: #172033 !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .product-image-container,
+    body.dark-mode .content-wrapper .product-metadata-section {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .content-wrapper .product-body h3,
+    body.dark-mode .content-wrapper .product-title,
+    body.dark-mode .content-wrapper .product-category,
+    body.dark-mode .content-wrapper .product-metadata-section,
+    body.dark-mode .content-wrapper .compact-meta {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper #cart-footer {
+      background: #172033 !important;
+      border-color: #475569 !important;
+      box-shadow: 0 -10px 20px rgba(2, 6, 23, 0.7) !important;
+    }
+
+    body.dark-mode .content-wrapper #delete-selected-cart {
+      background: #dc2626 !important;
+      border-color: #fca5a5 !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.25) !important;
+    }
+
+    body.dark-mode .content-wrapper #delete-selected-cart:hover:not(:disabled),
+    body.dark-mode .content-wrapper #delete-selected-cart:focus-visible {
+      background: #ef4444 !important;
+      border-color: #fecaca !important;
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .content-wrapper .management-section > .panel,
+    body.dark-mode .content-wrapper #txn-history-content,
+    body.dark-mode .content-wrapper #voided-report-table-wrapper {
+      background: #172033 !important;
+      border-color: #475569 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .management-section > .panel > .panel-header,
+    body.dark-mode .content-wrapper .management-section > .panel .panel-header > div:last-child > div {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .content-wrapper .data-table,
+    body.dark-mode .content-wrapper .txn-history-table {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .data-table th,
+    body.dark-mode .content-wrapper .txn-history-table th {
+      background: #1e293b !important;
+      color: #a9b7cb !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper .data-table td,
+    body.dark-mode .content-wrapper .txn-history-table td {
+      background: #172033 !important;
+      color: #cbd5e1 !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper .data-table tbody tr:hover,
+    body.dark-mode .content-wrapper .txn-history-table tbody tr:hover {
+      background: #1e293b !important;
+    }
+
+    body.dark-mode .content-wrapper .pagination-controls {
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .content-wrapper .pagination-btn {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .content-wrapper .pagination-btn.active {
+      background: #4f46e5 !important;
+      border-color: #818cf8 !important;
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .content-wrapper .pagination-btn:disabled {
+      background: #0f172a !important;
+      color: #64748b !important;
+    }
   </style>
 </head>
 
@@ -2359,10 +2946,16 @@
           </button>
         </div>
         <div class="filter-group">
-          <select id="course-filter" class="search-input" style="max-width: 180px;">
+          <select id="course-filter" class="search-input catalog-course-filter">
             <option value="All">All Courses</option>
           </select>
           <div id="category-filters"></div>
+          <div class="catalog-view-tools" aria-label="Catalog display options">
+            <div class="catalog-view-toggle" role="group" aria-label="Catalog view">
+              <button type="button" class="catalog-view-btn active" data-view="grid" aria-label="Grid view" title="Grid view"><i class="fas fa-grip"></i></button>
+              <button type="button" class="catalog-view-btn" data-view="list" aria-label="List view" title="List view"><i class="fas fa-list"></i></button>
+            </div>
+          </div>
         </div>
         <div id="product-grid" class="products-grid"></div>
         <div id="product-pagination" class="pagination-controls"></div>
@@ -2415,12 +3008,6 @@
             <button class="btn btn-secondary" onclick="openVoidedReportModal()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fas fa-file-invoice"></i> Voided Report</button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; flex: 1; justify-content: flex-end;">
-            <div style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 3px 3px; border-radius: 14px; border: 1px solid #d1d5db;">
-              <i class="far fa-calendar-alt" style="color: #64748b; font-size: 0.85rem;"></i>
-              <input id="txn-date-from" class="search-input" type="date" style="padding: 3px 6px; font-size: 0.85rem; width: auto; border: none; background: transparent; cursor: pointer;" title="From Date" />
-              <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">→</span>
-              <input id="txn-date-to" class="search-input" type="date" style="padding: 3px 6px; font-size: 0.85rem; width: auto; border: none; background: transparent; cursor: pointer;" title="To Date" />
-            </div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <select id="txn-status-filter" class="search-input" style="padding: 6px 12px; font-size: 0.85rem;" aria-label="Filter transactions by status or receipt type">
                 <option value="all">All Transactions</option>
@@ -2609,16 +3196,12 @@
     <div id="tuition-modal" class="modal-backdrop hidden receipt-modal-shell" style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10000;">
       <div class="panel receipt-modal-card" style="position: relative;">
         <div class="receipt-modal-body" style="position: relative; padding-top: 30px;">
-          <button type="button" class="modal-close" onclick="closeTuitionModal()" style="position: absolute; top: 18px; right: 18px; border:none; background:#f8fafc; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:1.35rem; cursor:pointer; color:#64748b; border:1px solid #e2e8f0;">×</button>
+          <button type="button" class="modal-close receipt-modal-close" onclick="closeTuitionModal()" style="position: absolute; top: 18px; right: 18px; border:none; background:#f8fafc; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size:1.35rem; cursor:pointer; color:#64748b; border:1px solid #e2e8f0;">×</button>
           <div class="receipt-card">
             <div class="receipt-card-title"><i class="fas fa-layer-group"></i> Receipt Mode</div>
             <div class="receipt-mode-switch">
               <button id="use-payment-receipt-btn" type="button" class="btn btn-primary btn-sm flex-1 receipt-mode-btn" onclick="setReceiptMode('payment')">Use payment receipt</button>
               <button id="use-tuition-fee-btn" type="button" class="btn btn-secondary btn-sm flex-1 receipt-mode-btn" onclick="setReceiptMode('tuition')">Use tuition fee</button>
-            </div>
-            <div id="receipt-mode-hint" class="receipt-hint">Payment receipt mode is selected.</div>
-            <div id="receipt-mode-highlight" style="margin-top: 10px; padding: 12px 14px; border-radius: 14px; border: 1px solid #dbeafe; background: #f8fbff; color: #334155;">
-              <div id="receipt-mode-highlight-title" style="font-size: 0.9rem; font-weight: 700; color: #1d4ed8; margin-bottom: 4px;">Standard payment receipt</div>
             </div>
             <input type="hidden" id="tuition-receipt-mode" value="Payment Receipt">
             <input type="hidden" id="tuition-receipt-category" value="Payment Receipt">
@@ -2668,10 +3251,11 @@
                   <option value="4th Year">4th Year</option>
                 </select>
               </div>
-              <div class="receipt-field-group">
+              <div id="tuition-student-type-field-group" class="receipt-field-group">
                 <label class="receipt-label">Student Type</label>
                 <select id="tuition-student-type" class="search-input receipt-input">
-                  <option value="Regular Student" selected>Regular Student</option>
+                  <option value="Select Student" selected>Select Student Type</option>
+                  <option value="Regular Student" >Regular Student</option>
                   <option value="Irregular Student">Irregular Student</option>
                 </select>
               </div>
@@ -2736,7 +3320,7 @@
                   <option value="Full Payment">Full Payment</option>
                 </select>
               </div>
-              <div class="receipt-field-group">
+              <div class="receipt-field-group full-width">
                 <label class="receipt-label">Form of Payment</label>
                 <select id="tuition-form-of-payment" class="search-input receipt-select" onchange="toggleTuitionCheckNumberField()">
                   <option value="Cash">Cash</option>
@@ -3242,7 +3826,9 @@
       query: '',
       course: 'All',
       currentPage: 1,
-      itemsPerPage: 20,
+      itemsPerPage: 12,
+      productSort: 'newest',
+      productView: 'grid',
       transactionType: 'buy',
       discountPercent: 0,
       cashReceived: 0,
@@ -3624,6 +4210,20 @@
 
     function renderProducts() {
       filteredProducts = applyProductFilters();
+      filteredProducts.sort((left, right) => {
+        switch (state.productSort) {
+          case 'name-asc':
+            return String(left.product_name || '').localeCompare(String(right.product_name || ''));
+          case 'price-asc':
+            return getProductPrice(left) - getProductPrice(right);
+          case 'price-desc':
+            return getProductPrice(right) - getProductPrice(left);
+          case 'stock-desc':
+            return getProductStock(right) - getProductStock(left);
+          default:
+            return Number(right.product_id || 0) - Number(left.product_id || 0);
+        }
+      });
       ProductPagination.setData(filteredProducts);
       state.currentPage = ProductPagination.currentPage;
     }
@@ -5307,6 +5907,11 @@
       const semesterField = document.getElementById('tuition-semester-field-group');
       if (semesterField) {
         semesterField.style.display = isTuition ? '' : 'none';
+      }
+
+      const studentTypeField = document.getElementById('tuition-student-type-field-group');
+      if (studentTypeField) {
+        studentTypeField.style.display = isTuition ? '' : 'none';
       }
 
       // Hide Partial / Full Payment field in payment receipt mode (always Full Payment in payment mode)
@@ -7371,6 +7976,23 @@
       });
     }
 
+    const productSortSelect = document.getElementById('product-sort');
+    productSortSelect?.addEventListener('change', (event) => {
+      state.productSort = event.target.value;
+      state.currentPage = 1;
+      renderProducts();
+    });
+
+    document.querySelectorAll('.catalog-view-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        state.productView = button.dataset.view === 'list' ? 'list' : 'grid';
+        document.querySelectorAll('.catalog-view-btn').forEach((item) => {
+          item.classList.toggle('active', item === button);
+        });
+        document.getElementById('product-grid')?.classList.toggle('product-list-view', state.productView === 'list');
+      });
+    });
+
     const activeRentalSearchInput = document.getElementById('active-rental-search');
     if (activeRentalSearchInput) {
       activeRentalSearchInput.addEventListener('input', (e) => {
@@ -7425,6 +8047,20 @@
         updateTransactionSettings();
       });
     }
+
+    const tuitionAmountInput = document.getElementById('tuition-amount');
+    tuitionAmountInput?.addEventListener('wheel', (event) => {
+      if (document.activeElement === tuitionAmountInput) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    const tuitionTotalPaymentInput = document.getElementById('tuition-total-payment');
+    tuitionTotalPaymentInput?.addEventListener('wheel', (event) => {
+      if (document.activeElement === tuitionTotalPaymentInput) {
+        event.preventDefault();
+      }
+    }, { passive: false });
 
     // Enhanced Guest School ID Input Formatting (GC-######)
     let guestLookupTimeout = null;
@@ -7765,7 +8401,7 @@
 
   <!-- Tuition Receipt Transaction Review Modal -->
   <div id="tuition-receipt-review-modal" class="modal-backdrop hidden" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 10000;">
-    <div class="panel" style="width: min(600px, 92vw); border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28); animation: modalFadeIn 0.2s ease-out; max-height: 90vh; overflow-y: auto;">
+    <div class="panel receipt-review-modal-panel" style="width: min(600px, 92vw); border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28); animation: modalFadeIn 0.2s ease-out; max-height: 90vh; overflow-y: auto;">
       <div style="padding: 22px 24px 18px; border-bottom: 1px solid #e2e8f0; background: linear-gradient(90deg, #f8fafc 0%, #eef2ff 100%);">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
           <div>
@@ -7777,7 +8413,7 @@
           </button>
         </div>
       </div>
-      <div style="padding: 24px; background: #fff;">
+      <div class="receipt-review-content" style="padding: 24px; background: #fff;">
         <p style="margin: 0 0 20px; color: #334155; font-size: 0.95rem; line-height: 1.5; font-weight: 500;">Please review all the information before finalizing this receipt:</p>
         
         <!-- Student Details Section -->
@@ -7870,6 +8506,16 @@
               <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Additional Notes</span>
               <div id="tuition-review-notes" style="color: #0f172a; font-size: 0.88rem; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; line-height: 1.4;">—</div>
             </div>
+            <div id="tuition-review-approval-row" style="display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 14px; border-top: 1px solid #eef2ff;">
+              <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+                <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">Approved By</span>
+                <strong id="tuition-review-admin-name" style="color: #0f172a; font-size: 0.95rem;">Admin Cashier</strong>
+                <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">Admin Cashier</span>
+              </div>
+              <div id="tuition-review-signature-container" style="height: 60px; width: 120px; display: flex; align-items: center; justify-content: center; flex: 0 0 auto;">
+                <img id="tuition-review-signature-image" src="" alt="Signature" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -7881,24 +8527,6 @@
           </button>
         </div>
 
-        <!-- Signature Section -->
-        <div style="margin-top: 32px; padding-top: 28px; border-top: 2px solid #eef2ff;">
-          <div style="text-align: center;">
-            <div style="font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: #4f46e5; margin-bottom: 16px; letter-spacing: 0.08em;">Approved By</div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-              <!-- Signature Image -->
-              <div id="tuition-review-signature-container" style="height: 60px; width: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
-                <img id="tuition-review-signature-image" src="" alt="Signature" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
-              </div>
-              <!-- Signature Line -->
-              <div style="width: 160px; border-top: 2px solid #0f172a; margin: 12px 0; margin-bottom: 4px;"></div>
-              <!-- Admin Name -->
-              <div id="tuition-review-admin-name" style="font-size: 0.92rem; font-weight: 700; color: #0f172a; margin-top: 4px;">Admin Cashier</div>
-              <!-- Admin Title -->
-              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px;">Admin Cashier</div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

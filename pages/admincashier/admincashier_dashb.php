@@ -160,25 +160,125 @@
       font-weight: 600;
     }
 
-    .low-stock-toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 9999;
-      background: #fff7ed;
-      color: #9a5b00;
-      border: 1px solid #fdba74;
-      border-left: 5px solid #f97316;
-      border-radius: 14px;
-      padding: 14px 16px;
-      box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.5);
-      max-width: 340px;
-      display: none;
-      font-weight: 600;
+    .balance-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .balance-cards .balance-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 128px;
+      padding: 24px 24px 22px;
+      border: 1px solid #edf2f7;
+      border-radius: 20px;
+      background: #ffffff;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .balance-cards .balance-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: #4558ff;
+    }
+
+    .balance-cards .balance-card:nth-child(2)::before { background: #ef4444; }
+    .balance-cards .balance-card:nth-child(3)::before { background: #f59e0b; }
+    .balance-cards .balance-card:nth-child(4)::before { background: #10b981; }
+
+    .balance-cards .balance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
+    }
+
+    .balance-cards .balance-card h3 {
+      margin: 0 0 10px;
+      color: #64748b;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .balance-cards .balance-card .amount {
+      margin: 0;
+      color: #4558ff;
+      font-size: 1.75rem;
+      font-weight: 800 !important;
+      line-height: 1.15;
+    }
+
+    .balance-cards .low-stock-summary-card {
+      border: 1px solid #edf2f7;
+      background: #ffffff;
+    }
+
+    @media (max-width: 1100px) {
+      .balance-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .balance-cards { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 1024px) {
       .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    body.dark-mode .content-wrapper .balance-cards .balance-card .amount {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .balance-cards .low-stock-summary-card .amount {
+      color: #fca5a5 !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-summary-card,
+    body.dark-mode .content-wrapper .low-stock-alert-panel {
+      background: #2a2024 !important;
+      border-color: #7f3541 !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-alert-panel .panel-title {
+      color: #fcd34d !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-item {
+      background: #172033 !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-item .text-slate-800,
+    body.dark-mode .content-wrapper .low-stock-item .text-slate-700 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-item .text-slate-500,
+    body.dark-mode .content-wrapper .low-stock-item .text-slate-400 {
+      color: #a9b7cb !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-item:hover {
+      background: #1e293b !important;
+    }
+
+    body.dark-mode .content-wrapper .low-stock-empty {
+      background: #123b2d !important;
+      color: #a7f3d0 !important;
+      border-color: #276749 !important;
+    }
+
+    body.dark-mode .content-wrapper .top-selling-list-wrapper .group:hover {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .content-wrapper .top-selling-list-wrapper .bg-slate-100 {
+      background: #334155 !important;
     }
   </style>
 </head>
@@ -290,9 +390,7 @@
         topProducts: null
       },
       pollInterval: null,
-      isRefreshing: false,
-      lowStockToastShown: false,
-      toastTimeout: null
+      isRefreshing: false
     };
 
     /**
@@ -417,20 +515,6 @@
       });
     }
 
-    function showLowStockToast(count) {
-      const toast = document.getElementById('lowStockToast');
-      if (!toast || count <= 0 || dashState.lowStockToastShown) return;
-
-      toast.textContent = `⚠ ${count} product${count === 1 ? '' : 's'} are running low on stock.`;
-      toast.style.display = 'block';
-      dashState.lowStockToastShown = true;
-
-      clearTimeout(dashState.toastTimeout);
-      dashState.toastTimeout = setTimeout(() => {
-        toast.style.display = 'none';
-      }, 6000);
-    }
-
     /**
      * Fetches low stock items from products API.
      */
@@ -439,7 +523,6 @@
         const rawData = await fetchWithError('../../actions/get_admincashier_products.php');
         const products = Array.isArray(rawData) ? rawData : (rawData.data || []);
         renderLowStockAlerts(products);
-        showLowStockToast((products || []).filter(product => isLowStockProduct(product)).length);
         return products;
       } catch (error) {
         console.error('Error fetching low stock products:', error);
@@ -581,14 +664,6 @@ document.addEventListener('DOMContentLoaded', initWaitingQueueInteractions);
     function initLowStockInteractions() {
       const card = document.getElementById('lowStockSummaryCard');
       const inventoryBtn = document.getElementById('viewInventoryBtn');
-      const toast = document.getElementById('lowStockToast');
-
-      if (!toast) {
-        const toastNode = document.createElement('div');
-        toastNode.id = 'lowStockToast';
-        toastNode.className = 'low-stock-toast';
-        document.body.appendChild(toastNode);
-      }
 
       card?.addEventListener('click', () => {
         window.location.href = 'admincashier_inventorys.php';
@@ -654,7 +729,6 @@ document.addEventListener('DOMContentLoaded', initTotalSaleInteractions);
       
       window.addEventListener('beforeunload', () => {
         if (dashState.pollInterval) clearInterval(dashState.pollInterval);
-        if (dashState.toastTimeout) clearTimeout(dashState.toastTimeout);
       });
     }
 
