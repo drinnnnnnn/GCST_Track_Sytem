@@ -37,6 +37,34 @@ export function getSidebarHTML() {
     }
 
     if (!window.openLogoutModal) {
+        window.toggleDarkMode = function() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('superadmin-dark-mode', isDark ? 'true' : 'false');
+            const button = document.getElementById('dark-mode-toggle');
+            const icon = button?.querySelector('i');
+            const text = button?.querySelector('span');
+            const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+            button?.setAttribute('title', label);
+            button?.setAttribute('aria-label', label);
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            if (text) text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        };
+
+        const savedTheme = localStorage.getItem('superadmin-dark-mode');
+        if (savedTheme === 'true') document.body.classList.add('dark-mode');
+
+        window.syncDarkModeToggle = function() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const button = document.getElementById('dark-mode-toggle');
+            const icon = button?.querySelector('i');
+            const text = button?.querySelector('span');
+            const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+            button?.setAttribute('title', label);
+            button?.setAttribute('aria-label', label);
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            if (text) text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        };
+
         window.openLogoutModal = function() {
             const modal = document.getElementById('sidebar-logout-modal');
             if (!modal) return;
@@ -247,6 +275,53 @@ export function getSidebarHTML() {
         transition: padding 0.25s ease, margin 0.25s ease;
     }
 
+    body.dark-mode .sidebar {
+        background: rgba(31, 41, 55, 0.96);
+        border-right-color: rgba(71, 85, 105, 0.8);
+        box-shadow: 18px 0 40px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark-mode .sidebar-brand {
+        background: #273449 !important;
+        border-color: #475569 !important;
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+    }
+
+    body.dark-mode .sidebar-brand .brand-subtitle,
+    body.dark-mode .sidebar-brand .brand-title,
+    body.dark-mode .sidebar-brand .brand-role {
+        color: #f1f5f9;
+    }
+
+    body.dark-mode .sidebar-brand .brand-subtitle,
+    body.dark-mode .sidebar-brand .brand-role {
+        color: #fca5a5;
+    }
+
+    body.dark-mode .sidebar-link {
+        color: #cbd5e1;
+    }
+
+    body.dark-mode .sidebar-link i,
+    body.dark-mode .nav-section-label {
+        color: #94a3b8;
+    }
+
+    body.dark-mode .sidebar-link:hover {
+        background: #2d3a4f;
+        color: #f8fafc;
+    }
+
+    body.dark-mode .sidebar-link.active,
+    body.dark-mode .sidebar-link.active i {
+        color: #ffffff;
+    }
+
+    body.dark-mode .sidebar.minimized .sidebar-link i {
+        background: rgba(39, 52, 73, 0.9);
+        border-color: rgba(71, 85, 105, 0.8);
+    }
+
     .brand-content {
         display: flex;
         align-items: center;
@@ -262,6 +337,9 @@ export function getSidebarHTML() {
         object-fit: contain;
         flex-shrink: 0;
         border-radius: 0.75rem;
+        background: #ffffff;
+        padding: 0.2rem;
+        border: 1px solid rgba(255, 255, 255, 0.75);
         
         /* Pushes the logo down from the top */
         margin-top: 1rem; 
@@ -442,6 +520,40 @@ export function getSidebarHTML() {
         margin-top: auto;
     }
 
+    .sidebar-theme-control { padding: 0.5rem 0 0; }
+
+    .dark-mode-toggle {
+        width: 100%;
+        min-height: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0.85rem;
+        border: 1px solid var(--border-soft);
+        border-radius: 0.8rem;
+        background: var(--surface-soft);
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-align: left;
+        transition: var(--transition);
+    }
+
+    .dark-mode-toggle:hover,
+    .dark-mode-toggle:focus-visible {
+        color: var(--primary);
+        border-color: rgba(var(--primary-rgb), 0.35);
+        outline: none;
+    }
+
+    .dark-mode-toggle i { width: 1.1rem; text-align: center; }
+
+    #main-sidebar.sidebar.minimized .sidebar-theme-control { display: flex; justify-content: center; }
+    #main-sidebar.sidebar.minimized .dark-mode-toggle { width: 2.8rem; height: 2.8rem; padding: 0; justify-content: center; }
+    #main-sidebar.sidebar.minimized .dark-mode-toggle span { display: none; }
+
     .btn-logout {
         margin-top: 0.35rem;
         border: 1px solid transparent;
@@ -519,7 +631,33 @@ export function getSidebarHTML() {
 
         .sidebar.minimized .sidebar-footer {
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
+            gap: 0.45rem;
+            width: 100%;
+            padding-top: 0.75rem;
+        }
+
+        .sidebar.minimized .sidebar-theme-control {
+            width: 2.8rem;
+            padding: 0;
+        }
+
+        .sidebar.minimized .btn-logout {
+            width: 2.8rem;
+            height: 2.8rem;
+            min-height: 2.8rem;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar.minimized .btn-logout i {
+            width: auto;
+            height: auto;
+            background: transparent;
+            border: 0;
         }
     }
 
@@ -648,6 +786,90 @@ export function getSidebarHTML() {
         .logout-modal-text { font-size: 0.9rem; }
         .logout-modal-actions { flex-direction: column; }
     }
+
+    @media (min-width: 1025px) {
+        #main-sidebar.sidebar.minimized .sidebar-footer {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            gap: 0.45rem !important;
+            width: 100% !important;
+        }
+
+        #main-sidebar.sidebar.minimized .sidebar-theme-control,
+        #main-sidebar.sidebar.minimized .btn-logout {
+            width: 2.8rem !important;
+            margin: 0 !important;
+        }
+
+        #main-sidebar.sidebar.minimized .dark-mode-toggle,
+        #main-sidebar.sidebar.minimized .btn-logout {
+            height: 2.8rem !important;
+            min-height: 2.8rem !important;
+            padding: 0 !important;
+            justify-content: center !important;
+        }
+    }
+
+    #main-sidebar.sidebar.minimized .sidebar-footer {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 0.45rem !important;
+        width: 100% !important;
+    }
+
+    #main-sidebar.sidebar.minimized .sidebar-theme-control,
+    #main-sidebar.sidebar.minimized .btn-logout {
+        width: 2.8rem !important;
+        margin: 0 !important;
+    }
+
+    #main-sidebar.sidebar.minimized .dark-mode-toggle,
+    #main-sidebar.sidebar.minimized .btn-logout {
+        height: 2.8rem !important;
+        min-height: 2.8rem !important;
+        padding: 0 !important;
+        justify-content: center !important;
+    }
+
+    #main-sidebar.sidebar.minimized .sidebar-brand {
+        min-height: 0;
+        height: 5rem;
+        padding: 0 !important;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #main-sidebar.sidebar.minimized .brand-content {
+        width: 100%;
+        height: 100%;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #main-sidebar.sidebar.minimized .brand-toggle {
+        width: 3.25rem;
+        height: 3.25rem;
+    }
+
+    #main-sidebar.sidebar.minimized .brand-logo {
+        width: 3.25rem;
+        height: 3.25rem;
+        margin: 0 !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        object-fit: contain;
+        background: #ffffff !important;
+        padding: 0.2rem;
+    }
 </style>
 
 <aside id="main-sidebar" class="sidebar" aria-label="Main Sidebar">
@@ -689,6 +911,11 @@ export function getSidebarHTML() {
     </div>
 
     <div class="sidebar-footer">
+        <div class="sidebar-theme-control">
+            <button type="button" id="dark-mode-toggle" class="dark-mode-toggle" title="Switch to dark mode" aria-label="Switch to dark mode" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i><span>Dark Mode</span>
+            </button>
+        </div>
         <a href="javascript:void(0)" onclick="openLogoutModal()" id="sidebar-logout" class="sidebar-link btn-logout">
             <i class="fas fa-sign-out-alt"></i> <span>Sign Out</span>
         </a>

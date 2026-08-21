@@ -234,13 +234,10 @@ const SuperAdmin = (function() {
         try {
             const { getSidebarHTML } = await import('./superadmin_sidebar_content.js');
             elements.sidebarContainer.innerHTML = getSidebarHTML();
+            window.syncDarkModeToggle?.();
 
             const isMinimized = localStorage.getItem('sidebar-minimized') === 'true';
-            if (isMinimized) {
-                document.getElementById('main-sidebar')?.classList.add('minimized');
-                document.querySelector('.content-wrapper')?.classList.add('minimized');
-                document.querySelector('header')?.classList.add('minimized');
-            }
+            window.setSidebarMinimized?.(isMinimized, false);
             const toggleButton = document.getElementById('brand-toggle');
             const toggleLabel = isMinimized ? 'Expand sidebar' : 'Collapse sidebar';
             toggleButton?.setAttribute('title', toggleLabel);
@@ -334,18 +331,34 @@ window.toggleSidebar = function() {
     }
 };
 
-window.toggleMinimizeSidebar = function() {
+window.setSidebarMinimized = function(isMinimized, persist = true) {
     const sidebar = document.getElementById('main-sidebar');
     const content = document.querySelector('.content-wrapper');
     const header = document.querySelector('header');
-    const isMin = sidebar?.classList.toggle('minimized');
-    content?.classList.toggle('minimized');
-    header?.classList.toggle('minimized');
+    if (!sidebar) return false;
+
+    sidebar.classList.toggle('minimized', Boolean(isMinimized));
+    content?.classList.toggle('minimized', Boolean(isMinimized));
+    header?.classList.toggle('minimized', Boolean(isMinimized));
+
     const toggleButton = document.getElementById('brand-toggle');
-    const toggleLabel = isMin ? 'Expand sidebar' : 'Collapse sidebar';
+    const toggleLabel = isMinimized ? 'Expand sidebar' : 'Collapse sidebar';
     toggleButton?.setAttribute('title', toggleLabel);
     toggleButton?.setAttribute('aria-label', toggleLabel);
-    localStorage.setItem('sidebar-minimized', isMin ? 'true' : 'false');
+    toggleButton?.setAttribute('aria-expanded', isMinimized ? 'false' : 'true');
+    sidebar.setAttribute('data-state', isMinimized ? 'minimized' : 'expanded');
+
+    if (persist) {
+        localStorage.setItem('sidebar-minimized', isMinimized ? 'true' : 'false');
+    }
+
+    return Boolean(isMinimized);
+};
+
+window.toggleMinimizeSidebar = function() {
+    const sidebar = document.getElementById('main-sidebar');
+    const isMinimized = !sidebar?.classList.contains('minimized');
+    window.setSidebarMinimized(isMinimized);
 };
 
 /**
@@ -360,6 +373,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sidebarFile) {
             import(`./${sidebarFile}`).then(m => {
                 container.innerHTML = m.getSidebarHTML();
+                window.syncDarkModeToggle?.();
+                window.setSidebarMinimized?.(localStorage.getItem('sidebar-minimized') === 'true', false);
             }).catch(() => {});
         }
     }

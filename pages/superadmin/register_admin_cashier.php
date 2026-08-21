@@ -8,6 +8,12 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <script>
+        if (localStorage.getItem('superadmin-dark-mode') === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+
     <style>
         :root {
             --primary: #dc2626;   
@@ -289,6 +295,77 @@
 
         .toast-close:hover {
             opacity: 1;
+        }
+
+        /* Dark mode follows the shared super-admin theme preference. */
+        html.dark-mode body {
+            --text-dark: #f1f5f9;
+            --text-muted: #a8b5c7;
+            --glass: rgba(31, 41, 55, 0.96);
+            --surface-light: #273449;
+            background: linear-gradient(-45deg, #111827, #182235, #1f2937, #111827);
+            color: #f1f5f9;
+        }
+
+        html.dark-mode .container {
+            background: var(--glass);
+            border-color: #475569;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        html.dark-mode .input-group label {
+            color: #cbd5e1;
+        }
+
+        html.dark-mode .input-group input {
+            background: rgba(23, 34, 53, 0.9);
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        html.dark-mode .input-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        html.dark-mode .input-group input:focus {
+            background: #172235;
+            border-color: var(--primary);
+        }
+
+        html.dark-mode .form-fields {
+            scrollbar-color: #64748b #172235;
+        }
+
+        html.dark-mode .form-fields::-webkit-scrollbar-track {
+            background: #172235;
+            border-radius: 10px;
+        }
+
+        html.dark-mode .form-fields::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 10px;
+        }
+
+        html.dark-mode .form-fields::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        html.dark-mode .password-toggle {
+            background: rgba(148, 163, 184, 0.14);
+            color: #cbd5e1;
+        }
+
+        html.dark-mode .password-toggle:hover {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.16);
+        }
+
+        html.dark-mode .signin-link {
+            color: #a8b5c7;
+        }
+
+        html.dark-mode button {
+            background: #0f172a;
         }
 
         /* Staggered Entrance Animations */

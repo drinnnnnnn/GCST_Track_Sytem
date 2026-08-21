@@ -65,6 +65,13 @@
         .toast-warning { background: #f59e0b; }
         .toast-info { background: #2563eb; }
 
+        body.dark-mode .toast-info {
+            background: #1f2937 !important;
+            border: 1px solid #475569;
+            color: #f1f5f9;
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.35);
+        }
+
         .signature-preview-box {
             border: 1px solid #e2e8f0;
             background: #f8fafc;
@@ -287,7 +294,10 @@
     </div>
 
     <div id="admin-modal" class="logout-modal-overlay">
-        <div class="logout-modal-card" style="max-width: 900px; width: min(900px, calc(100vw - 64px)); margin: 0 auto;">
+        <div class="logout-modal-card relative">
+            <button type="button" class="admin-modal-close" aria-label="Close edit account modal" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="logout-modal-icon"><i class="fas fa-user-pen"></i></div>
             <h2 id="modal-title" class="logout-modal-title">Edit Account</h2>
             <p class="text-muted mb-6">Update the account credentials and permissions below.</p>

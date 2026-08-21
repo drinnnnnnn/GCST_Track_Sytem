@@ -56,6 +56,18 @@
         .toast.warning { background: #f59e0b; }
         .toast.info { background: #2563eb; }
 
+        body.dark-mode .toast.info {
+            background: #1f2937;
+            border: 1px solid #475569;
+            color: #f1f5f9;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        body.dark-mode .toast.info .toast-icon {
+            background: rgba(96, 165, 250, 0.18);
+            color: #93c5fd;
+        }
+
         .toast-icon {
             width: 32px;
             height: 32px;

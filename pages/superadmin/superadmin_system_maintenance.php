@@ -60,6 +60,16 @@
         .toast.error { background: #dc2626; }
         .toast.warning { background: #f59e0b; }
         .toast.info { background: #2563eb; }
+        body.dark-mode .toast.info {
+          background: #1f2937;
+          border: 1px solid #475569;
+          color: #f1f5f9;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        }
+        body.dark-mode .toast.info .toast-icon {
+          background: rgba(96, 165, 250, 0.18);
+          color: #93c5fd;
+        }
         .status.missing { background: #facc15; color: #0f172a; }
         .status.failed { background: #ef4444; }
         .status.success { background: #16a34a; }
@@ -141,6 +151,44 @@
             color: #fff;
         }
         .modal-btn.confirm:hover { background: #b91c1c; }
+
+        body.dark-mode .maintenance-modal {
+          background: #1f2937;
+          border: 1px solid #475569;
+          box-shadow: 0 28px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .maintenance-modal h2 {
+          color: #f8fafc;
+        }
+
+        body.dark-mode .maintenance-modal p {
+          color: #a8b5c7;
+        }
+
+        body.dark-mode .action-preview {
+          background: #273449;
+          border-color: #475569;
+        }
+
+        body.dark-mode .action-preview strong,
+        body.dark-mode #maintenanceModalAction {
+          color: #e2e8f0;
+        }
+
+        body.dark-mode #maintenanceModalImpact {
+          color: #a8b5c7 !important;
+        }
+
+        body.dark-mode .modal-btn.cancel {
+          background: #334155;
+          color: #f1f5f9;
+        }
+
+        body.dark-mode .modal-btn.cancel:hover {
+          background: #475569;
+        }
+
         @keyframes modalSlideIn {
             from { opacity: 0; transform: translateY(8px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -199,6 +247,24 @@
           margin-top: 0.2rem;
           color: #71809a;
           font-size: 0.72rem;
+        }
+
+        body.dark-mode .maintenance-meta {
+          border-color: rgba(248, 113, 113, 0.28);
+          background: rgba(39, 52, 73, 0.94);
+          box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+        }
+
+        body.dark-mode .maintenance-meta-label {
+          color: #fca5a5;
+        }
+
+        body.dark-mode .maintenance-meta strong {
+          color: #f8fafc;
+        }
+
+        body.dark-mode .maintenance-meta span {
+          color: #a8b5c7;
         }
 
         .maintenance-refresh-list {
