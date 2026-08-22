@@ -2,6 +2,11 @@
 let notificationPollInterval = null;
 const BASE_PATH = '/GCST_Track_System';
 
+if (localStorage.getItem('user-dark-mode') === 'true') {
+  document.documentElement.classList.add('dark-mode');
+  document.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark-mode'), { once: true });
+}
+
 function normalizePagePath(targetPath) {
   if (!targetPath || typeof targetPath !== 'string') return targetPath;
 
@@ -364,6 +369,7 @@ async function autoLoadSidebar() {
     const { getSidebarHTML } = await import('../../assets/js/user_sidebar_content.js');
     if (container) {
       container.innerHTML = getSidebarHTML();
+      window.syncUserDarkModeToggle?.();
 
       // Automatically highlight the active link based on the current URL
       const getFileName = (path) => path.split('/').pop() || 'InUser_home.php';

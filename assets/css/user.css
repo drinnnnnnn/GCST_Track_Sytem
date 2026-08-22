@@ -899,6 +899,323 @@
       transform: translateY(-1px);
     }
 
+    body.dark-mode {
+      --bg: #0f172a;
+      --surface: #172033;
+      --surface-soft: #1e293b;
+      --text: #e5edf8;
+      --muted: #9aa9bf;
+      --border: #334155;
+      --border-soft: #273449;
+      color-scheme: dark;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body.dark-mode .user-top-navbar,
+    body.dark-mode .nav-menu-wrapper {
+      background: rgba(23, 32, 51, 0.94);
+      border-color: var(--border);
+    }
+
+    body.dark-mode .brand-system,
+    body.dark-mode .brand-college,
+    body.dark-mode .brand-portal,
+    body.dark-mode .nav-item,
+    body.dark-mode .greeting-content h1,
+    body.dark-mode .quick-actions h2,
+    body.dark-mode .balance-section h2,
+    body.dark-mode .product-name,
+    body.dark-mode .modal-title,
+    body.dark-mode .balance-card p,
+    body.dark-mode .queue-card .amount {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .greeting-section,
+    body.dark-mode .action-card,
+    body.dark-mode .balance-card,
+    body.dark-mode .activity-section,
+    body.dark-mode .control-panel,
+    body.dark-mode .products-section,
+    body.dark-mode .product-card,
+    body.dark-mode .cart-panel,
+    body.dark-mode .queue-card,
+    body.dark-mode .action-panel,
+    body.dark-mode .action-panel > .bg-white,
+    body.dark-mode #latest-ticket-card,
+    body.dark-mode .ticket-history-card,
+    body.dark-mode .modal-card,
+    body.dark-mode .product-modal,
+    body.dark-mode .save-profile-modal-card {
+      background: var(--surface) !important;
+      border-color: var(--border) !important;
+      color: var(--text);
+      box-shadow: 0 12px 28px rgba(2, 6, 23, 0.28);
+    }
+
+    body.dark-mode .action-panel [class*="bg-blue-50"],
+    body.dark-mode #latest-ticket-card [class*="bg-blue-50"],
+    body.dark-mode .ticket-detail-pill,
+    body.dark-mode .mobile-filter-scroll {
+      background: var(--surface-soft) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .action-panel [class*="border-slate-100"],
+    body.dark-mode #latest-ticket-card [class*="border-slate-100"],
+    body.dark-mode .ticket-history-card [class*="border-slate-50"] {
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .ticket-history-card .text-slate-900,
+    body.dark-mode .ticket-history-card .text-slate-800,
+    body.dark-mode #latest-ticket-card .text-slate-900,
+    body.dark-mode #latest-ticket-card .text-slate-800 {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea,
+    body.dark-mode .search-input-wrapper,
+    body.dark-mode .table-container,
+    body.dark-mode .tab-buttons,
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group textarea {
+      background: #0f172a !important;
+      color: var(--text) !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .search-bar input::placeholder,
+    body.dark-mode #search-input::placeholder {
+      color: #a9b7cb !important;
+      opacity: 1;
+    }
+
+    body.dark-mode .availability-toggle,
+    body.dark-mode .filter-btn {
+      background: var(--surface-soft) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .availability-toggle:hover,
+    body.dark-mode .filter-btn:hover {
+      background: #273449 !important;
+      color: #c7d2fe !important;
+      border-color: #818cf8 !important;
+    }
+
+    body.dark-mode .filter-btn.active {
+      background: #2563eb !important;
+      color: #ffffff !important;
+      border-color: #2563eb !important;
+    }
+
+    body.dark-mode .toggle-switch-ui {
+      background: #475569;
+    }
+
+    body.dark-mode .availability-toggle input:checked + .toggle-switch-ui {
+      background: #2563eb;
+    }
+
+    body.dark-mode .product-card img,
+    body.dark-mode .quick-link-icon,
+    body.dark-mode .step-box,
+    body.dark-mode .modal-meta-item,
+    body.dark-mode .products-loading,
+    body.dark-mode .products-empty {
+      background: var(--surface-soft) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .product-card img,
+    body.dark-mode .product-card .product-image,
+    body.dark-mode .modal-card [class*="bg-slate-50"] {
+      background: var(--surface-soft) !important;
+    }
+
+    body.dark-mode .checkout-confirm-card,
+    body.dark-mode .confirmation-modal-card {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .checkout-confirm-header {
+      background: var(--surface-soft) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .checkout-confirm-card .checkout-summary,
+    body.dark-mode .checkout-confirm-card .checkout-item-preview,
+    body.dark-mode .confirmation-modal-card .confirmation-modal-body {
+      background: var(--surface-soft) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .checkout-confirm-card .text-slate-900,
+    body.dark-mode .checkout-confirm-card .text-slate-700,
+    body.dark-mode .checkout-confirm-card .text-slate-600,
+    body.dark-mode .confirmation-modal-card .confirmation-modal-title,
+    body.dark-mode .confirmation-modal-card .confirmation-modal-message {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .checkout-confirm-card .checkout-summary-row,
+    body.dark-mode .checkout-confirm-card .checkout-item-preview {
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .checkout-confirm-card .checkout-summary-row strong,
+    body.dark-mode .checkout-confirm-card .checkout-item-preview span {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .modal-card .spec-group,
+    body.dark-mode .modal-card [class*="bg-slate-50"] {
+      background: var(--surface-soft) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .modal-card [class*="bg-blue-50"] {
+      background: rgba(37, 99, 235, 0.16) !important;
+      border-color: rgba(96, 165, 250, 0.35) !important;
+    }
+
+    body.dark-mode .modal-card .spec-label,
+    body.dark-mode .modal-card .text-slate-400,
+    body.dark-mode .modal-card .text-slate-500,
+    body.dark-mode .modal-card .spec-value,
+    body.dark-mode .modal-card .text-slate-900 {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .modal-card .spec-label,
+    body.dark-mode .modal-card .text-slate-400,
+    body.dark-mode .modal-card .text-slate-500 {
+      color: var(--muted) !important;
+    }
+
+    body.dark-mode .modal-card .modal-qty-btn {
+      background: var(--surface-soft) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .modal-card #modal-qty-container [class*="bg-slate-100"] {
+      background: #0f172a !important;
+      border-color: #e5edf8 !important;
+    }
+
+    body.dark-mode .modal-card #modal-qty-container input,
+    body.dark-mode .modal-card #modal-qty-container [class*="text-slate-400"] {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .modal-card #modal-qty-container input {
+      background: transparent !important;
+      border-color: transparent !important;
+    }
+
+    body.dark-mode .cart-item,
+    body.dark-mode .cart-empty-state {
+      background: var(--surface-soft) !important;
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .cart-item-controls button,
+    body.dark-mode .cart-item input,
+    body.dark-mode .cart-item select {
+      background: #0f172a !important;
+      color: var(--text) !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .cart-item-controls button {
+      background: var(--surface-soft) !important;
+      color: #e5edf8 !important;
+      border-color: #64748b !important;
+    }
+
+    body.dark-mode .cart-item-controls span {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .cart-quantity-btn {
+      background: var(--surface-soft) !important;
+      color: #e5edf8 !important;
+      border-color: #64748b !important;
+    }
+
+    body.dark-mode .cart-quantity-value {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .cart-item .text-blue-600 {
+      color: #93c5fd !important;
+    }
+
+    body.dark-mode .product-card .spec-label {
+      color: var(--muted) !important;
+    }
+
+    body.dark-mode .product-card .spec-value {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .cart-header h2,
+    body.dark-mode .cart-item .text-slate-900,
+    body.dark-mode .summary-row,
+    body.dark-mode .summary-row span,
+    body.dark-mode .select-all-wrapper {
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .cart-subtitle,
+    body.dark-mode .cart-item .text-slate-500,
+    body.dark-mode .cart-item .text-slate-400 {
+      color: var(--muted) !important;
+    }
+
+    body.dark-mode .cart-summary {
+      border-color: var(--border) !important;
+    }
+
+    body.dark-mode .text-slate-900,
+    body.dark-mode .text-slate-800,
+    body.dark-mode .text-slate-700,
+    body.dark-mode .text-slate-600,
+    body.dark-mode .text-slate-500,
+    body.dark-mode .product-details,
+    body.dark-mode .compact-meta,
+    body.dark-mode .modal-description,
+    body.dark-mode .modal-meta-item span {
+      color: var(--muted) !important;
+    }
+
+    body.dark-mode .nav-item:hover,
+    body.dark-mode .nav-theme-toggle:hover {
+      background: rgba(99, 102, 241, 0.18);
+      color: #a5b4fc !important;
+    }
+
+    body.dark-mode .nav-item.active {
+      background: var(--primary);
+      color: white !important;
+    }
+
+    body.dark-mode .nav-logout:hover { background: rgba(239, 68, 68, 0.16) !important; }
+
+    @media (max-width: 991px) {
+      body.dark-mode .nav-right { border-color: var(--border); }
+    }
+
     .btn-success {
       background: var(--success);
       color: white;

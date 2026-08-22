@@ -251,6 +251,21 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     }
 
+    body.dark-mode .pending-orders-table tr td {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+    }
+
+    body.dark-mode .pending-orders-table tbody tr:hover td {
+      background: var(--surface-soft) !important;
+    }
+
+    body.dark-mode .activity-section h2,
+    body.dark-mode .balance-section h2,
+    body.dark-mode .alert-text h3 {
+      color: var(--text) !important;
+    }
+
     .status-pill {
       display: inline-flex;
       align-items: center;
@@ -474,6 +489,43 @@
       .pending-orders-table tr td > p {
         width: 100%;
         text-align: left;
+      }
+
+      body.dark-mode .pending-orders-table tr {
+        background: var(--surface) !important;
+        border-color: var(--border) !important;
+      }
+
+      body.dark-mode .pending-orders-table tr td {
+        background: var(--surface) !important;
+        color: var(--text) !important;
+      }
+
+      body.dark-mode .pending-orders-table tr td::before {
+        color: var(--muted);
+      }
+
+      body.dark-mode .pending-orders-table tr td[data-label="Product(s)"] {
+        max-width: none !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        overflow-wrap: anywhere;
+      }
+
+      .pending-orders-table tr td {
+        display: grid;
+        grid-template-columns: 5rem minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .pending-orders-table tr td[data-label="Product(s)"] {
+        max-width: none !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+      }
+
+      .pending-orders-table .status-pill {
+        width: fit-content;
       }
 
       .rental-card {

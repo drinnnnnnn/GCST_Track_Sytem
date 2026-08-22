@@ -219,6 +219,12 @@
       cursor: pointer;
       user-select: none;
       touch-action: manipulation;
+      overflow: visible !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 300px;
+      max-height: 340px;
     }
 
     .ticket-history-card:hover {
@@ -229,26 +235,36 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 0.85rem;
-      padding-top: 0.75rem;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 1rem;
+      padding-right: 0;
+      padding-left: 0;
+      padding-bottom: 0;
       border-top: 1px solid #f1f5f9;
       color: #64748b;
       font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.12em;
+      position: relative;
+      min-height: 2.5rem;
     }
 
     .ticket-details-toggle .toggle-icon {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      width: 1.7rem;
-      height: 1.7rem;
+      width: 2rem;
+      height: 2rem;
       border-radius: 999px;
       background: #eff6ff;
       color: #2563eb;
       transition: transform 0.25s ease;
+      flex-shrink: 0;
+      margin-left: auto;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+      z-index: 20;
     }
 
     .ticket-history-card.is-expanded .ticket-details-toggle {
@@ -265,24 +281,96 @@
       opacity: 0;
       transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.25s ease;
       margin-top: 0;
+      width: 100%;
     }
 
     .ticket-history-card.is-expanded .ticket-details-panel {
-      max-height: 220px;
+      max-height: 300px;
       opacity: 1;
       margin-top: 0.75rem;
+      overflow-y: auto;
     }
 
     .ticket-detail-pill {
       border-radius: 1rem;
       background: #f8fafc;
-      padding: 0.7rem 0.8rem;
+      padding: 0.8rem;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .ticket-detail-pill p {
+      margin: 0;
+      white-space: normal;
+    }
+
+    .ticket-detail-pill p:first-child {
+      font-size: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .ticket-detail-pill p:last-child {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e293b;
     }
 
     .muted-text {
       color: var(--muted);
       margin: 6px 0 0;
       font-size: 0.95rem;
+    }
+
+    body.dark-mode .action-panel > .bg-white,
+    body.dark-mode #latest-ticket-card,
+    body.dark-mode .ticket-history-card {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+      border-color: #334155 !important;
+      box-shadow: 0 12px 28px rgba(2, 6, 23, 0.28) !important;
+    }
+
+    body.dark-mode .action-panel .text-slate-900,
+    body.dark-mode #latest-ticket-card .text-slate-900,
+    body.dark-mode #latest-ticket-card .text-slate-800,
+    body.dark-mode .ticket-history-card .text-slate-900,
+    body.dark-mode .ticket-history-card .text-slate-800 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .action-panel .text-slate-500,
+    body.dark-mode #latest-ticket-card .text-slate-500,
+    body.dark-mode #latest-ticket-card .text-slate-600,
+    body.dark-mode .ticket-history-card .text-slate-500,
+    body.dark-mode .ticket-history-card .text-slate-600 {
+      color: #a9b7cb !important;
+    }
+
+    body.dark-mode .action-panel [class*="bg-slate-50"],
+    body.dark-mode #latest-ticket-card [class*="bg-slate-50"],
+    body.dark-mode .ticket-detail-pill,
+    body.dark-mode .mobile-filter-scroll {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode #tickets-container > .col-span-full {
+      background: #172033 !important;
+      border-color: #334155 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #tickets-container > .col-span-full [class*="bg-slate-50"] {
+      background: #1e293b !important;
+    }
+
+    body.dark-mode #tickets-container > .col-span-full .text-slate-900 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #tickets-container > .col-span-full .text-slate-500,
+    body.dark-mode #tickets-container > .col-span-full .text-slate-300 {
+      color: #a9b7cb !important;
     }
 
     @keyframes pulse-light {
@@ -367,12 +455,67 @@
         padding: 0.85rem;
       }
 
+      .queue-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+      }
+
+      .queue-card {
+        min-width: 0;
+        min-height: 82px;
+        gap: 0.55rem;
+      }
+
+      .queue-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .queue-card h3 {
+        font-size: 0.62rem;
+        line-height: 1.2;
+      }
+
       .queue-card .amount {
         font-size: 1rem;
       }
 
       .action-panel .rounded-\[2rem\] {
-        padding: 1.1rem !important;
+        padding: 1rem !important;
+      }
+
+      .action-panel .rounded-\[2rem\] .flex.items-center.gap-4.mb-8 {
+        gap: 0.7rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .action-panel .rounded-\[2rem\] .w-12.h-12 {
+        width: 2.75rem;
+        height: 2.75rem;
+        flex-shrink: 0;
+      }
+
+      .action-panel .rounded-\[2rem\] h2 {
+        font-size: 1.05rem;
+      }
+
+      .action-panel .rounded-\[2rem\] .grid {
+        gap: 0.85rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .action-panel .rounded-\[2rem\] .form-group {
+        margin-bottom: 0.25rem;
+      }
+
+      .action-panel .rounded-\[2rem\] .pt-8 {
+        padding-top: 1rem;
+      }
+
+      .action-panel .rounded-\[2rem\] #generate-ticket-btn {
+        min-height: 52px;
       }
 
       .ticket-actions {
@@ -389,9 +532,28 @@
         padding-right: 1rem;
       }
 
+      .mobile-filter-scroll {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.35rem;
+        width: 100%;
+        overflow: visible;
+      }
+
+      .mobile-filter-scroll .filter-button {
+        width: 100%;
+        min-width: 0;
+        padding-left: 0.35rem;
+        padding-right: 0.35rem;
+        font-size: 0.62rem;
+        white-space: nowrap;
+      }
+
       .ticket-history-card {
         border-radius: 1.1rem !important;
         padding: 1rem !important;
+        min-height: 280px !important;
+        max-height: none !important;
       }
 
       .ticket-history-card .ticket-top {
@@ -406,6 +568,51 @@
 
       .ticket-history-card .ticket-number {
         font-size: 1.5rem;
+      }
+
+      .ticket-details-toggle {
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        min-height: 2rem;
+      }
+
+      .ticket-details-toggle span:first-child {
+        font-size: 0.65rem;
+      }
+
+      .ticket-details-toggle .toggle-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+
+      .ticket-history-card.is-expanded .ticket-details-panel {
+        max-height: 280px;
+      }
+
+      .ticket-detail-pill {
+        padding: 0.6rem 0.65rem;
+      }
+
+      .ticket-detail-pill p:first-child {
+        font-size: 0.7rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .ticket-detail-pill p:last-child {
+        font-size: 0.9rem;
+      }
+
+      .ticket-details-panel {
+        padding: 0.75rem 0;
+      }
+
+      .ticket-details-panel .grid {
+        gap: 0.5rem;
+        grid-template-columns: 1fr !important;
+      }
+
+      .ticket-detail-pill.col-span-2 {
+        grid-column: 1 / -1;
       }
     }
 
@@ -483,7 +690,7 @@
         
         <div class="relative z-10">
           <div class="flex items-center gap-4 mb-8">
-            <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+            <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
               <i class="fas fa-plus text-xl"></i>
             </div>
             <div class="text-left">
@@ -532,7 +739,7 @@
               </p>
             </div>
             <button id="generate-ticket-btn" 
-              class="w-full md:w-auto px-10 py-4 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl font-semibold shadow-xl shadow-blue-500/20 hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98] hover:-translate-y-1 flex items-center justify-center gap-3 group">
+              class="w-full md:w-auto px-10 py-4 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl font-semibold transition-all duration-300 active:scale-[0.98] hover:-translate-y-1 flex items-center justify-center gap-3 group">
               <span class="group-hover:rotate-90 transition-transform duration-300"><i class="fas fa-plus"></i></span>
               Generate New Ticket
             </button>
@@ -818,10 +1025,10 @@
         if (sClass === 'expired') badgeColors = "bg-red-100 text-red-700";
 
         return `
-          <div class="ticket-history-card group bg-white rounded-[1.4rem] p-4 shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col ${isServing ? 'ring-2 ring-green-500 ring-offset-2' : ''} ${isPwd ? 'ring-2 ring-violet-200 bg-violet-50/20' : ''}">
+          <div class="ticket-history-card group bg-white rounded-[1.4rem] p-6 shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 relative overflow-visible ${isServing ? 'ring-2 ring-green-500 ring-offset-2' : ''} ${isPwd ? 'ring-2 ring-violet-200 bg-violet-50/20' : ''}">
             ${isServing ? '<div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-12 -mt-12 pointer-events-none"></div>' : ''}
             
-            <div class="relative z-10">
+            <div class="relative z-10 flex flex-col h-full">
               <div class="ticket-top flex items-start justify-between mb-4 gap-3">
                 <div class="flex items-center gap-2">
                   <div class="ticket-number text-2xl font-semibold text-blue-600 tracking-tighter">${formatQueueNumber(ticket.queue_number)}</div>
@@ -832,27 +1039,27 @@
                 </span>
               </div>
 
-              <div class="space-y-3 flex-1">
+              <div class="space-y-2.5 flex-1">
                 <div>
                   <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Visit Purpose</p>
-                  <p class="text-slate-800 font-semibold leading-snug">${ticket.purpose || 'General Inquiry'}</p>
+                  <p class="text-slate-800 font-semibold leading-snug text-sm">${ticket.purpose || 'General Inquiry'}</p>
                 </div>
 
-                <div class="ticket-meta-grid grid grid-cols-2 gap-3 pt-3 border-t border-slate-50">
+                <div class="ticket-meta-grid grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
                   <div>
-                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Generated</p>
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Generated</p>
                     <p class="text-slate-600 text-[11px] font-medium leading-tight">${formatDateTime(ticket.created_at)}</p>
                   </div>
                   <div>
-                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Elapsed</p>
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Elapsed</p>
                     <p class="text-slate-600 text-[11px] font-medium leading-tight">${getWaitingDuration(ticket.created_at, ticket.served_at)}</p>
                   </div>
                 </div>
 
                 ${ticket.served_at ? `
-                  <div class="pt-3 border-t border-slate-50">
-                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Processed On</p>
-                    <p class="text-slate-900 font-semibold text-[11px] uppercase">${formatDateTime(ticket.served_at)}</p>
+                  <div class="pt-2 border-t border-slate-100">
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Processed On</p>
+                    <p class="text-slate-900 font-semibold text-[11px]">${formatDateTime(ticket.served_at)}</p>
                   </div>
                 ` : ''}
               </div>

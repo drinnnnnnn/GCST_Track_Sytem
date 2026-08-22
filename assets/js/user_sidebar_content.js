@@ -65,6 +65,30 @@ export function getSidebarHTML() {
             window.location.replace('/GCST_Track_System/actions/sign_out.php');
         };
 
+        window.toggleUserDarkMode = function() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            document.documentElement.classList.toggle('dark-mode', isDark);
+            localStorage.setItem('user-dark-mode', isDark ? 'true' : 'false');
+            window.syncUserDarkModeToggle();
+        };
+
+        window.syncUserDarkModeToggle = function() {
+            const button = document.getElementById('user-dark-mode-toggle');
+            const icon = button?.querySelector('i');
+            const text = button?.querySelector('span');
+            const isDark = document.body.classList.contains('dark-mode');
+            const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+            button?.setAttribute('title', label);
+            button?.setAttribute('aria-label', label);
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            if (text) text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        };
+
+        if (localStorage.getItem('user-dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.documentElement.classList.add('dark-mode');
+        }
+
         document.addEventListener('click', (e) => {
             const target = e.target;
             if (target && target.id === 'nav-backdrop') {
@@ -169,6 +193,9 @@ export function getSidebarHTML() {
         width: 52px; 
         height: 52px; 
         object-fit: contain;
+        background: #ffffff;
+        padding: 3px;
+        border-radius: 50%;
         filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
         transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         flex-shrink: 0;
@@ -285,6 +312,13 @@ export function getSidebarHTML() {
 
     .nav-item:active { transform: scale(0.97); }
 
+    .nav-theme-toggle {
+        border: 0;
+        background: transparent;
+        font: inherit;
+        cursor: pointer;
+    }
+
     .hamburger-toggle {
         display: none;
         background: #f1f5f9;
@@ -397,6 +431,15 @@ export function getSidebarHTML() {
     .btn-modal-confirm:hover { background: #dc2626; box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
     .btn-modal:active { transform: translateY(0); }
 
+    body.dark-mode .logout-modal-card {
+        background: #172033;
+        border-color: #334155;
+    }
+    body.dark-mode .logout-modal-title { color: #e5edf8; }
+    body.dark-mode .logout-modal-text { color: #a9b7cb; }
+    body.dark-mode .btn-modal-cancel { background: #1e293b; color: #e5edf8; }
+    body.dark-mode .btn-modal-cancel:hover { background: #334155; }
+
     .nav-logout { color: #ef4444; font-weight: 700; }
     .nav-logout:hover { background: #fff1f2 !important; color: #e11d48 !important; }
 </style>
@@ -432,6 +475,9 @@ export function getSidebarHTML() {
                 <a href="user_profile.php" class="nav-item">
                     <i class="fas fa-user-circle"></i> <span>Profile</span>
                 </a>
+                <button type="button" id="user-dark-mode-toggle" class="nav-item nav-theme-toggle" onclick="toggleUserDarkMode()" aria-label="Switch to dark mode" title="Switch to dark mode">
+                    <i class="fas fa-moon"></i> <span>Dark Mode</span>
+                </button>
                 <a href="javascript:void(0)" data-action="logout" class="nav-item nav-logout">
                     <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
                 </a>

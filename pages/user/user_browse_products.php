@@ -84,6 +84,19 @@
       padding-top: 0.2rem;
     }
 
+    .product-card .product-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .product-card .product-footer > .w-full {
+      width: 100%;
+    }
+
+    .product-card .product-footer .product-price-group {
+      width: 100%;
+    }
+
     .product-price-group {
       display: flex;
       flex-direction: column;
@@ -154,6 +167,7 @@
       width: 100%;
       max-width: 1000px;
       max-height: 95vh;
+      position: relative;
       border-radius: 1.5rem;
       overflow: hidden;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -621,45 +635,11 @@
       flex: 1;
     }
 
-    .mobile-cart-quickbar {
-      position: sticky;
-      bottom: 0.9rem;
-      z-index: 1400;
-      display: none;
-      margin: 0 0 0.75rem;
-    }
-
-    .mobile-cart-btn {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      border: none;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #2563eb, #1d4ed8);
-      color: white;
-      padding: 0.9rem 1rem;
-      font-weight: 700;
-      box-shadow: 0 18px 30px -12px rgba(37, 99, 235, 0.45);
-      touch-action: manipulation;
-    }
-
-    .mobile-cart-pill {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 0.35rem 0.65rem;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      white-space: nowrap;
-    }
-
     @media (min-width: 1025px) {
       .cart-panel { position: sticky; top: 24px; }
     }
 
     @media (max-width: 1023px) {
-      .mobile-cart-quickbar { display: block; }
-
       .cart-panel {
         position: fixed;
         left: 0.7rem;
@@ -751,19 +731,18 @@
       }
 
       .filter-buttons {
-        overflow-x: auto;
-        padding-bottom: 2px;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-
-      .filter-buttons::-webkit-scrollbar {
-        display: none;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+        padding-bottom: 0;
       }
 
       .filter-btn {
-        padding: 10px 16px;
+        width: 100%;
+        min-width: 0;
+        padding: 10px 8px;
         white-space: nowrap;
+        font-size: 0.78rem;
       }
 
       .availability-toggle {
@@ -1029,6 +1008,60 @@
     }
 
     @media (max-width: 768px) {
+      .modal-overlay {
+        padding: 0.5rem;
+      }
+
+      .modal-card {
+        max-height: calc(100vh - 1rem);
+        border-radius: 1rem;
+      }
+
+      .modal-content-scroll {
+        padding: 0.85rem;
+      }
+
+      .modal-grid {
+        gap: 1rem;
+      }
+
+      .modal-close-btn {
+        top: 0.65rem;
+        right: 0.65rem;
+        width: 32px;
+        height: 32px;
+      }
+
+      .modal-card .modal-grid > div:last-child {
+        min-width: 0;
+      }
+
+      .modal-card .modal-grid > div:last-child > .bg-blue-50\/50 > div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.9rem;
+      }
+
+      .modal-card #modal-qty-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.55rem;
+      }
+
+      .modal-card #modal-qty-container > div {
+        order: 2;
+      }
+
+      .modal-card #modal-actions {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      .modal-card #modal-actions > button {
+        width: 100%;
+        min-height: 46px;
+      }
+
       .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
@@ -1039,6 +1072,92 @@
       
       .search-bar-wrapper input {
         min-width: 100%;
+      }
+
+      .product-card .product-image {
+        height: 96px;
+      }
+
+      .product-card .product-info {
+        padding: 0.6rem 0.65rem 0.35rem;
+        gap: 0.15rem;
+      }
+
+      .product-card .product-name {
+        font-size: 0.85rem;
+        line-height: 1.2;
+        height: 2.4em;
+      }
+
+      .product-card .compact-meta {
+        font-size: 0.68rem;
+      }
+
+      .product-card .spec-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 4px;
+        padding: 3px 0;
+      }
+
+      .product-card .spec-label,
+      .product-card .spec-value {
+        font-size: 0.68rem;
+        line-height: 1.2;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .product-card .compact-meta {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+      }
+
+      .product-card .product-footer {
+        gap: 0.25rem;
+      }
+
+      .product-card .product-actions {
+        padding: 0 0.65rem 0.55rem;
+      }
+
+      .product-card .btn-action {
+        min-height: 40px;
+        padding: 0.45rem 0.65rem;
+      }
+
+      .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+      }
+
+      .product-card {
+        min-width: 0;
+        border-radius: 0.8rem;
+      }
+
+      .product-card .product-image {
+        height: auto;
+        aspect-ratio: 1 / 1;
+      }
+
+      .product-card .product-info {
+        min-width: 0;
+      }
+
+      .product-card .product-name,
+      .product-card .compact-meta {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .product-card .product-price-value {
+        font-size: 0.82rem;
+      }
+
+      .product-card .stock-badge {
+        font-size: 0.58rem;
+        padding: 2px 5px;
       }
     }
   </style>
@@ -1063,7 +1182,7 @@
     <!-- Controls: Search & Filters Combined -->
     <div class="control-panel">
       <div class="flex flex-col md:flex-row gap-4 items-stretch">
-        <input id="search-input" type="search" autocomplete="off" aria-label="Search products" placeholder="Search products..." class="w-full px-5 py-4 bg-white rounded-2xl shadow-xl shadow-gray-200 border border-transparent focus:border-indigo-500 outline-none transition-all"/>
+        <input id="search-input" type="search" autocomplete="off" aria-label="Search products" placeholder="Search products..." class="w-full px-5 py-4 bg-white rounded-2xl border border-transparent focus:border-indigo-500 outline-none transition-all"/>
         <label class="availability-toggle w-full md:w-auto justify-center">
           <input type="checkbox" id="stock-toggle" />
           <div class="toggle-switch-ui"></div>
@@ -1083,13 +1202,6 @@
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-    <div class="mobile-cart-quickbar">
-      <button type="button" class="mobile-cart-btn" onclick="scrollToCart()">
-        <span><i class="fas fa-shopping-cart"></i> View Cart</span>
-        <span id="mobile-cart-pill" class="mobile-cart-pill">0 items</span>
-      </button>
-    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-8 xl:gap-12">
       <section class="space-y-6">
@@ -1140,7 +1252,7 @@
             </div>
           </div>
 
-          <button id="checkout-button" class="w-full py-4 px-6 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl font-semibold text-base tracking-wide shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 group" type="button">
+          <button id="checkout-button" class="w-full py-4 px-6 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl font-semibold text-base tracking-wide hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 group" type="button">
             <i class="fas fa-lock text-sm opacity-70 group-hover:opacity-100 transition-opacity"></i>
             <span>Proceed to Checkout</span>
           </button>
@@ -1912,7 +2024,6 @@
       const cartCount = document.getElementById('cart-count');
       const cartItemsCount = document.getElementById('cart-items-count');
       const cartSubtotal = document.getElementById('cart-subtotal');
-      const mobileCartPill = document.getElementById('mobile-cart-pill');
       const selectAllContainer = document.getElementById('select-all-container');
       const selectAllCheckbox = document.getElementById('select-all-cart');
       const deleteSelectedBtn = document.getElementById('btn-delete-selected');
@@ -1928,9 +2039,6 @@
       cartCount.textContent = totalItemsCount;
       cartItemsCount.textContent = selectedItemsQuantity;
       cartSubtotal.textContent = formatCurrency(totalAmount);
-      if (mobileCartPill) {
-        mobileCartPill.textContent = totalItemsCount === 0 ? 'Empty' : `${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'}`;
-      }
       checkoutButton.disabled = selectedItems.length === 0;
       if (deleteSelectedBtn) deleteSelectedBtn.disabled = selectedItems.length === 0;
 
@@ -1976,9 +2084,9 @@
           </div>
           <div class="flex flex-col items-end gap-2">
             <div class="flex items-center gap-2">
-              <button type="button" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs hover:bg-slate-50" onclick="changeCartQuantity('${item.cart_id}', ${isYardUnit ? -0.25 : -1})">−</button>
-              <span class="text-sm font-semibold min-w-[30px] text-center">${isYardUnit ? item.quantity.toFixed(2) : item.quantity}${isYardUnit ? ' yd' : ''}</span>
-              <button type="button" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs hover:bg-slate-50" onclick="changeCartQuantity('${item.cart_id}', ${isYardUnit ? 0.25 : 1})">+</button>
+              <button type="button" class="cart-quantity-btn w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs hover:bg-slate-50" onclick="changeCartQuantity('${item.cart_id}', ${isYardUnit ? -0.25 : -1})">−</button>
+              <span class="cart-quantity-value text-sm font-semibold min-w-[30px] text-center">${isYardUnit ? item.quantity.toFixed(2) : item.quantity}${isYardUnit ? ' yd' : ''}</span>
+              <button type="button" class="cart-quantity-btn w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs hover:bg-slate-50" onclick="changeCartQuantity('${item.cart_id}', ${isYardUnit ? 0.25 : 1})">+</button>
             </div>
             <button type="button" class="text-red-400 hover:text-red-600 transition-colors" onclick="removeCartItem('${item.cart_id}')"><i class="fas fa-trash-alt text-xs"></i></button>
           </div>

@@ -51,11 +51,13 @@
     .btn-primary {
       background: var(--primary);
       color: white;
+      box-shadow: none;
     }
     
     .btn-primary:hover {
       background: var(--primary-dark);
       transform: translateY(-1px);
+      box-shadow: none;
     }
     
     .btn-secondary {
@@ -247,6 +249,133 @@
     .notification-label {
       color: var(--text);
       font-weight: 600;
+    }
+
+    body.dark-mode .activity-section h2,
+    body.dark-mode .activity-section h3,
+    body.dark-mode .tab-btn,
+    body.dark-mode .info-item-value,
+    body.dark-mode .txn-mobile-card .txn-value {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .sticky-tab-shell {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%);
+    }
+
+    body.dark-mode .tab-buttons,
+    body.dark-mode .info-item,
+    body.dark-mode .notification-item,
+    body.dark-mode .txn-mobile-card,
+    body.dark-mode .save-profile-modal-preview {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .tab-btn.active {
+      background: #172033 !important;
+      color: #a5b4fc !important;
+    }
+
+    body.dark-mode .tab-btn:hover {
+      background: rgba(99, 102, 241, 0.18);
+      color: #c7d2fe !important;
+    }
+
+    body.dark-mode .txn-history-table,
+    body.dark-mode .txn-history-table tbody tr:nth-child(even) {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .txn-history-table th,
+    body.dark-mode .txn-history-table td {
+      background: #1e293b !important;
+      color: #e5edf8 !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .save-profile-modal-card {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .save-profile-modal-header {
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .save-profile-modal-card .text-slate-600,
+    body.dark-mode .save-profile-modal-card .text-slate-500,
+    body.dark-mode .save-profile-preview-item span:first-child {
+      color: #a9b7cb !important;
+    }
+
+    body.dark-mode .save-profile-preview-item span:last-child {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .save-profile-modal-footer .bg-slate-100 {
+      background: #1e293b !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #password-verification-trigger {
+      background: rgba(37, 99, 235, 0.16) !important;
+      border-color: rgba(96, 165, 250, 0.4) !important;
+    }
+
+    body.dark-mode #password-verification-trigger .text-slate-900 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #password-verification-trigger .text-slate-500 {
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .receipt-modal .save-profile-modal-card {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .receipt-modal .save-profile-modal-card [class*="bg-slate-50"] {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .receipt-modal .save-profile-modal-card .text-slate-900,
+    body.dark-mode .receipt-modal .save-profile-modal-card .text-slate-700 {
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode .receipt-modal .save-profile-modal-card .text-slate-500,
+    body.dark-mode .receipt-modal .save-profile-modal-card .text-slate-400 {
+      color: #a9b7cb !important;
+    }
+
+    body.dark-mode .receipt-modal .save-profile-modal-header {
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode #verification-modal > div {
+      background: #172033 !important;
+      color: #e5edf8 !important;
+    }
+
+    body.dark-mode #verification-modal [class*="bg-blue-50"] {
+      background: rgba(37, 99, 235, 0.18) !important;
+    }
+
+    body.dark-mode #verification-modal input {
+      background: #0f172a !important;
+      color: #e5edf8 !important;
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode #verification-modal input::placeholder,
+    body.dark-mode #verification-modal .text-slate-500,
+    body.dark-mode #verification-modal .text-slate-400 {
+      color: #a9b7cb !important;
+      opacity: 1;
     }
     
     .toggle-switch {
@@ -622,6 +751,29 @@
       .txn-mobile-list {
         display: flex;
       }
+
+      .txn-mobile-card {
+        padding: 0.85rem;
+      }
+
+      .txn-mobile-card .txn-row {
+        display: grid;
+        grid-template-columns: 5.5rem minmax(0, 1fr);
+        align-items: start;
+        gap: 0.6rem;
+      }
+
+      .txn-mobile-card .txn-value {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .txn-mobile-card .txn-actions .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+      }
+
       #toastContainer {
         left: 12px;
         right: 12px;
@@ -636,11 +788,68 @@
         max-height: 90vh;
         overflow: auto;
       }
+
+      .receipt-modal .save-profile-modal-card {
+        width: calc(100vw - 1rem);
+        max-height: calc(100vh - 1rem);
+      }
+
+      .receipt-modal .save-profile-modal-header,
+      .receipt-modal .save-profile-modal-body {
+        padding: 1rem;
+      }
+
+      .receipt-modal .save-profile-modal-header h3 {
+        font-size: 1.35rem;
+      }
+
+      .receipt-modal #receipt-modal-content > .grid:first-child {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+
+      .receipt-modal #receipt-modal-content > .grid > div {
+        min-width: 0;
+      }
+
+      .receipt-modal #receipt-modal-content > .grid > div > div {
+        overflow-wrap: anywhere;
+      }
     }
 
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
+      }
+
+      .activity-section {
+        padding: 1rem;
+      }
+
+      .activity-section h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .form-row {
+        gap: 0.55rem;
+      }
+
+      .form-group {
+        margin-bottom: 0.65rem;
+      }
+
+      .form-group label {
+        margin-bottom: 0.4rem;
+        font-size: 0.85rem;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -911,9 +1120,6 @@
           <div><span class="block text-slate-500">Payment Method</span><strong id="receipt-modal-payment-method" class="text-slate-900"></strong></div>
           <div><span class="block text-slate-500">Total</span><strong id="receipt-modal-total" class="text-slate-900"></strong></div>
           <div><span class="block text-slate-500">Paid</span><strong id="receipt-modal-paid" class="text-slate-900"></strong></div>
-        </div>
-        <div class="flex justify-end gap-3">
-          <button type="button" onclick="closeReceiptModal()" class="btn btn-secondary">Close</button>
         </div>
       </div>
     </div>
